@@ -73,7 +73,7 @@ fun ThesisNavHost(
         }
 
         composable(ThesisScreen.ThesisFullScreen.name){
-            ThesisFullScreen(name = "SASA")
+            ThesisFullScreen(name = "Ciao")
         }
     }
 }
