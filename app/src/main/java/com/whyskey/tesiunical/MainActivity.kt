@@ -21,37 +21,30 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            TesiUnicalTheme {
-                // A surface container using the 'background' color from the theme
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colors.background
-                ) {
-                    ThesisApp()
-                }
-            }
+                ThesisApp()
         }
     }
 }
 
+
 @Composable
 fun ThesisApp(){
-
-    val allScreens = ThesisScreen.values().toList()
-    val navController = rememberNavController()
-    val backstackEntry = navController.currentBackStackEntryAsState()
-    val currentScreen = ThesisScreen.fromRoute(
-        backstackEntry.value?.destination?.route
-    )
-
-    Scaffold() { innerPadding ->
-        ThesisNavHost(
-            navController = navController,
-            modifier = Modifier.padding(innerPadding)
+    TesiUnicalTheme {
+        val allScreens = ThesisScreen.values().toList()
+        val navController = rememberNavController()
+        val backstackEntry = navController.currentBackStackEntryAsState()
+        val currentScreen = ThesisScreen.fromRoute(
+            backstackEntry.value?.destination?.route
         )
 
-    }
+        Scaffold() { innerPadding ->
+            ThesisNavHost(
+                navController = navController,
+                modifier = Modifier.padding(innerPadding)
+            )
 
+        }
+    }
 }
 
 
@@ -73,7 +66,7 @@ fun ThesisNavHost(
         }
 
         composable(ThesisScreen.ThesisFullScreen.name){
-            ThesisFullScreen(name = "Ciao")
+            ThesisFullScreen()
         }
     }
 }

@@ -1,9 +1,12 @@
 package com.whyskey.tesiunical.ui
 
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -18,6 +21,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
@@ -25,6 +29,7 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
 import com.whyskey.tesiunical.R
 import com.whyskey.tesiunical.data.ThesisData
 import com.whyskey.tesiunical.ui.theme.TesiUnicalTheme
@@ -51,6 +56,14 @@ fun Profile(
 
 @Composable
 private fun ProfileCard(){
+
+    val webIntent: Intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://www.android.com"))
+    val emailIntent: Intent = Intent(Intent.ACTION_SEND).apply {
+        type = "text/plain"
+        putExtra(Intent.EXTRA_EMAIL, arrayOf("jan@example.com"))
+    }
+    val context = LocalContext.current
+
     Card(backgroundColor = MaterialTheme.colors.primary,
         modifier = Modifier.fillMaxWidth()) {
         Column(horizontalAlignment = Alignment.CenterHorizontally,
@@ -68,14 +81,21 @@ private fun ProfileCard(){
             Text("Nome Cognome")
 
             Row(Modifier.padding(8.dp)) {
+
+
+                Icon(
+                    Icons.Rounded.Language ,
+                    contentDescription = null,
+                    modifier = Modifier
+                        .padding(end = 8.dp)
+                        .clickable { ContextCompat.startActivity(context, webIntent, null) }
+                )
                 Icon(
                     Icons.Rounded.Email ,
                     contentDescription = null,
-                    modifier = Modifier.padding(end = 8.dp)
-                )
-                Icon(
-                    Icons.Rounded.Language ,
-                    contentDescription = null
+                    modifier = Modifier
+                        .padding(end = 8.dp)
+                        .clickable { ContextCompat.startActivity(context, emailIntent, null) }
                 )
             }
         }
