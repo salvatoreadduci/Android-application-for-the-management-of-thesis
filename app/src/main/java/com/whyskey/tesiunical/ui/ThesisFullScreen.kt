@@ -11,11 +11,11 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.whyskey.tesiunical.data.ThesisData
+import com.whyskey.tesiunical.data.Thesis
 import com.whyskey.tesiunical.ui.theme.TesiUnicalTheme
 
 @Composable
-fun ThesisFullScreen() {
+fun ThesisFullScreen(list: List<Thesis>) {
     var expandedThesis by remember { mutableStateOf<String?>(null) }
 
     Card{
@@ -27,7 +27,7 @@ fun ThesisFullScreen() {
             LazyColumn(
                 contentPadding = PaddingValues(horizontal = 16.dp, vertical = 32.dp),
             ){
-                items(ThesisData.applicative) { thesis ->
+                items(list) { thesis ->
                     ThesisRow(
                         name = thesis.name,
                         expanded = expandedThesis == thesis.name,
@@ -44,6 +44,6 @@ fun ThesisFullScreen() {
 @Composable
 fun DefaultPreview() {
     TesiUnicalTheme {
-        ThesisFullScreen()
+        //ThesisFullScreen()
     }
 }

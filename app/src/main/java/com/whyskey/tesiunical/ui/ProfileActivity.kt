@@ -31,12 +31,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import com.whyskey.tesiunical.R
-import com.whyskey.tesiunical.data.ThesisData
+import com.whyskey.tesiunical.data.Thesis
 import com.whyskey.tesiunical.ui.theme.TesiUnicalTheme
 
 @Composable
 fun Profile(
-    onClickSeeAll: () -> Unit = {}
+    onClickSeeAll: () -> Unit = {},
+    list: List<Thesis>
 ) {
 
     Column(
@@ -46,9 +47,9 @@ fun Profile(
     ) {
         ProfileCard()
         Spacer(Modifier.height(16.dp))
-        ApplicativeThesisCard(onClickSeeAll)
+        ApplicativeThesisCard(onClickSeeAll,list)
         Spacer(Modifier.height(16.dp))
-        ComparativeThesisCard(onClickSeeAll)
+        ComparativeThesisCard(onClickSeeAll,list)
     }
 }
 
@@ -134,13 +135,14 @@ private fun <T> TemplateThesisCard(
 @Composable
 private fun ApplicativeThesisCard(
     onClickSeeAll: () -> Unit,
+    list: List<Thesis>
 ){
     var expandedThesis by remember { mutableStateOf<String?>(null) }
 
     TemplateThesisCard(
         title = stringResource(id = R.string.applications_thesis),
         onClickSeeAll =  onClickSeeAll ,
-        data = ThesisData.applicative
+        data = list
     ){
             thesis ->
         ThesisRow(
@@ -152,13 +154,16 @@ private fun ApplicativeThesisCard(
 }
 
 @Composable
-private fun ComparativeThesisCard(onClickSeeAll: () -> Unit){
+private fun ComparativeThesisCard(
+    onClickSeeAll: () -> Unit,
+    list: List<Thesis>
+){
     var expandedThesis by remember { mutableStateOf<String?>(null) }
 
     TemplateThesisCard(
         title = stringResource(id = R.string.comparative_thesis),
         onClickSeeAll = { onClickSeeAll() },
-        data = ThesisData.comparative
+        data = list
     ){
             thesis ->
         ThesisRow(
@@ -239,6 +244,6 @@ private const val SHOWN_ITEMS = 3
 @Composable
 fun ProfilePreview() {
     TesiUnicalTheme {
-        Profile()
+
     }
 }
