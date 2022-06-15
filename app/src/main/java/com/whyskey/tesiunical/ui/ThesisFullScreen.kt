@@ -12,10 +12,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.whyskey.tesiunical.data.Thesis
+import com.whyskey.tesiunical.model.ThesisViewModel
+import com.whyskey.tesiunical.ui.components.ThesisRow
 import com.whyskey.tesiunical.ui.theme.TesiUnicalTheme
 
 @Composable
-fun ThesisFullScreen(list: List<Thesis>) {
+fun ThesisFullScreen(
+    list: List<Thesis>,
+    viewModel: ThesisViewModel
+) {
     var expandedThesis by remember { mutableStateOf<String?>(null) }
 
     Card{
@@ -31,7 +36,10 @@ fun ThesisFullScreen(list: List<Thesis>) {
                     ThesisRow(
                         name = thesis.name,
                         expanded = expandedThesis == thesis.name,
-                        onClick = { expandedThesis = if (expandedThesis == thesis.name) null else thesis.name }
+                        onClick = {
+                            expandedThesis = if (expandedThesis == thesis.name) null else thesis.name
+                        },
+                        onDelete = { viewModel.removeThesis(thesis) }
                     )
 
                 }

@@ -2,9 +2,6 @@ package com.whyskey.tesiunical.ui
 
 import android.content.Intent
 import android.net.Uri
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -14,7 +11,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Email
-import androidx.compose.material.icons.rounded.Info
 import androidx.compose.material.icons.rounded.Language
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -26,18 +22,21 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import com.whyskey.tesiunical.R
 import com.whyskey.tesiunical.data.Thesis
+import com.whyskey.tesiunical.model.ThesisViewModel
+import com.whyskey.tesiunical.ui.components.ThesisRow
 import com.whyskey.tesiunical.ui.theme.TesiUnicalTheme
 
 @Composable
 fun Profile(
     onClickSeeAll: () -> Unit = {},
-    list: List<Thesis>
+    allCompilation: List<Thesis>,
+    allExperimental: List<Thesis>,
+    viewModel: ThesisViewModel
 ) {
 
     Column(
@@ -47,19 +46,17 @@ fun Profile(
     ) {
         ProfileCard()
         Spacer(Modifier.height(16.dp))
-        ApplicativeThesisCard(onClickSeeAll,list)
+        CompilationThesisCard(onClickSeeAll,allCompilation,viewModel)
         Spacer(Modifier.height(16.dp))
-        ComparativeThesisCard(onClickSeeAll,list)
+        ExperimentalThesisCard(onClickSeeAll,allExperimental,viewModel)
     }
 }
-
-
 
 @Composable
 private fun ProfileCard(){
 
-    val webIntent: Intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://www.android.com"))
-    val emailIntent: Intent = Intent(Intent.ACTION_SEND).apply {
+    val webIntent = Intent(Intent.ACTION_VIEW, Uri.parse("https://www.android.com"))
+    val emailIntent = Intent(Intent.ACTION_SEND).apply {
         type = "text/plain"
         putExtra(Intent.EXTRA_EMAIL, arrayOf("jan@example.com"))
     }
@@ -109,7 +106,6 @@ private fun <T> TemplateThesisCard(
     onClickSeeAll: () -> Unit,
     data: List<T>,
     row: @Composable (T) -> Unit
-
 ){
     Card{
         Column {
@@ -129,18 +125,18 @@ private fun <T> TemplateThesisCard(
             )
         }
     }
-
 }
 
 @Composable
-private fun ApplicativeThesisCard(
+private fun CompilationThesisCard(
     onClickSeeAll: () -> Unit,
-    list: List<Thesis>
+    list: List<Thesis>,
+    viewModel: ThesisViewModel
 ){
     var expandedThesis by remember { mutableStateOf<String?>(null) }
 
     TemplateThesisCard(
-        title = stringResource(id = R.string.applications_thesis),
+        title = stringResource(id = R.string.compilation_thesis),
         onClickSeeAll =  onClickSeeAll ,
         data = list
     ){
@@ -148,20 +144,22 @@ private fun ApplicativeThesisCard(
         ThesisRow(
             name = thesis.name,
             expanded = expandedThesis == thesis.name,
-            onClick = { expandedThesis = if (expandedThesis == thesis.name) null else thesis.name }
+            onClick = { expandedThesis = if (expandedThesis == thesis.name) null else thesis.name },
+            onDelete = { viewModel.removeThesis(thesis) }
         )
     }
 }
 
 @Composable
-private fun ComparativeThesisCard(
+private fun ExperimentalThesisCard(
     onClickSeeAll: () -> Unit,
-    list: List<Thesis>
+    list: List<Thesis>,
+    viewModel: ThesisViewModel
 ){
     var expandedThesis by remember { mutableStateOf<String?>(null) }
 
     TemplateThesisCard(
-        title = stringResource(id = R.string.comparative_thesis),
+        title = stringResource(id = R.string.experimental_thesis),
         onClickSeeAll = { onClickSeeAll() },
         data = list
     ){
@@ -171,63 +169,17 @@ private fun ComparativeThesisCard(
             expanded = expandedThesis == thesis.name,
             onClick = {
                 expandedThesis = if (expandedThesis == thesis.name) null else thesis.name
-            }
+            },
+            onDelete = { viewModel.removeThesis(thesis) }
         )
     }
-
-}
-
-
-
-@OptIn(ExperimentalMaterialApi::class)
-@Composable
-fun ThesisRow(name: String, expanded: Boolean, onClick: () -> Unit) {
-    ThesisRowSpacer(visible = expanded)
-    Surface(
-        modifier = Modifier
-            .fillMaxWidth(),
-        elevation = 2.dp,
-        onClick = onClick
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
-                .animateContentSize()
-        ) {
-            Row {
-                Icon(
-                    imageVector = Icons.Rounded.Info,
-                    contentDescription = null
-                )
-                Spacer(modifier = Modifier.width(16.dp))
-                Text(
-                    text = name,
-                    style = MaterialTheme.typography.body1
-                )
-            }
-            if (expanded) {
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(
-                    text = stringResource(R.string.lorem_ipsum),
-                    textAlign = TextAlign.Justify
-                )
-            }
-        }
-    }
-    ThesisRowSpacer(visible = expanded)
-}
-
-@OptIn(ExperimentalAnimationApi::class)
-@Composable
-fun ThesisRowSpacer(visible: Boolean) {
-    AnimatedVisibility(visible = visible) {
-        Spacer(modifier = Modifier.height(8.dp))
-    }
 }
 
 @Composable
-private fun SeeAllButton(modifier: Modifier = Modifier, onClick: () -> Unit) {
+private fun SeeAllButton(
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit
+) {
     TextButton(
         onClick = onClick,
         modifier = modifier
@@ -244,6 +196,6 @@ private const val SHOWN_ITEMS = 3
 @Composable
 fun ProfilePreview() {
     TesiUnicalTheme {
-
+        //Profile(onClickSeeAll = {}, list = )
     }
 }

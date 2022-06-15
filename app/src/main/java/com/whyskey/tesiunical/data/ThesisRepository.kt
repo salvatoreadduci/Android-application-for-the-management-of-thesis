@@ -6,6 +6,8 @@ import kotlinx.coroutines.flow.Flow
 class ThesisRepository(private val thesisDao: ThesisDao) {
 
     val readAllData: LiveData<List<Thesis>> = thesisDao.getThesis()
+    val readAllCompilation: LiveData<List<Thesis>> = thesisDao.getCompilationThesis()
+    val readAllExperimental: LiveData<List<Thesis>> = thesisDao.getExperimentalThesis()
 
     suspend fun addThesis(thesis: Thesis){
         thesisDao.insert(thesis)
@@ -16,5 +18,4 @@ class ThesisRepository(private val thesisDao: ThesisDao) {
     suspend fun deleteThesis(thesis: Thesis){
         thesisDao.delete(thesis)
     }
-
 }
