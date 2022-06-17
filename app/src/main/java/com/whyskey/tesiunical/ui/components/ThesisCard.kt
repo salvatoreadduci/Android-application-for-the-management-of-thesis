@@ -19,7 +19,7 @@ import com.whyskey.tesiunical.R
 @Composable
 fun <T> ThesisCard(
     title: String,
-    onClickSeeAll: () -> Unit,
+    onClickSeeAll: (String) -> Unit,
     data: List<T>,
     row: @Composable (T) -> Unit
 ){
@@ -37,7 +37,8 @@ fun <T> ThesisCard(
                 modifier = Modifier.clearAndSetSemantics {
                     contentDescription = "All $title"
                 },
-                onClick = onClickSeeAll,
+                title = title,
+                onClick = { onClickSeeAll(title) },
             )
         }
     }
@@ -46,10 +47,11 @@ fun <T> ThesisCard(
 @Composable
 private fun SeeAllButton(
     modifier: Modifier = Modifier,
-    onClick: () -> Unit
+    title: String,
+    onClick: (String) -> Unit
 ) {
     TextButton(
-        onClick = onClick,
+        onClick = { onClick(title) },
         modifier = modifier
             .height(44.dp)
             .fillMaxWidth()

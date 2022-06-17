@@ -18,13 +18,13 @@ enum class ThesisScreen(
         ),
         Settings(
           icon = Icons.Filled.Settings
-        ),
+        )/*,
         CompilationFullScreen(
             icon = Icons.Filled.AttachMoney
         ),
         ExperimentalFullScreen(
             icon = Icons.Filled.MoneyOff
-        );
+        )*/;
 
         companion object {
             fun fromRoute(route: String?): ThesisScreen =
@@ -33,8 +33,8 @@ enum class ThesisScreen(
                     Analytics.name -> Analytics
                     Profile.name -> Profile
                     Settings.name -> Settings
-                    CompilationFullScreen.name -> CompilationFullScreen
-                    ExperimentalFullScreen.name -> ExperimentalFullScreen
+                    //CompilationFullScreen.name -> CompilationFullScreen
+                    //ExperimentalFullScreen.name -> ExperimentalFullScreen
                     null -> Home
                     else -> throw IllegalArgumentException("Route $route is not recognized.")
                 }

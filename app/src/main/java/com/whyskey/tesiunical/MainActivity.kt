@@ -12,6 +12,7 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
@@ -19,10 +20,13 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import androidx.navigation.navDeepLink
 import com.whyskey.tesiunical.data.Thesis
 import com.whyskey.tesiunical.model.ThesisViewModel
 import com.whyskey.tesiunical.ui.*
@@ -130,8 +134,7 @@ fun ThesisNavHost(
 
         composable(ThesisScreen.Profile.name) {
             Profile(
-                onClickSeeAllCompilation = { navController.navigate(ThesisScreen.CompilationFullScreen.name) },
-                onClickSeeAllExperimental = { navController.navigate(ThesisScreen.ExperimentalFullScreen.name) },
+                onClickSeeAll = { name -> navigateToFullScreenThesis(navController, name) },
                 allCompilation = allCompilation,
                 allExperimental = allExperimental,
                 viewModel = viewModel
@@ -142,19 +145,36 @@ fun ThesisNavHost(
             Settings()
         }
 
-        composable(ThesisScreen.CompilationFullScreen.name) {
-            CompilationFullScreen(list = allCompilation,
-                viewModel = viewModel
-            )
-        }
+        val profileName = ThesisScreen.Profile.name
+        composable(
+            "$profileName/{name}",
+            arguments = listOf(
+                navArgument("name"){
+                    type = NavType.StringType
+                }
+            ),
+            deepLinks = listOf(navDeepLink {
+                uriPattern = "thesis://$profileName/{name}"
+            })
+        ){
+                entry ->
+            when(entry.arguments?.getString("name")){
+                stringResource(id = R.string.compilation_thesis) ->
+                    CompilationFullScreen(list = allCompilation, viewModel = viewModel)
+                stringResource(id = R.string.experimental_thesis) ->
+                    ExperimentalFullScreen(list = allExperimental, viewModel = viewModel)
+            }
 
-        composable(ThesisScreen.ExperimentalFullScreen.name) {
-            ExperimentalFullScreen(
-                list = allExperimental,
-                viewModel = viewModel
-            )
         }
     }
+}
+
+private fun navigateToFullScreenThesis(
+    navController: NavHostController,
+    listName: String
+) {
+    println(listName)
+    navController.navigate("${ThesisScreen.Profile.name}/$listName")
 }
 
 class MainViewModelFactory(private val application: Application) : ViewModelProvider.Factory {

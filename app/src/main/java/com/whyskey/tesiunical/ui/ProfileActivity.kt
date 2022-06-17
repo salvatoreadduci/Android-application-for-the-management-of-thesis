@@ -34,8 +34,7 @@ import com.whyskey.tesiunical.ui.theme.TesiUnicalTheme
 
 @Composable
 fun Profile(
-    onClickSeeAllCompilation: () -> Unit = {},
-    onClickSeeAllExperimental: () -> Unit = {},
+    onClickSeeAll: (String) -> Unit = {},
     allCompilation: List<Thesis>,
     allExperimental: List<Thesis>,
     viewModel: ThesisViewModel
@@ -48,9 +47,9 @@ fun Profile(
     ) {
         ProfileCard()
         Spacer(Modifier.height(16.dp))
-        CompilationThesisCard(onClickSeeAllCompilation,allCompilation,viewModel)
+        CompilationThesisCard(onClickSeeAll = onClickSeeAll,allCompilation,viewModel)
         Spacer(Modifier.height(16.dp))
-        ExperimentalThesisCard(onClickSeeAllExperimental,allExperimental,viewModel)
+        ExperimentalThesisCard(onClickSeeAll = onClickSeeAll,allExperimental,viewModel)
     }
 }
 
@@ -104,15 +103,16 @@ private fun ProfileCard(){
 
 @Composable
 private fun CompilationThesisCard(
-    onClickSeeAll: () -> Unit,
+    onClickSeeAll: (String) -> Unit,
     list: List<Thesis>,
     viewModel: ThesisViewModel
 ){
     var expandedThesis by remember { mutableStateOf<String?>(null) }
+    val title = stringResource(id = R.string.compilation_thesis)
 
     ThesisCard(
-        title = stringResource(id = R.string.compilation_thesis),
-        onClickSeeAll =  onClickSeeAll ,
+        title = title,
+        onClickSeeAll =  { onClickSeeAll(title) } ,
         data = list
     ){
             thesis ->
@@ -127,15 +127,16 @@ private fun CompilationThesisCard(
 
 @Composable
 private fun ExperimentalThesisCard(
-    onClickSeeAll: () -> Unit,
+    onClickSeeAll: (String) -> Unit,
     list: List<Thesis>,
     viewModel: ThesisViewModel
 ){
     var expandedThesis by remember { mutableStateOf<String?>(null) }
+    val title = stringResource(id = R.string.experimental_thesis)
 
     ThesisCard(
-        title = stringResource(id = R.string.experimental_thesis),
-        onClickSeeAll = { onClickSeeAll() },
+        title = title,
+        onClickSeeAll = { onClickSeeAll(title) },
         data = list
     ){
             thesis ->
