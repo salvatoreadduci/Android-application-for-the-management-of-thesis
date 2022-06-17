@@ -1,31 +1,41 @@
 package com.whyskey.tesiunical
 
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AttachMoney
-import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.MoneyOff
-import androidx.compose.material.icons.filled.PieChart
+import androidx.compose.material.icons.filled.*
 import androidx.compose.ui.graphics.vector.ImageVector
 
 enum class ThesisScreen(
     val icon: ImageVector
     ) {
+        Home(
+            icon = Icons.Filled.Home
+        ),
+        Analytics(
+            icon = Icons.Filled.Insights
+        ),
         Profile(
-            icon = Icons.Filled.Info,
+            icon = Icons.Filled.Person
         ),
-        ThesisFullScreen(
-            icon = Icons.Filled.AttachMoney,
+        Settings(
+          icon = Icons.Filled.Settings
         ),
-        Bills(
-            icon = Icons.Filled.MoneyOff,
+        CompilationFullScreen(
+            icon = Icons.Filled.AttachMoney
+        ),
+        ExperimentalFullScreen(
+            icon = Icons.Filled.MoneyOff
         );
 
         companion object {
             fun fromRoute(route: String?): ThesisScreen =
                 when (route?.substringBefore("/")) {
-                    ThesisFullScreen.name -> ThesisFullScreen
+                    Home.name -> Home
+                    Analytics.name -> Analytics
                     Profile.name -> Profile
-                    null -> Profile
+                    Settings.name -> Settings
+                    CompilationFullScreen.name -> CompilationFullScreen
+                    ExperimentalFullScreen.name -> ExperimentalFullScreen
+                    null -> Home
                     else -> throw IllegalArgumentException("Route $route is not recognized.")
                 }
         }

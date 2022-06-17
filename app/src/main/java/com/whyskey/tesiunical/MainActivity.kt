@@ -4,18 +4,15 @@ import android.app.Application
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
-import androidx.compose.material.SnackbarDefaults.backgroundColor
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -28,10 +25,8 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.whyskey.tesiunical.data.Thesis
 import com.whyskey.tesiunical.model.ThesisViewModel
-import com.whyskey.tesiunical.ui.Profile
-import com.whyskey.tesiunical.ui.ThesisFullScreen
+import com.whyskey.tesiunical.ui.*
 import com.whyskey.tesiunical.ui.components.AddThesisDialog
-
 import com.whyskey.tesiunical.ui.theme.TesiUnicalTheme
 
 class MainActivity : ComponentActivity() {
@@ -39,7 +34,6 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-
 
             val owner = LocalViewModelStoreOwner.current
 
@@ -55,7 +49,6 @@ class MainActivity : ComponentActivity() {
                 ThesisApp(viewModel)
             }
         }
-
     }
 }
 
@@ -63,12 +56,13 @@ class MainActivity : ComponentActivity() {
 fun ThesisApp(viewModel: ThesisViewModel) {
     TesiUnicalTheme {
 
-        //val allThesis by viewModel.allThesis.observeAsState(listOf())
+        val allThesis by viewModel.allThesis.observeAsState(listOf())
         val allCompilation by viewModel.allCompilation.observeAsState(listOf())
         val allExperimental by viewModel.allExperimental.observeAsState(listOf())
         val showDialogState: Boolean by viewModel.showDialog.collectAsState()
         //Navigation
-        //val allScreens = ThesisScreen.values().toList()
+        val allScreens = ThesisScreen.values().toList()
+        //val allScreens =
         val navController = rememberNavController()
         val backstackEntry = navController.currentBackStackEntryAsState()
         val currentScreen = ThesisScreen.fromRoute(
@@ -82,6 +76,13 @@ fun ThesisApp(viewModel: ThesisViewModel) {
         )
         
         Scaffold(
+            topBar = {
+                com.whyskey.tesiunical.ui.components.TabRow(
+                    allScreens =  allScreens,
+                    onTabSelected = { screen -> navController.navigate(screen.name) },
+                    currentScreen = currentScreen
+                )
+            },
             floatingActionButton = {
                 AddFloatingActionButton(
                     onClick = { viewModel.onOpenDialogClicked() }
@@ -91,6 +92,7 @@ fun ThesisApp(viewModel: ThesisViewModel) {
             ThesisNavHost(
                 navController = navController,
                 modifier = Modifier.padding(innerPadding),
+                allThesis = allThesis,
                 allCompilation = allCompilation,
                 allExperimental = allExperimental,
                 viewModel = viewModel
@@ -104,34 +106,58 @@ fun ThesisApp(viewModel: ThesisViewModel) {
 fun ThesisNavHost(
     navController: NavHostController,
     modifier: Modifier = Modifier,
+    allThesis: List<Thesis>,
     allCompilation: List<Thesis>,
     allExperimental: List<Thesis>,
     viewModel: ThesisViewModel
 ) {
     NavHost(
         navController = navController,
-        startDestination = ThesisScreen.Profile.name,
+        startDestination = ThesisScreen.Home.name,
         modifier = modifier
 
     ) {
+        composable(ThesisScreen.Home.name){
+            Home(
+                list = allThesis,
+                viewModel = viewModel
+            )
+        }
+
+        composable(ThesisScreen.Analytics.name) {
+            Analytics()
+        }
+
         composable(ThesisScreen.Profile.name) {
             Profile(
-                onClickSeeAll = { navController.navigate(ThesisScreen.ThesisFullScreen.name) },
+                onClickSeeAllCompilation = { navController.navigate(ThesisScreen.CompilationFullScreen.name) },
+                onClickSeeAllExperimental = { navController.navigate(ThesisScreen.ExperimentalFullScreen.name) },
                 allCompilation = allCompilation,
                 allExperimental = allExperimental,
                 viewModel = viewModel
             )
         }
-        composable(ThesisScreen.ThesisFullScreen.name) {
-            ThesisFullScreen(
-                list = allCompilation,
+
+        composable(ThesisScreen.Settings.name){
+            Settings()
+        }
+
+        composable(ThesisScreen.CompilationFullScreen.name) {
+            CompilationFullScreen(list = allCompilation,
+                viewModel = viewModel
+            )
+        }
+
+        composable(ThesisScreen.ExperimentalFullScreen.name) {
+            ExperimentalFullScreen(
+                list = allExperimental,
                 viewModel = viewModel
             )
         }
     }
 }
 
-class MainViewModelFactory(val application: Application) : ViewModelProvider.Factory {
+class MainViewModelFactory(private val application: Application) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         return ThesisViewModel(application) as T
     }

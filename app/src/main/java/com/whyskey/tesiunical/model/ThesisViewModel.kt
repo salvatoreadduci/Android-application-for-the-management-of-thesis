@@ -3,6 +3,7 @@ package com.whyskey.tesiunical.model
 import android.app.Application
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.*
 import com.whyskey.tesiunical.data.Thesis
@@ -16,6 +17,11 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class ThesisViewModel(application: Application) : ViewModel(){
+
+    //Statistics
+    val typeList : List<Type> = listOf(Type.EXPERIMENTAL, Type.COMPILATION, Type.ERASMUS, Type.CORPORATE)
+    val colors = listOf<Color>(Color(0xFF004940),Color(0xFFFFDC78),Color(0xFFFF6951))
+
 
     //Add Thesis Dialog
     private val _showDialog = MutableStateFlow(false)
@@ -92,4 +98,5 @@ class ThesisViewModel(application: Application) : ViewModel(){
     fun onDialogDismiss() {
         _showDialog.value = false
     }
+
 }

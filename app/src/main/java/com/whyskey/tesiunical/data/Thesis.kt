@@ -1,6 +1,7 @@
 package com.whyskey.tesiunical.data
 
 import androidx.compose.runtime.Immutable
+import androidx.compose.ui.graphics.Color
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
@@ -10,8 +11,10 @@ enum class Type(){
     CORPORATE,
     ERASMUS,
     COMPILATION,
-    EXPERIMENTAL
+    EXPERIMENTAL,
 }
+
+val colors = listOf<Color>(Color(0xFF004940),Color(0xFFFFDC78),Color(0xFFFF6951))
 
 @Immutable
 @Entity(tableName = "thesis")

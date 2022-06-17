@@ -28,12 +28,14 @@ import androidx.core.content.ContextCompat
 import com.whyskey.tesiunical.R
 import com.whyskey.tesiunical.data.Thesis
 import com.whyskey.tesiunical.model.ThesisViewModel
+import com.whyskey.tesiunical.ui.components.ThesisCard
 import com.whyskey.tesiunical.ui.components.ThesisRow
 import com.whyskey.tesiunical.ui.theme.TesiUnicalTheme
 
 @Composable
 fun Profile(
-    onClickSeeAll: () -> Unit = {},
+    onClickSeeAllCompilation: () -> Unit = {},
+    onClickSeeAllExperimental: () -> Unit = {},
     allCompilation: List<Thesis>,
     allExperimental: List<Thesis>,
     viewModel: ThesisViewModel
@@ -46,9 +48,9 @@ fun Profile(
     ) {
         ProfileCard()
         Spacer(Modifier.height(16.dp))
-        CompilationThesisCard(onClickSeeAll,allCompilation,viewModel)
+        CompilationThesisCard(onClickSeeAllCompilation,allCompilation,viewModel)
         Spacer(Modifier.height(16.dp))
-        ExperimentalThesisCard(onClickSeeAll,allExperimental,viewModel)
+        ExperimentalThesisCard(onClickSeeAllExperimental,allExperimental,viewModel)
     }
 }
 
@@ -58,7 +60,7 @@ private fun ProfileCard(){
     val webIntent = Intent(Intent.ACTION_VIEW, Uri.parse("https://www.android.com"))
     val emailIntent = Intent(Intent.ACTION_SEND).apply {
         type = "text/plain"
-        putExtra(Intent.EXTRA_EMAIL, arrayOf("jan@example.com"))
+        putExtra(Intent.EXTRA_EMAIL, arrayOf("mario@example.com"))
     }
     val context = LocalContext.current
 
@@ -101,33 +103,6 @@ private fun ProfileCard(){
 }
 
 @Composable
-private fun <T> TemplateThesisCard(
-    title: String,
-    onClickSeeAll: () -> Unit,
-    data: List<T>,
-    row: @Composable (T) -> Unit
-){
-    Card{
-        Column {
-            Column(Modifier.padding(16.dp)) {
-                Text(text = title)
-            }
-
-            Column(Modifier.padding(start = 8.dp, top = 4.dp, end = 8.dp)) {
-                data.take(SHOWN_ITEMS).forEach { row(it) }
-            }
-
-            SeeAllButton(
-                modifier = Modifier.clearAndSetSemantics {
-                    contentDescription = "All $title"
-                },
-                onClick = onClickSeeAll,
-            )
-        }
-    }
-}
-
-@Composable
 private fun CompilationThesisCard(
     onClickSeeAll: () -> Unit,
     list: List<Thesis>,
@@ -135,7 +110,7 @@ private fun CompilationThesisCard(
 ){
     var expandedThesis by remember { mutableStateOf<String?>(null) }
 
-    TemplateThesisCard(
+    ThesisCard(
         title = stringResource(id = R.string.compilation_thesis),
         onClickSeeAll =  onClickSeeAll ,
         data = list
@@ -158,7 +133,7 @@ private fun ExperimentalThesisCard(
 ){
     var expandedThesis by remember { mutableStateOf<String?>(null) }
 
-    TemplateThesisCard(
+    ThesisCard(
         title = stringResource(id = R.string.experimental_thesis),
         onClickSeeAll = { onClickSeeAll() },
         data = list
@@ -174,23 +149,6 @@ private fun ExperimentalThesisCard(
         )
     }
 }
-
-@Composable
-private fun SeeAllButton(
-    modifier: Modifier = Modifier,
-    onClick: () -> Unit
-) {
-    TextButton(
-        onClick = onClick,
-        modifier = modifier
-            .height(44.dp)
-            .fillMaxWidth()
-    ) {
-        Text(stringResource(R.string.see_all))
-    }
-}
-
-private const val SHOWN_ITEMS = 3
 
 @Preview(showBackground = true)
 @Composable
