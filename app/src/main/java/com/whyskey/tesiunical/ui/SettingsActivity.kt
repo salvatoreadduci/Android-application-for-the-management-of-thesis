@@ -10,7 +10,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.whyskey.tesiunical.ui.ui.theme.TesiUnicalTheme
+import com.whyskey.tesiunical.ui.theme.TesiUnicalTheme
 
 @Composable
 fun Settings() {

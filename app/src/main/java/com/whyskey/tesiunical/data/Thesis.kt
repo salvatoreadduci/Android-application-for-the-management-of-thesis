@@ -6,15 +6,37 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
-enum class Type(){
-    DEPARTMENTAL,
-    CORPORATE,
-    ERASMUS,
-    COMPILATION,
-    EXPERIMENTAL,
+enum class Type(
+    val color: Color,
+    var amount: Int,
+    var max: Int,
+){
+    DEPARTMENTAL(
+        color = Color(0xFF004940),
+        amount = 19,
+        max = 20
+    ),
+    CORPORATE(
+        color = Color(0xFFFFDC78),
+        amount = 15,
+        max = 30
+    ),
+    ERASMUS(
+        color = Color(0xFFFF6951),
+        amount = 3,
+        max = 15
+    ),
+    COMPILATION(
+        color = Color(0xFF004940),
+        amount = 8,
+        max = -1
+    ),
+    EXPERIMENTAL(
+        color = Color(0xFF004940),
+        amount = 11,
+        max = -1
+    )
 }
-
-val colors = listOf<Color>(Color(0xFF004940),Color(0xFFFFDC78),Color(0xFFFF6951))
 
 @Immutable
 @Entity(tableName = "thesis")

@@ -20,9 +20,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.clearAndSetSemantics
-import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import com.whyskey.tesiunical.R
@@ -30,7 +27,6 @@ import com.whyskey.tesiunical.data.Thesis
 import com.whyskey.tesiunical.model.ThesisViewModel
 import com.whyskey.tesiunical.ui.components.ThesisCard
 import com.whyskey.tesiunical.ui.components.ThesisRow
-import com.whyskey.tesiunical.ui.theme.TesiUnicalTheme
 
 @Composable
 fun Profile(
@@ -80,7 +76,6 @@ private fun ProfileCard(){
             Text("Nome Cognome")
 
             Row(Modifier.padding(8.dp)) {
-
 
                 Icon(
                     Icons.Rounded.Language ,
@@ -148,13 +143,5 @@ private fun ExperimentalThesisCard(
             },
             onDelete = { viewModel.removeThesis(thesis) }
         )
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun ProfilePreview() {
-    TesiUnicalTheme {
-        //Profile(onClickSeeAll = {}, list = )
     }
 }

@@ -13,7 +13,6 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -66,7 +65,6 @@ fun ThesisApp(viewModel: ThesisViewModel) {
         val showDialogState: Boolean by viewModel.showDialog.collectAsState()
         //Navigation
         val allScreens = ThesisScreen.values().toList()
-        //val allScreens =
         val navController = rememberNavController()
         val backstackEntry = navController.currentBackStackEntryAsState()
         val currentScreen = ThesisScreen.fromRoute(
@@ -101,7 +99,6 @@ fun ThesisApp(viewModel: ThesisViewModel) {
                 allExperimental = allExperimental,
                 viewModel = viewModel
             )
-
         }
     }
 }
@@ -129,7 +126,9 @@ fun ThesisNavHost(
         }
 
         composable(ThesisScreen.Analytics.name) {
-            Analytics()
+            Analytics(
+                viewModel = viewModel
+            )
         }
 
         composable(ThesisScreen.Profile.name) {
@@ -160,9 +159,17 @@ fun ThesisNavHost(
                 entry ->
             when(entry.arguments?.getString("name")){
                 stringResource(id = R.string.compilation_thesis) ->
-                    CompilationFullScreen(list = allCompilation, viewModel = viewModel)
+                    ThesisFullScreen(
+                        list = allCompilation,
+                        viewModel = viewModel,
+                        title = stringResource(id = R.string.compilation_thesis)
+                    )
                 stringResource(id = R.string.experimental_thesis) ->
-                    ExperimentalFullScreen(list = allExperimental, viewModel = viewModel)
+                    ThesisFullScreen(
+                        list = allExperimental,
+                        viewModel = viewModel,
+                        title = stringResource(id = R.string.experimental_thesis)
+                    )
             }
 
         }
@@ -173,10 +180,10 @@ private fun navigateToFullScreenThesis(
     navController: NavHostController,
     listName: String
 ) {
-    println(listName)
     navController.navigate("${ThesisScreen.Profile.name}/$listName")
 }
 
+@Suppress("UNCHECKED_CAST")
 class MainViewModelFactory(private val application: Application) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         return ThesisViewModel(application) as T
