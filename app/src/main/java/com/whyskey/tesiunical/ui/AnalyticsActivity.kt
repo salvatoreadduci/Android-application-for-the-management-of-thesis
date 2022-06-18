@@ -21,12 +21,9 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.whyskey.tesiunical.R
-import com.whyskey.tesiunical.data.Thesis
 import com.whyskey.tesiunical.data.Type
 import com.whyskey.tesiunical.model.ThesisViewModel
 import com.whyskey.tesiunical.ui.components.AnalyticsRow
-import com.whyskey.tesiunical.ui.components.ThesisRow
-
 
 @Composable
 fun Analytics(
@@ -39,7 +36,6 @@ fun Analytics(
         items = list,
         colors = { it.color },
         amounts = { it.amount },
-        max = {it.max},
         amountsTotal = list.sumOf { it.amount },
         maxTotal = list.sumOf { it.max },
         circleLabel = stringResource(id = R.string.total),
@@ -55,7 +51,6 @@ fun <T> AnalyticsBody(
     items: List<T>,
     colors: (T) -> Color,
     amounts: (T) -> Int,
-    max: (T) ->Int,
     amountsTotal: Int,
     maxTotal: Int,
     circleLabel: String,
