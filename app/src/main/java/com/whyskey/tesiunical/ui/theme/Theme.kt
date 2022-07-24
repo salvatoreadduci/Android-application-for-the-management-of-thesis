@@ -1,13 +1,14 @@
 package com.whyskey.tesiunical.ui.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.material.Colors
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.darkColors
 import androidx.compose.material.lightColors
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 
-private val LightColorPalette = lightColors(
+private val LightColorPalette: Colors = lightColors(
     primary = Red700,
     primaryVariant = Red900,
     onPrimary = Color.White,
@@ -17,7 +18,7 @@ private val LightColorPalette = lightColors(
     error = Red800
 )
 
-private val DarkColorPalette = darkColors(
+private val DarkColorPalette: Colors = darkColors(
     primary = Red300,
     primaryVariant = Red700,
     onPrimary = Color.Black,
@@ -27,7 +28,10 @@ private val DarkColorPalette = darkColors(
 )
 
 @Composable
-fun TesiUnicalTheme(darkTheme: Boolean = isSystemInDarkTheme(), content: @Composable () -> Unit) {
+fun TesiUnicalTheme(
+    darkTheme: Boolean = isSystemInDarkTheme(),
+    content: @Composable () -> Unit
+) {
     val colors = if (darkTheme) {
         DarkColorPalette
     } else {

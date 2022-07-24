@@ -1,15 +1,9 @@
 package com.whyskey.tesiunical.model
 
 import android.app.Application
-import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.*
-import com.whyskey.tesiunical.data.Thesis
-import com.whyskey.tesiunical.data.ThesisRepository
-import com.whyskey.tesiunical.data.ThesisRoomDatabase
-import com.whyskey.tesiunical.data.Type
+import com.whyskey.tesiunical.data.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -18,23 +12,16 @@ import kotlinx.coroutines.launch
 
 class ThesisViewModel(application: Application) : ViewModel(){
 
-    //Statistics
-    val typeList : List<Type> = listOf(Type.EXPERIMENTAL, Type.COMPILATION, Type.ERASMUS, Type.CORPORATE)
-    val colors = listOf<Color>(Color(0xFF004940),Color(0xFFFFDC78),Color(0xFFFF6951))
-
-
-    //Add Thesis Dialog
-    private val _showDialog = MutableStateFlow(false)
-    val showDialog: StateFlow<Boolean> = _showDialog.asStateFlow()
-
-    private var _type = Type.COMPILATION
-    var type: Type = _type
-
     //Database
     private val repository: ThesisRepository
     val allThesis: LiveData<List<Thesis>>
     val allCompilation: LiveData<List<Thesis>>
     val allExperimental: LiveData<List<Thesis>>
+    val corporateAmount: LiveData<Int>
+    val erasmusAmount: LiveData<Int>
+    val compilationAmount: LiveData<Int>
+    val experimentalAmount: LiveData<Int>
+    val totalAmount: LiveData<Int>
 
     init {
         val thesisDb = ThesisRoomDatabase.getDatabase(application)
@@ -44,7 +31,24 @@ class ThesisViewModel(application: Application) : ViewModel(){
         allThesis = repository.readAllData
         allCompilation = repository.readAllCompilation
         allExperimental = repository.readAllExperimental
+        corporateAmount = repository.corporateAmount
+        erasmusAmount = repository.erasmusAmount
+        compilationAmount = repository.compilationAmount
+        experimentalAmount = repository.experimentalAmount
+        totalAmount = repository.totalAmount
     }
+
+    //Statistics
+
+
+    //Add Thesis Dialog
+    private val _showDialog = MutableStateFlow(false)
+    val showDialog: StateFlow<Boolean> = _showDialog.asStateFlow()
+
+    private var _type = Type.COMPILATION
+    var type: Type = _type
+
+
 
     private fun insertThesis(thesis: Thesis) {
         viewModelScope.launch {
@@ -63,6 +67,7 @@ class ThesisViewModel(application: Application) : ViewModel(){
         when(thesisType){
             Type.COMPILATION -> temp = 4
             Type.EXPERIMENTAL -> temp = 5
+            else -> AssertionError()
         }
 
         return Thesis(
@@ -77,7 +82,6 @@ class ThesisViewModel(application: Application) : ViewModel(){
         val newThesis = getNewThesisEntry(thesisName, type, thesisDescription)
         insertThesis(newThesis)
         onDialogConfirm()
-
     }
 
     fun removeThesis(thesis: Thesis){
@@ -92,7 +96,6 @@ class ThesisViewModel(application: Application) : ViewModel(){
 
     private fun onDialogConfirm() {
         _showDialog.value = false
-
     }
 
     fun onDialogDismiss() {

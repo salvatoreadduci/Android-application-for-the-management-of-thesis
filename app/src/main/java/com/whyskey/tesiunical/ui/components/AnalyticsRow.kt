@@ -13,9 +13,8 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun AnalyticsRow(
     modifier: Modifier = Modifier,
-    color: Color,
     title: String,
-    amount: Int,
+    amount: Any,
     max: Int
 ) {
 
@@ -26,7 +25,6 @@ fun AnalyticsRow(
     ) {
         val typography = MaterialTheme.typography
         AccountIndicator(
-            color = color,
             modifier = Modifier
         )
         Spacer(Modifier.width(12.dp))
@@ -47,10 +45,9 @@ fun AnalyticsRow(
 }
 
 @Composable
-private fun AccountIndicator(color: Color, modifier: Modifier = Modifier) {
+private fun AccountIndicator(modifier: Modifier = Modifier) {
     Spacer(
         modifier
             .size(4.dp, 36.dp)
-            .background(color = color)
     )
 }
