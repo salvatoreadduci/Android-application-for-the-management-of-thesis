@@ -59,10 +59,9 @@ class MainActivity : ComponentActivity() {
 fun ThesisApp(viewModel: ThesisViewModel) {
     TesiUnicalTheme {
 
-        val allThesis by viewModel.allThesis.observeAsState(listOf())
+        //val allThesis by viewModel.allThesis.observeAsState(listOf())
         val allCompilation by viewModel.allCompilation.observeAsState(listOf())
         val allExperimental by viewModel.allExperimental.observeAsState(listOf())
-        val showDialogState: Boolean by viewModel.showDialog.collectAsState()
         //Navigation
         val allScreens = ThesisScreen.values().toList()
         val navController = rememberNavController()
@@ -71,7 +70,7 @@ fun ThesisApp(viewModel: ThesisViewModel) {
             backstackEntry.value?.destination?.route
         )
         
-        AddThesisDialog(show = showDialogState,
+        AddThesisDialog(show = viewModel.showDialog.collectAsState().value,
             onDismiss = viewModel::onDialogDismiss,
             onConfirm = viewModel::addNewThesis,
             viewModel = viewModel
@@ -94,7 +93,7 @@ fun ThesisApp(viewModel: ThesisViewModel) {
             ThesisNavHost(
                 navController = navController,
                 modifier = Modifier.padding(innerPadding),
-                allThesis = allThesis,
+                //allThesis = allThesis,
                 allCompilation = allCompilation,
                 allExperimental = allExperimental,
                 viewModel = viewModel
@@ -107,7 +106,7 @@ fun ThesisApp(viewModel: ThesisViewModel) {
 fun ThesisNavHost(
     navController: NavHostController,
     modifier: Modifier = Modifier,
-    allThesis: List<Thesis>,
+    //allThesis: List<Thesis>,
     allCompilation: List<Thesis>,
     allExperimental: List<Thesis>,
     viewModel: ThesisViewModel
@@ -120,7 +119,7 @@ fun ThesisNavHost(
     ) {
         composable(ThesisScreen.Home.name){
             Home(
-                list = allThesis,
+                //list = allThesis,
                 viewModel = viewModel
             )
         }
@@ -141,7 +140,7 @@ fun ThesisNavHost(
         }
 
         composable(ThesisScreen.Settings.name){
-            Settings()
+            Settings(viewModel = viewModel)
         }
 
         val profileName = ThesisScreen.Profile.name

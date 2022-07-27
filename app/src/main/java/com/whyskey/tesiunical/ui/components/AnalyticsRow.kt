@@ -1,12 +1,10 @@
 package com.whyskey.tesiunical.ui.components
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 
 import androidx.compose.ui.unit.dp
 
@@ -15,7 +13,7 @@ fun AnalyticsRow(
     modifier: Modifier = Modifier,
     title: String,
     amount: Any,
-    max: Int
+    max: Any
 ) {
 
     Row(

@@ -40,7 +40,7 @@ fun TabRow(
     ) {
         Row(Modifier.selectableGroup()) {
             allScreens.forEach { screen ->
-                RallyTab(
+                ThesisTab(
                     text = screen.name,
                     icon = screen.icon,
                     onSelected = { onTabSelected(screen) },
@@ -52,7 +52,7 @@ fun TabRow(
 }
 
 @Composable
-private fun RallyTab(
+private fun ThesisTab(
     text: String,
     icon: ImageVector,
     onSelected: () -> Unit,

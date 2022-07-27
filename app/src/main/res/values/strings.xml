@@ -16,4 +16,22 @@
     <string name="title_activity_option">OptionActivity</string>
     <string name="title_activity_analytics">AnalyticsActivity</string>
     <string name="total">Total</string>
+    <string name="name">Name</string>
+    <string name="email">Email</string>
+    <string name="web_site">Web Site</string>
+    <string name="thesis_limit">Thesis limit</string>
+    <string name="account_settings">Account Settings</string>
+    <string name="thesis_settings">Thesis Settings</string>
+    <string name="save">Save</string>
+    <string name="cancel">Cancel</string>
+    <string name="title">Title</string>
+    <string name="thesis_dialog">Add a new Thesis</string>
+    <string name="change_name">Change your name</string>
+    <string name="change_email">Change your email</string>
+    <string name="change_web">Change your web site</string>
+    <string name="change_thesis">Change the thesis limit you want to follow</string>
+
+
+
+
 </resources>

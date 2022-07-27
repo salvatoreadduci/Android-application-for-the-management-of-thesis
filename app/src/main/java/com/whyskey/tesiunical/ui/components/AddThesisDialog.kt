@@ -8,7 +8,9 @@ import androidx.compose.material.TextField
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.whyskey.tesiunical.R
 import com.whyskey.tesiunical.model.ThesisViewModel
 
 @Composable
@@ -26,17 +28,21 @@ fun AddThesisDialog(
             modifier = Modifier.fillMaxWidth(),
             onDismissRequest = onDismiss,
             confirmButton = {
-                TextButton(onClick = { onConfirm(nameInput,descriptionInput) } )
-                { Text(text = "Add") }
+                TextButton(onClick = {
+                    onConfirm(nameInput,descriptionInput)
+                    nameInput = ""
+                    descriptionInput =""
+                })
+                { Text(text = stringResource(id = R.string.save)) }
             },
             dismissButton = {
                 TextButton(onClick = onDismiss)
-                { Text(text = "Cancel") }
+                { Text(text = stringResource(id = R.string.cancel)) }
             },
-            title = { Text(text = "Add a new Thesis") },
+            title = { Text(text = stringResource(id = R.string.thesis_dialog)) },
             text = {
                 Column(modifier = Modifier.padding(8.dp) ) {
-                    Text(text = "Name")
+                    Text(text = stringResource(id = R.string.title))
                     TextField(
                         value = nameInput,
                         onValueChange = {nameInput = it},

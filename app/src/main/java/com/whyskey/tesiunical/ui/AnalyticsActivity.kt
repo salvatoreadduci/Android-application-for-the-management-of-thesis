@@ -24,23 +24,17 @@ fun Analytics(
     viewModel: ThesisViewModel
 ) {
 
-    val experimental by viewModel.experimentalAmount.observeAsState(Int)
-    val corporate by viewModel.corporateAmount.observeAsState(Int)
-    val erasmus by viewModel.erasmusAmount.observeAsState(Int)
-    val compilation by viewModel.compilationAmount.observeAsState(Int)
-    val total by viewModel.totalAmount.observeAsState(Int)
-
     val typeList: List<DataType> = listOf(
-        DataType(Type.COMPILATION, compilation, 28),
-        DataType(Type.EXPERIMENTAL,experimental,15),
-        DataType(Type.CORPORATE,corporate,20),
-        DataType(Type.ERASMUS,erasmus,30),
+        DataType(Type.COMPILATION, viewModel.compilationAmount.observeAsState(Int).value, viewModel.maxCompilation.observeAsState(Int).value),
+        DataType(Type.EXPERIMENTAL, viewModel.experimentalAmount.observeAsState(Int).value,viewModel.maxExperimental.observeAsState(Int).value),
+        DataType(Type.CORPORATE, viewModel.corporateAmount.observeAsState(Int).value,viewModel.maxCorporate.observeAsState(Int).value),
+        DataType(Type.ERASMUS, viewModel.erasmusAmount.observeAsState(Int).value,viewModel.maxErasmus.observeAsState(Int).value),
     )
 
     AnalyticsBody(
         items = typeList,
-        amountsTotal = total,
-        maxTotal = typeList.sumOf { it.max },
+        amountsTotal = viewModel.totalAmount.observeAsState(Int).value,
+        maxTotal = viewModel.maxTotal.observeAsState(Int).value,
         label = stringResource(id = R.string.total),
         rows = {
             AnalyticsRow(title = it.name.toString(), amount = it.amount, max = it.max)
@@ -53,7 +47,7 @@ fun <T> AnalyticsBody(
     modifier: Modifier = Modifier,
     items: List<T>,
     amountsTotal: Any,
-    maxTotal: Int,
+    maxTotal: Any,
     label: String,
     rows: @Composable (T) -> Unit
 ){
@@ -71,7 +65,6 @@ fun <T> AnalyticsBody(
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             )
         }
-
         Spacer(Modifier.height(10.dp))
         Card {
             Column(modifier = Modifier.padding(12.dp)) {

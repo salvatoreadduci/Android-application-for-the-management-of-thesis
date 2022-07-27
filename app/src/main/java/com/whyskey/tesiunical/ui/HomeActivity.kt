@@ -7,7 +7,7 @@ import com.whyskey.tesiunical.model.ThesisViewModel
 
 @Composable
 fun Home(
-    list: List<Thesis>,
+    //list: List<Thesis>,
     viewModel: ThesisViewModel
 ) {
 

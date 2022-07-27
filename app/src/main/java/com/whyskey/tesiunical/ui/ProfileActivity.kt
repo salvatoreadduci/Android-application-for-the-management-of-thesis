@@ -13,6 +13,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Email
 import androidx.compose.material.icons.rounded.Language
 import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -41,7 +42,7 @@ fun Profile(
             .fillMaxWidth()
             .verticalScroll(rememberScrollState())
     ) {
-        ProfileCard()
+        ProfileCard(viewModel)
         Spacer(Modifier.height(16.dp))
         CompilationThesisCard(onClickSeeAll = onClickSeeAll,allCompilation,viewModel)
         Spacer(Modifier.height(16.dp))
@@ -50,12 +51,14 @@ fun Profile(
 }
 
 @Composable
-private fun ProfileCard(){
+private fun ProfileCard(
+    viewModel: ThesisViewModel
+){
 
-    val webIntent = Intent(Intent.ACTION_VIEW, Uri.parse("https://www.android.com"))
+    val webIntent = Intent(Intent.ACTION_VIEW, Uri.parse("http://${viewModel.webAccount.observeAsState(String).value}"))
     val emailIntent = Intent(Intent.ACTION_SEND).apply {
         type = "text/plain"
-        putExtra(Intent.EXTRA_EMAIL, arrayOf("mario@example.com"))
+        putExtra(Intent.EXTRA_EMAIL, arrayOf("${viewModel.emailAccount.observeAsState(String).value}"))
     }
     val context = LocalContext.current
 
@@ -73,7 +76,7 @@ private fun ProfileCard(){
 
             )
 
-            Text("Nome Cognome")
+            Text("${viewModel.nameAccount.observeAsState(String).value}")
 
             Row(Modifier.padding(8.dp)) {
 

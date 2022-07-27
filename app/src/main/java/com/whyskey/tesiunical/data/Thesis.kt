@@ -1,15 +1,11 @@
 package com.whyskey.tesiunical.data
 
 import androidx.compose.runtime.Immutable
-import androidx.compose.runtime.State
-import androidx.compose.ui.graphics.Color
-import androidx.lifecycle.LiveData
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 enum class Type{
-    DEPARTMENTAL,
     CORPORATE,
     ERASMUS,
     COMPILATION,
@@ -19,7 +15,7 @@ enum class Type{
 class DataType(
     val name: Type,
     var amount: Any,
-    var max: Int
+    var max: Any
 )
 
 @Immutable
