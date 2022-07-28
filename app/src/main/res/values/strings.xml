@@ -30,8 +30,7 @@
     <string name="change_email">Change your email</string>
     <string name="change_web">Change your web site</string>
     <string name="change_thesis">Change the thesis limit you want to follow</string>
-
-
+    <string name="title_activity_register">RegisterActivity</string>
 
 
 </resources>

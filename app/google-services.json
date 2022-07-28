@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "71826074334",
+    "project_id": "thesis-unical-android",
+    "storage_bucket": "thesis-unical-android.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:71826074334:android:febfe5934941912728f04f",
+        "android_client_info": {
+          "package_name": "com.whyskey.tesiunical"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "71826074334-dvr2lcg7egungijs9u45vk6fbppgd3k1.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.whyskey.tesiunical",
+            "certificate_hash": "d93e1dceaf1c6ca385797f08e5f756dbb1aa6794"
+          }
+        },
+        {
+          "client_id": "71826074334-o08kms2fvplj6aps5c3kflc72v5blu3i.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB2jzABxNnFkzs8Q9U0d90wjp_VKsHsqgs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "71826074334-o08kms2fvplj6aps5c3kflc72v5blu3i.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
