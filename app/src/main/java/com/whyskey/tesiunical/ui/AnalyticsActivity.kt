@@ -7,8 +7,7 @@ import androidx.compose.material.Card
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
+
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -25,16 +24,26 @@ fun Analytics(
 ) {
 
     val typeList: List<DataType> = listOf(
-        DataType(Type.COMPILATION, viewModel.compilationAmount.observeAsState(Int).value, viewModel.maxCompilation.observeAsState(Int).value),
-        DataType(Type.EXPERIMENTAL, viewModel.experimentalAmount.observeAsState(Int).value,viewModel.maxExperimental.observeAsState(Int).value),
-        DataType(Type.CORPORATE, viewModel.corporateAmount.observeAsState(Int).value,viewModel.maxCorporate.observeAsState(Int).value),
-        DataType(Type.ERASMUS, viewModel.erasmusAmount.observeAsState(Int).value,viewModel.maxErasmus.observeAsState(Int).value),
+        DataType(Type.COMPILATION, viewModel.compilationThesis.value.size, viewModel.userData.value.max_compilation),
+        DataType(Type.APPLICATION, viewModel.compilationThesis.value.size,viewModel.userData.value.max_applicative),
+        DataType(Type.RESEARCH, viewModel.compilationThesis.value.size,viewModel.userData.value.max_research),
+        DataType(Type.CORPORATE, viewModel.compilationThesis.value.size,viewModel.userData.value.max_corporate),
+        DataType(Type.ERASMUS, viewModel.compilationThesis.value.size,viewModel.userData.value.max_erasmus),
     )
 
-    AnalyticsBody(
+   AnalyticsBody(
         items = typeList,
-        amountsTotal = viewModel.totalAmount.observeAsState(Int).value,
-        maxTotal = viewModel.maxTotal.observeAsState(Int).value,
+        amountsTotal =  viewModel.compilationThesis.value.size +
+                viewModel.compilationThesis.value.size +
+                viewModel.compilationThesis.value.size +
+                viewModel.compilationThesis.value.size +
+                viewModel.compilationThesis.value.size,
+        maxTotal =  viewModel.userData.value.max_compilation +
+                viewModel.userData.value.max_applicative +
+                viewModel.userData.value.max_research +
+                viewModel.userData.value.max_corporate +
+                viewModel.userData.value.max_erasmus
+       ,
         label = stringResource(id = R.string.total),
         rows = {
             AnalyticsRow(title = it.name.toString(), amount = it.amount, max = it.max)
@@ -46,8 +55,8 @@ fun Analytics(
 fun <T> AnalyticsBody(
     modifier: Modifier = Modifier,
     items: List<T>,
-    amountsTotal: Any,
-    maxTotal: Any,
+    amountsTotal: Int,
+    maxTotal: Int,
     label: String,
     rows: @Composable (T) -> Unit
 ){

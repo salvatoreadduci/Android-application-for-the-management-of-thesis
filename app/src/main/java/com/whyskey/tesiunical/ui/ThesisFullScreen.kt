@@ -37,12 +37,12 @@ fun ThesisFullScreen(
             ){
                 items(list) { thesis ->
                     ThesisRow(
-                        name = thesis.name,
-                        expanded = expandedThesis == thesis.name,
+                        name = thesis.title,
+                        expanded = expandedThesis == thesis.title,
                         onClick = {
-                            expandedThesis = if (expandedThesis == thesis.name) null else thesis.name
+                            expandedThesis = if (expandedThesis == thesis.title) null else thesis.title
                         },
-                        onDelete = { viewModel.removeThesis(thesis) }
+                        onDelete = {  }
                     )
 
                 }

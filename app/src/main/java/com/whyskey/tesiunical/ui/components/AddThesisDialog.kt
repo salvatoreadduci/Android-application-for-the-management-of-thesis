@@ -17,11 +17,12 @@ import com.whyskey.tesiunical.model.ThesisViewModel
 fun AddThesisDialog(
     show: Boolean,
     onDismiss: () -> Unit,
-    onConfirm: (String,String) -> Unit,
+    onConfirm: (String,Int,String) -> Unit,
     viewModel: ThesisViewModel
 ){
     var nameInput by rememberSaveable { mutableStateOf("") }
     var descriptionInput by rememberSaveable { mutableStateOf("") }
+    var type: Int = 0
 
     if (show) {
         AlertDialog(
@@ -29,7 +30,7 @@ fun AddThesisDialog(
             onDismissRequest = onDismiss,
             confirmButton = {
                 TextButton(onClick = {
-                    onConfirm(nameInput,descriptionInput)
+                    onConfirm(nameInput,type,descriptionInput)
                     nameInput = ""
                     descriptionInput =""
                 })
@@ -52,7 +53,7 @@ fun AddThesisDialog(
                     Spacer(modifier = Modifier.padding(16.dp))
 
                     Text(text = "Type")
-                    TypeRadioList(viewModel)
+                    type = TypeRadioList()
 
                     Spacer(modifier = Modifier.padding(8.dp))
 

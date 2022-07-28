@@ -10,7 +10,6 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.runtime.*
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -53,7 +52,6 @@ class MainActivity : ComponentActivity() {
                     )
                 )
 
-                viewModel.auth.currentUser
                 //Log.d("TAG","$currentUser")
 
                 if(viewModel.auth.currentUser != null){
@@ -71,9 +69,6 @@ class MainActivity : ComponentActivity() {
 fun ThesisApp(viewModel: ThesisViewModel) {
     TesiUnicalTheme {
 
-        //val allThesis by viewModel.allThesis.observeAsState(listOf())
-        val allCompilation by viewModel.allCompilation.observeAsState(listOf())
-        val allExperimental by viewModel.allExperimental.observeAsState(listOf())
         //Navigation
         val allScreens = ThesisScreen.values().toList()
         val navController = rememberNavController()
@@ -106,8 +101,8 @@ fun ThesisApp(viewModel: ThesisViewModel) {
                 navController = navController,
                 modifier = Modifier.padding(innerPadding),
                 //allThesis = allThesis,
-                allCompilation = allCompilation,
-                allExperimental = allExperimental,
+                allCompilation = viewModel.compilationThesis.value,
+                allExperimental = viewModel.applicationThesis.value,
                 viewModel = viewModel
             )
         }
@@ -176,11 +171,11 @@ fun ThesisNavHost(
                         viewModel = viewModel,
                         title = stringResource(id = R.string.compilation_thesis)
                     )
-                stringResource(id = R.string.experimental_thesis) ->
+                stringResource(id = R.string.application_thesis) ->
                     ThesisFullScreen(
                         list = allExperimental,
                         viewModel = viewModel,
-                        title = stringResource(id = R.string.experimental_thesis)
+                        title = stringResource(id = R.string.application_thesis)
                     )
             }
 

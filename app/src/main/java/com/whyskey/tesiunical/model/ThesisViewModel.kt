@@ -1,11 +1,15 @@
 package com.whyskey.tesiunical.model
 
 import android.app.Application
-import android.graphics.Bitmap
+import android.util.Log
+import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.*
-import coil.ImageLoader
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.firestore.ktx.toObject
+import com.google.firebase.firestore.ktx.toObjects
 import com.google.firebase.ktx.Firebase
 import com.whyskey.tesiunical.data.*
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,54 +22,78 @@ class ThesisViewModel(application: Application) : ViewModel(){
 
     private var _auth: FirebaseAuth = Firebase.auth
     val auth = _auth
+    private val user = auth.currentUser
 
-    //Database
-    private val repository: ThesisRepository
-    //val allThesis: LiveData<List<Thesis>>
-    val allCompilation: LiveData<List<Thesis>>
-    val allExperimental: LiveData<List<Thesis>>
-    val corporateAmount: LiveData<Int>
-    val erasmusAmount: LiveData<Int>
-    val compilationAmount: LiveData<Int>
-    val experimentalAmount: LiveData<Int>
-    val totalAmount: LiveData<Int>
+    private val _compilationThesis = mutableStateOf<List<Thesis>>(emptyList())
+    val compilationThesis: State<List<Thesis>>
+        get() = _compilationThesis
 
-    val picProfile: LiveData<String>
-    val nameAccount: LiveData<String>
-    val emailAccount: LiveData<String>
-    val webAccount: LiveData<String>
+    private val _applicationThesis = mutableStateOf<List<Thesis>>(emptyList())
+    val applicationThesis: State<List<Thesis>>
+        get() = _applicationThesis
 
-    val maxExperimental: LiveData<Int>
-    val maxCompilation: LiveData<Int>
-    val maxCorporate: LiveData<Int>
-    val maxErasmus: LiveData<Int>
-    val maxTotal: LiveData<Int>
+    private val _userData = mutableStateOf<Account>(Account())
+    val userData: State<Account>
+        get() = _userData
+
+    private val queryCompilation = Firebase.firestore.collection("thesis").whereEqualTo("type",0)
+    private val queryApplication= Firebase.firestore.collection("thesis").whereEqualTo("type",1)
+    private val queryUser = Firebase.firestore.collection("account").document(user!!.uid)
 
     init {
-        val thesisDb = ThesisRoomDatabase.getDatabase(application)
-        val thesisDao = thesisDb.thesisDao()
-        val userDao = thesisDb.userDao()
-        repository = ThesisRepository(thesisDao,userDao)
+        getCompilationThesis()
+        getApplicationThesis()
+        getUserData()
+    }
 
-        //allThesis = repository.readAllData
-        allCompilation = repository.readAllCompilation
-        allExperimental = repository.readAllExperimental
-        corporateAmount = repository.corporateAmount
-        erasmusAmount = repository.erasmusAmount
-        compilationAmount = repository.compilationAmount
-        experimentalAmount = repository.experimentalAmount
-        totalAmount = repository.totalAmount
+    private fun getCompilationThesis(){
+        viewModelScope.launch {
+            queryCompilation.addSnapshotListener { value, _ ->
+                if(value != null) {
+                    _compilationThesis.value = value.toObjects()
+                }
+            }
+        }
+    }
 
-        picProfile = repository.pic
-        nameAccount = repository.name
-        emailAccount = repository.email
-        webAccount = repository.webSite
+    private fun getApplicationThesis(){
+        viewModelScope.launch {
+            queryApplication.addSnapshotListener { value, _ ->
+                if(value != null) {
+                    _applicationThesis.value = value.toObjects()
+                }
+            }
+        }
+    }
 
-        maxExperimental = repository.maxExperimental
-        maxCompilation = repository.maxCompilation
-        maxCorporate = repository.maxCorporate
-        maxErasmus = repository.maxErasmus
-        maxTotal = repository.maxTotal
+    private fun getUserData(){
+        viewModelScope.launch {
+            queryUser.addSnapshotListener { value, _ ->
+                if(value != null) {
+                    _userData.value = value.toObject()!!
+                }
+            }
+        }
+    }
+
+    fun addNewThesis(thesisName: String, thesisType: Int,thesisDescription: String) {
+        val newThesis = getNewThesisEntry(thesisName, thesisType, thesisDescription)
+        insertThesis(newThesis)
+        onDialogConfirm()
+    }
+
+    private fun getNewThesisEntry(thesisName: String, thesisType: Int, thesisDescription: String): Thesis {
+        return Thesis(
+            title = thesisName,
+            type = thesisType,
+            description = thesisDescription
+        )
+    }
+
+    private fun insertThesis(thesis: Thesis) {
+        viewModelScope.launch {
+            Firebase.firestore.collection("thesis").add(thesis)
+        }
     }
 
     //Add Thesis Dialog
@@ -81,102 +109,6 @@ class ThesisViewModel(application: Application) : ViewModel(){
 
     private val _showOptionWebDialog = MutableStateFlow(false)
     val showOptionWebDialog: StateFlow<Boolean> = _showOptionWebDialog.asStateFlow()
-
-
-
-    private var _type = Type.COMPILATION
-    var type: Type = _type
-
-
-    fun changeLimit(name: String, value: Int){
-        setLimit(name,value)
-    }
-
-    private fun setLimit(name: String, value: Int){
-
-        viewModelScope.launch {
-            when(name){
-               "Compilation Thesis" -> repository.setMaxCompilation(value)
-                "Experimental  Thesis" -> repository.setMaxExperimental(value)
-                "Corporate Thesis" -> repository.setMaxCorporate(value)
-                "Erasmus Thesis" -> repository.setMaxErasmus(value)
-                else -> null
-
-            }
-        }
-
-    }
-
-    fun changeName(name: String){
-        setName(name)
-        onOptionDialogConfirm()
-    }
-
-    private fun setName(name: String){
-        viewModelScope.launch {
-            repository.setName(name)
-        }
-    }
-
-    fun changeEmail(email: String){
-        setEmail(email)
-        onOptionDialogConfirm()
-    }
-
-    private fun setEmail(email: String){
-        viewModelScope.launch {
-            repository.setEmail(email)
-        }
-    }
-
-    fun changeWebSite(web: String){
-        setWeb(web)
-        onOptionDialogConfirm()
-    }
-
-    private fun setWeb(web: String){
-        viewModelScope.launch {
-            repository.setWeb(web)
-        }
-    }
-
-    private fun insertThesis(thesis: Thesis) {
-        viewModelScope.launch {
-            repository.addThesis(thesis)
-        }
-    }
-
-    private fun deleteThesis(thesis: Thesis) {
-        viewModelScope.launch {
-            repository.deleteThesis(thesis)
-        }
-    }
-
-    private fun getNewThesisEntry(thesisName: String, thesisType: Type, thesisDescription: String): Thesis {
-        var temp= 0
-        when(thesisType){
-            Type.COMPILATION -> temp = 4
-            Type.EXPERIMENTAL -> temp = 5
-            else -> null
-        }
-
-        return Thesis(
-            name = thesisName,
-            type = temp,
-            description = thesisDescription
-        )
-    }
-
-    fun addNewThesis(thesisName: String, thesisDescription: String) {
-        val newThesis = getNewThesisEntry(thesisName, type, thesisDescription)
-        insertThesis(newThesis)
-        onDialogConfirm()
-    }
-
-    fun removeThesis(thesis: Thesis){
-        deleteThesis(thesis)
-    }
-
 
 
     fun onOpenDialogClicked() {

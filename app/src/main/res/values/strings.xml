@@ -1,11 +1,11 @@
 <resources>
     <string name="app_name">Tesi Unical</string>
     <string name="see_all">SEE ALL</string>
-    <string name="departmental_thesis">Departmental Thesis</string>
-    <string name="corporate_thesis">Corporate Thesis</string>
-    <string name="erasmus_thesis">Erasmus Thesis</string>
-    <string name="compilation_thesis">Compilation Thesis</string>
-    <string name="experimental_thesis">Experimental  Thesis</string>
+    <string name="compilation_thesis">Tesi Compilativa</string>
+    <string name="application_thesis">Tesi Applicativa</string>
+    <string name="research_thesis">Tesi di ricerca</string>
+    <string name="corporate_thesis">Tesi in azienda</string>
+    <string name="erasmus_thesis">Tesi Erasmus</string>
     <string name="following">Following</string>
     <string name="requests">Requests</string>
     <string name="lorem_ipsum">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</string>

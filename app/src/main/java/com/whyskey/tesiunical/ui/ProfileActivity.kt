@@ -2,6 +2,7 @@ package com.whyskey.tesiunical.ui
 
 import android.content.Intent
 import android.net.Uri
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -13,7 +14,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Email
 import androidx.compose.material.icons.rounded.Language
 import androidx.compose.runtime.*
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -55,10 +55,10 @@ private fun ProfileCard(
     viewModel: ThesisViewModel
 ){
 
-    val webIntent = Intent(Intent.ACTION_VIEW, Uri.parse("http://${viewModel.webAccount.observeAsState(String).value}"))
+    val webIntent = Intent(Intent.ACTION_VIEW, Uri.parse("http://${viewModel.userData.value.web_site}"))
     val emailIntent = Intent(Intent.ACTION_SEND).apply {
         type = "text/plain"
-        putExtra(Intent.EXTRA_EMAIL, arrayOf("${viewModel.emailAccount.observeAsState(String).value}"))
+        putExtra(Intent.EXTRA_EMAIL, arrayOf(viewModel.userData.value.email))
     }
     val context = LocalContext.current
 
@@ -76,7 +76,7 @@ private fun ProfileCard(
 
             )
 
-            Text("${viewModel.nameAccount.observeAsState(String).value}")
+            Text(viewModel.userData.value.name)
 
             Row(Modifier.padding(8.dp)) {
 
@@ -115,10 +115,10 @@ private fun CompilationThesisCard(
     ){
             thesis ->
         ThesisRow(
-            name = thesis.name,
-            expanded = expandedThesis == thesis.name,
-            onClick = { expandedThesis = if (expandedThesis == thesis.name) null else thesis.name },
-            onDelete = { viewModel.removeThesis(thesis) }
+            name = thesis.title,
+            expanded = expandedThesis == thesis.title,
+            onClick = { expandedThesis = if (expandedThesis == thesis.title) null else thesis.title },
+            onDelete = {  }
         )
     }
 }
@@ -130,7 +130,7 @@ private fun ExperimentalThesisCard(
     viewModel: ThesisViewModel
 ){
     var expandedThesis by remember { mutableStateOf<String?>(null) }
-    val title = stringResource(id = R.string.experimental_thesis)
+    val title = stringResource(id = R.string.application_thesis)
 
     ThesisCard(
         title = title,
@@ -139,12 +139,12 @@ private fun ExperimentalThesisCard(
     ){
             thesis ->
         ThesisRow(
-            name = thesis.name,
-            expanded = expandedThesis == thesis.name,
+            name = thesis.title,
+            expanded = expandedThesis == thesis.title,
             onClick = {
-                expandedThesis = if (expandedThesis == thesis.name) null else thesis.name
+                expandedThesis = if (expandedThesis == thesis.title) null else thesis.title
             },
-            onDelete = { viewModel.removeThesis(thesis) }
+            onDelete = {  }
         )
     }
 }

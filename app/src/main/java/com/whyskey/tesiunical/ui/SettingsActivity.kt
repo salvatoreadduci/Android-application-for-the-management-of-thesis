@@ -12,7 +12,6 @@ import androidx.compose.material.icons.rounded.Email
 import androidx.compose.material.icons.rounded.Language
 import androidx.compose.material.icons.rounded.Person
 import androidx.compose.runtime.*
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -32,11 +31,11 @@ import com.whyskey.tesiunical.ui.components.SettingsRow
 fun Settings(
     viewModel: ThesisViewModel
 ) {
-    ChangeOptionDialog(
+    /*ChangeOptionDialog(
         show = viewModel.showOptionNameDialog.collectAsState().value,
         title = stringResource(id = R.string.change_name),
         onDismiss =  { viewModel.onOptionDialogConfirm() },
-        onConfirm = viewModel::changeName,
+        onConfirm =  ,
         viewModel = viewModel
     )
 
@@ -143,7 +142,7 @@ fun Settings(
                 )
         }
 
-    }
+    }*/
 }
 
 @Composable
