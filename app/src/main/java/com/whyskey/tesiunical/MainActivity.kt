@@ -2,6 +2,7 @@ package com.whyskey.tesiunical
 
 import android.app.Application
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
@@ -26,6 +27,8 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 import com.whyskey.tesiunical.data.Thesis
 import com.whyskey.tesiunical.model.ThesisViewModel
 import com.whyskey.tesiunical.ui.*
@@ -49,7 +52,16 @@ class MainActivity : ComponentActivity() {
                                 as Application
                     )
                 )
-                ThesisApp(viewModel)
+
+                viewModel.auth.currentUser
+                //Log.d("TAG","$currentUser")
+
+                if(viewModel.auth.currentUser != null){
+                    ThesisApp(viewModel)
+                } else {
+                    LoginActivity(viewModel = viewModel)
+                }
+
             }
         }
     }
@@ -117,6 +129,7 @@ fun ThesisNavHost(
         modifier = modifier
 
     ) {
+
         composable(ThesisScreen.Home.name){
             Home(
                 //list = allThesis,

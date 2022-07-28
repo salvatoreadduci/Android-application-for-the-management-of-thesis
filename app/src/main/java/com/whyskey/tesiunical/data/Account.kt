@@ -24,7 +24,7 @@ data class Account(
     @ColumnInfo(name = "info")
     val info: String,
     @ColumnInfo(name = "pic", defaultValue = "R.drawable.account_pic_default")
-    val pic: Bitmap,
+    val pic: String,
     @ColumnInfo(name = "max_experimental",defaultValue = "0")
     val maxExperimental: Int,
     @ColumnInfo(name = "max_compilation",defaultValue = "0")

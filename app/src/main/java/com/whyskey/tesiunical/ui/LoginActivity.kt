@@ -1,11 +1,10 @@
 package com.whyskey.tesiunical.ui
 
-import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.*
+import androidx.compose.material.Button
+import androidx.compose.material.OutlinedTextField
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -13,12 +12,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.whyskey.tesiunical.ThesisApp
 import com.whyskey.tesiunical.model.ThesisViewModel
 
 @Composable
-fun RegisterActivity(
+fun LoginActivity(
     viewModel: ThesisViewModel
 ) {
 
@@ -26,11 +25,11 @@ fun RegisterActivity(
         .fillMaxSize()
         .padding(8.dp)
     ) {
-        val emailValue = remember { mutableStateOf(TextFieldValue()) }
-        val passwordValue = remember { mutableStateOf(TextFieldValue()) }
+        val emailValue = remember { mutableStateOf("") }
+        val passwordValue = remember { mutableStateOf("") }
 
         OutlinedTextField(
-            label = { Text(text = "Email")},
+            label = { Text(text = "Email") },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
             value = emailValue.value,
             singleLine = true,
@@ -41,7 +40,7 @@ fun RegisterActivity(
         )
 
         OutlinedTextField(
-            label = { Text(text = "Password")},
+            label = { Text(text = "Password") },
             visualTransformation = PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
             value =passwordValue.value,
@@ -56,13 +55,11 @@ fun RegisterActivity(
             modifier = Modifier
                 .fillMaxWidth(),
             onClick = {
-                viewModel.auth.createUserWithEmailAndPassword(
-                    emailValue.value.text.trim(),
-                    passwordValue.value.text.trim()
-                )
+                viewModel.auth.signInWithEmailAndPassword(emailValue.value,passwordValue.value)
+
             }
         ){
-            Text(text = "Register")
+            Text(text = "Login")
         }
 
 
