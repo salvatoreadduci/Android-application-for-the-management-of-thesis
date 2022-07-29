@@ -23,6 +23,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 import com.whyskey.tesiunical.R
 import com.whyskey.tesiunical.data.Thesis
 import com.whyskey.tesiunical.model.ThesisViewModel
@@ -34,6 +36,7 @@ fun Profile(
     onClickSeeAll: (String) -> Unit = {},
     allCompilation: List<Thesis>,
     allExperimental: List<Thesis>,
+    allResearch: List<Thesis>,
     viewModel: ThesisViewModel
 ) {
 
@@ -46,7 +49,9 @@ fun Profile(
         Spacer(Modifier.height(16.dp))
         CompilationThesisCard(onClickSeeAll = onClickSeeAll,allCompilation,viewModel)
         Spacer(Modifier.height(16.dp))
-        ExperimentalThesisCard(onClickSeeAll = onClickSeeAll,allExperimental,viewModel)
+        ApplicationThesisCard(onClickSeeAll = onClickSeeAll,allExperimental,viewModel)
+        Spacer(Modifier.height(16.dp))
+        ApplicationThesisCard(onClickSeeAll = onClickSeeAll,allResearch,viewModel)
     }
 }
 
@@ -118,13 +123,13 @@ private fun CompilationThesisCard(
             name = thesis.title,
             expanded = expandedThesis == thesis.title,
             onClick = { expandedThesis = if (expandedThesis == thesis.title) null else thesis.title },
-            onDelete = {  }
+            onDelete = { viewModel.removeThesis(thesis.id) }
         )
     }
 }
 
 @Composable
-private fun ExperimentalThesisCard(
+private fun ApplicationThesisCard(
     onClickSeeAll: (String) -> Unit,
     list: List<Thesis>,
     viewModel: ThesisViewModel
@@ -144,7 +149,33 @@ private fun ExperimentalThesisCard(
             onClick = {
                 expandedThesis = if (expandedThesis == thesis.title) null else thesis.title
             },
-            onDelete = {  }
+            onDelete = { viewModel.removeThesis(thesis.id) }
+        )
+    }
+}
+
+@Composable
+private fun ResearchThesisCard(
+    onClickSeeAll: (String) -> Unit,
+    list: List<Thesis>,
+    viewModel: ThesisViewModel
+){
+    var expandedThesis by remember { mutableStateOf<String?>(null) }
+    val title = stringResource(id = R.string.application_thesis)
+
+    ThesisCard(
+        title = title,
+        onClickSeeAll = { onClickSeeAll(title) },
+        data = list
+    ){
+            thesis ->
+        ThesisRow(
+            name = thesis.title,
+            expanded = expandedThesis == thesis.title,
+            onClick = {
+                expandedThesis = if (expandedThesis == thesis.title) null else thesis.title
+            },
+            onDelete = { viewModel.removeThesis(thesis.id) }
         )
     }
 }

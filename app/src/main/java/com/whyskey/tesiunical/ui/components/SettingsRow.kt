@@ -95,7 +95,7 @@ fun LimitThesisRow(
                         input = it
                         try {
                             if(input != "" && input != value.toString()){
-                               // viewModel.changeLimit(title, input.toInt())
+                               viewModel.changeLimit(title, input.toInt())
                             }
 
                         } catch (e: NumberFormatException) {input = "0"}

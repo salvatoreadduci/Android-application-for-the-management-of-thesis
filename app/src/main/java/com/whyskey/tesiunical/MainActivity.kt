@@ -2,7 +2,6 @@ package com.whyskey.tesiunical
 
 import android.app.Application
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
@@ -26,8 +25,6 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.ktx.Firebase
 import com.whyskey.tesiunical.data.Thesis
 import com.whyskey.tesiunical.model.ThesisViewModel
 import com.whyskey.tesiunical.ui.*
@@ -52,14 +49,11 @@ class MainActivity : ComponentActivity() {
                     )
                 )
 
-                //Log.d("TAG","$currentUser")
-
                 if(viewModel.auth.currentUser != null){
                     ThesisApp(viewModel)
                 } else {
                     LoginActivity(viewModel = viewModel)
                 }
-
             }
         }
     }
@@ -77,7 +71,8 @@ fun ThesisApp(viewModel: ThesisViewModel) {
             backstackEntry.value?.destination?.route
         )
         
-        AddThesisDialog(show = viewModel.showDialog.collectAsState().value,
+        AddThesisDialog(
+            show = viewModel.showDialog.collectAsState().value,
             onDismiss = viewModel::onDialogDismiss,
             onConfirm = viewModel::addNewThesis,
             viewModel = viewModel
@@ -100,9 +95,9 @@ fun ThesisApp(viewModel: ThesisViewModel) {
             ThesisNavHost(
                 navController = navController,
                 modifier = Modifier.padding(innerPadding),
-                //allThesis = allThesis,
                 allCompilation = viewModel.compilationThesis.value,
                 allExperimental = viewModel.applicationThesis.value,
+                allResearch = viewModel.researchThesis.value,
                 viewModel = viewModel
             )
         }
@@ -113,9 +108,9 @@ fun ThesisApp(viewModel: ThesisViewModel) {
 fun ThesisNavHost(
     navController: NavHostController,
     modifier: Modifier = Modifier,
-    //allThesis: List<Thesis>,
     allCompilation: List<Thesis>,
     allExperimental: List<Thesis>,
+    allResearch: List<Thesis>,
     viewModel: ThesisViewModel
 ) {
     NavHost(
@@ -130,6 +125,8 @@ fun ThesisNavHost(
                 //list = allThesis,
                 viewModel = viewModel
             )
+
+
         }
 
         composable(ThesisScreen.Analytics.name) {
@@ -143,6 +140,7 @@ fun ThesisNavHost(
                 onClickSeeAll = { name -> navigateToFullScreenThesis(navController, name) },
                 allCompilation = allCompilation,
                 allExperimental = allExperimental,
+                allResearch = allResearch,
                 viewModel = viewModel
             )
         }
@@ -177,6 +175,12 @@ fun ThesisNavHost(
                         viewModel = viewModel,
                         title = stringResource(id = R.string.application_thesis)
                     )
+                stringResource(id = R.string.research_thesis) ->
+                    ThesisFullScreen(
+                        list = allResearch,
+                        viewModel = viewModel,
+                        title = stringResource(id = R.string.research_thesis)
+                    )
             }
 
         }
@@ -193,13 +197,14 @@ private fun navigateToFullScreenThesis(
 @Suppress("UNCHECKED_CAST")
 class MainViewModelFactory(private val application: Application) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        return ThesisViewModel(application) as T
+        return ThesisViewModel() as T
     }
 }
 
 @Composable
 private fun  AddFloatingActionButton(onClick: () -> Unit){
-    FloatingActionButton(onClick = onClick) {
+    FloatingActionButton(onClick = onClick,
+    ) {
         Row(
             modifier = Modifier.padding(horizontal = 16.dp)
         ) {

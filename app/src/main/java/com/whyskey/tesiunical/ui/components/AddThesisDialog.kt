@@ -1,28 +1,38 @@
 package com.whyskey.tesiunical.ui.components
 
+import android.util.Log
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.AlertDialog
-import androidx.compose.material.Text
-import androidx.compose.material.TextButton
-import androidx.compose.material.TextField
+import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.selection.selectableGroup
+import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import com.whyskey.tesiunical.R
 import com.whyskey.tesiunical.model.ThesisViewModel
+import kotlin.reflect.KFunction3
 
 @Composable
 fun AddThesisDialog(
     show: Boolean,
     onDismiss: () -> Unit,
-    onConfirm: (String,Int,String) -> Unit,
+    onConfirm: KFunction3<String, String, String, Unit>,
     viewModel: ThesisViewModel
 ){
     var nameInput by rememberSaveable { mutableStateOf("") }
     var descriptionInput by rememberSaveable { mutableStateOf("") }
     var type: Int = 0
+    val radioOptions = listOf(
+        stringResource(id = R.string.compilation_thesis),
+        stringResource(id = R.string.application_thesis),
+        stringResource(id = R.string.research_thesis)
+    )
+    var (selectedOption, onOptionSelected) = remember { mutableStateOf(radioOptions[0]) }
+
 
     if (show) {
         AlertDialog(
@@ -30,7 +40,8 @@ fun AddThesisDialog(
             onDismissRequest = onDismiss,
             confirmButton = {
                 TextButton(onClick = {
-                    onConfirm(nameInput,type,descriptionInput)
+                    onConfirm(nameInput,selectedOption,descriptionInput)
+                    selectedOption = radioOptions[0]
                     nameInput = ""
                     descriptionInput =""
                 })
@@ -53,7 +64,33 @@ fun AddThesisDialog(
                     Spacer(modifier = Modifier.padding(16.dp))
 
                     Text(text = "Type")
-                    type = TypeRadioList()
+
+                    Column(Modifier.selectableGroup()) {
+                        radioOptions.forEach { text ->
+                            Row(
+                                Modifier
+                                    .fillMaxWidth()
+                                    .height(56.dp)
+                                    .selectable(
+                                        selected = (text == selectedOption),
+                                        onClick = { onOptionSelected(text) },
+                                        role = Role.RadioButton
+                                    )
+                                    .padding(horizontal = 16.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                RadioButton(
+                                    selected = (text == selectedOption),
+                                    onClick = null
+                                )
+                                Text(
+                                    text = text,
+                                    style = MaterialTheme.typography.body1.merge(),
+                                    modifier = Modifier.padding(start = 16.dp)
+                                )
+                            }
+                        }
+                    }
 
                     Spacer(modifier = Modifier.padding(8.dp))
 

@@ -25,19 +25,19 @@ fun Analytics(
 
     val typeList: List<DataType> = listOf(
         DataType(Type.COMPILATION, viewModel.compilationThesis.value.size, viewModel.userData.value.max_compilation),
-        DataType(Type.APPLICATION, viewModel.compilationThesis.value.size,viewModel.userData.value.max_applicative),
-        DataType(Type.RESEARCH, viewModel.compilationThesis.value.size,viewModel.userData.value.max_research),
-        DataType(Type.CORPORATE, viewModel.compilationThesis.value.size,viewModel.userData.value.max_corporate),
-        DataType(Type.ERASMUS, viewModel.compilationThesis.value.size,viewModel.userData.value.max_erasmus),
+        DataType(Type.APPLICATION, viewModel.applicationThesis.value.size,viewModel.userData.value.max_applicative),
+        DataType(Type.RESEARCH, viewModel.researchThesis.value.size,viewModel.userData.value.max_research),
+        DataType(Type.CORPORATE, viewModel.corporateThesis.value.size,viewModel.userData.value.max_corporate),
+        DataType(Type.ERASMUS, viewModel.erasmusThesis.value.size,viewModel.userData.value.max_erasmus),
     )
 
    AnalyticsBody(
         items = typeList,
         amountsTotal =  viewModel.compilationThesis.value.size +
-                viewModel.compilationThesis.value.size +
-                viewModel.compilationThesis.value.size +
-                viewModel.compilationThesis.value.size +
-                viewModel.compilationThesis.value.size,
+                viewModel.applicationThesis.value.size +
+                viewModel.researchThesis.value.size +
+                viewModel.corporateThesis.value.size +
+                viewModel.erasmusThesis.value.size,
         maxTotal =  viewModel.userData.value.max_compilation +
                 viewModel.userData.value.max_applicative +
                 viewModel.userData.value.max_research +

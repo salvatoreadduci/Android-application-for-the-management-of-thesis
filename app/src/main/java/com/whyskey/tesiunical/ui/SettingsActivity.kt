@@ -1,7 +1,12 @@
 package com.whyskey.tesiunical.ui
 
 
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContract
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -20,6 +25,8 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import coil.compose.rememberAsyncImagePainter
+import coil.compose.rememberImagePainter
 import com.whyskey.tesiunical.R
 import com.whyskey.tesiunical.model.ThesisViewModel
 import com.whyskey.tesiunical.ui.components.ChangeOptionDialog
@@ -31,21 +38,21 @@ import com.whyskey.tesiunical.ui.components.SettingsRow
 fun Settings(
     viewModel: ThesisViewModel
 ) {
-    /*ChangeOptionDialog(
+    ChangeOptionDialog(
         show = viewModel.showOptionNameDialog.collectAsState().value,
         title = stringResource(id = R.string.change_name),
         onDismiss =  { viewModel.onOptionDialogConfirm() },
-        onConfirm =  ,
+        onConfirm =  viewModel::changeName,
         viewModel = viewModel
     )
 
-    ChangeOptionDialog(
+   ChangeOptionDialog(
         show = viewModel.showOptionEmailDialog.collectAsState().value,
         title = stringResource(id = R.string.change_email),
         onDismiss =  { viewModel.onOptionDialogConfirm() },
         onConfirm = viewModel::changeEmail,
         viewModel = viewModel
-    )
+   )
 
     ChangeOptionDialog(
         show = viewModel.showOptionWebDialog.collectAsState().value,
@@ -59,19 +66,19 @@ fun Settings(
         SettingsData(
             Icons.Rounded.Person,
             stringResource(id = R.string.name),
-            viewModel.nameAccount.observeAsState(String).value,
+            viewModel.userData.value.name,
             0
         ),
         SettingsData(
             Icons.Rounded.Email,
             stringResource(id = R.string.email),
-            viewModel.emailAccount.observeAsState(String).value,
+            viewModel.userData.value.email,
             1
         ),
         SettingsData(
             Icons.Rounded.Language,
             stringResource(id = R.string.web_site),
-            viewModel.webAccount.observeAsState(String).value,
+            viewModel.userData.value.web_site,
             2
         )
     )
@@ -79,21 +86,35 @@ fun Settings(
     val list: List<LimitThesis> = listOf(
         LimitThesis(
             stringResource(id = R.string.compilation_thesis),
-            viewModel.maxCompilation.observeAsState(String).value
+            viewModel.userData.value.max_compilation
         ),
         LimitThesis(
-            stringResource(id = R.string.experimental_thesis),
-            viewModel.maxExperimental.observeAsState(String).value
+            stringResource(id = R.string.application_thesis),
+            viewModel.userData.value.max_applicative
+        ),
+        LimitThesis(
+            stringResource(id = R.string.research_thesis),
+            viewModel.userData.value.max_research
         ),
         LimitThesis(
             stringResource(id = R.string.corporate_thesis),
-            viewModel.maxCorporate.observeAsState(String).value
+            viewModel.userData.value.max_corporate
         ),
         LimitThesis(
             stringResource(id = R.string.erasmus_thesis),
-            viewModel.maxErasmus.observeAsState(String).value
+            viewModel.userData.value.max_erasmus
         )
     )
+
+    var selectedImage by remember {
+        mutableStateOf<Uri?>(null)
+    }
+
+    val launcher = rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent()){
+        selectedImage = it
+    }
+
+
 
     Column(
         modifier = Modifier
@@ -103,13 +124,16 @@ fun Settings(
     ) {
 
         Image(
-            painter = painterResource(id = R.drawable.account_pic_default),
+            painter = rememberAsyncImagePainter(model = selectedImage),
             contentDescription = null,
             contentScale = ContentScale.Crop,
             modifier = Modifier
                 .padding(top = 8.dp)
                 .size(154.dp)
                 .clip(CircleShape)
+                .clickable {
+                    launcher.launch("image/*")
+                }
         )
 
         Spacer(Modifier.height(8.dp))
@@ -128,7 +152,6 @@ fun Settings(
                 )
             }
         )
-
         Spacer(Modifier.height(8.dp))
         
         LimitThesisBody(
@@ -141,8 +164,7 @@ fun Settings(
                 viewModel = viewModel
                 )
         }
-
-    }*/
+    }
 }
 
 @Composable

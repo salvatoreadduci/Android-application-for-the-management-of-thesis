@@ -16,16 +16,16 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.whyskey.tesiunical.R
 import com.whyskey.tesiunical.model.ThesisViewModel
-import kotlin.reflect.KFunction1
 
 @Composable
 fun ChangeOptionDialog(
     show: Boolean,
     title: String,
     onDismiss: () -> Unit,
-    onConfirm: KFunction1<String, Unit>,
+    onConfirm: (String) -> Unit,
     viewModel: ThesisViewModel
 ){
+
     var input by rememberSaveable { mutableStateOf("") }
 
     if(show){
@@ -42,7 +42,7 @@ fun ChangeOptionDialog(
                 TextButton(onClick = onDismiss)
                 { Text(text = stringResource(id = R.string.cancel)) }
             },
-            title = { Text(text = "$title")},
+            title = { Text(text = title)},
             text = {
                 Column(modifier = Modifier.padding(8.dp)){
                     Text(text = "")

@@ -21,10 +21,9 @@ import com.whyskey.tesiunical.model.ThesisViewModel
 import kotlinx.coroutines.flow.StateFlow
 
 @Composable
-fun TypeRadioList(): Int {
+fun TypeRadioList() {
 
-    var state by remember { mutableStateOf(true) }
-    var value: Type = Type.APPLICATION
+    /*var value: Type = Type.APPLICATION
 
     Column(Modifier.selectableGroup()) {
         Row(modifier = Modifier
@@ -33,7 +32,8 @@ fun TypeRadioList(): Int {
             .selectable(
                 selected = state,
                 onClick = {
-                    state = true
+                    //state.value = true
+                    return 0
                     value = Type.COMPILATION
                 },
                 role = Role.RadioButton
@@ -77,5 +77,8 @@ fun TypeRadioList(): Int {
         Type.COMPILATION -> 0
         Type.APPLICATION -> 1
         else -> 2
-    }
+    }*/
+
+
+
 }

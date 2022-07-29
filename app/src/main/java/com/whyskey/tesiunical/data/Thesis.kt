@@ -1,7 +1,5 @@
 package com.whyskey.tesiunical.data
 
-import androidx.compose.runtime.Immutable
-
 enum class Type{
     COMPILATION,
     APPLICATION,
@@ -19,5 +17,6 @@ class DataType(
 data class Thesis(
     val title: String = "",
     val type: Int = 0,
-    val description: String = ""
+    val description: String = "",
+    var id: String = ""
 )
