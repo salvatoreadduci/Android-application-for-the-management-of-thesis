@@ -1,17 +1,14 @@
 package com.whyskey.tesiunical.model
 
-import android.app.Application
+import android.net.Uri
 import android.util.Log
-import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.*
+import androidx.core.net.toUri
 import androidx.lifecycle.*
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
-import com.google.firebase.database.DatabaseReference
-import com.google.firebase.database.ktx.database
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.firestore.ktx.toObject
-import com.google.firebase.firestore.ktx.toObjects
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
 import com.whyskey.tesiunical.data.*
@@ -19,17 +16,18 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import java.io.File
 
 class ThesisViewModel() : ViewModel(){
 
     private var _auth: FirebaseAuth = Firebase.auth
     val auth = _auth
 
-    private var _storage = Firebase.storage
-    private val storage = _storage
-    private var storageRef = storage.reference
+    private var _storage = Firebase.storage.reference
+    val storage = _storage
 
-    private val user = auth.currentUser
+    private var _user = auth.currentUser
+    val user = _user
 
     private val _compilationThesis = mutableStateOf<List<Thesis>>(emptyList())
     val compilationThesis: State<List<Thesis>>
@@ -55,6 +53,12 @@ class ThesisViewModel() : ViewModel(){
     val userData: State<Account>
         get() = _userData
 
+    //var userImage = mutableStateOf<Uri?>(null)
+    private val _userImage = mutableStateOf<Uri?>(null)
+    val userImage: State<Uri?>
+        get() = _userImage
+
+
     private val queryCompilation = Firebase.firestore.collection("thesis").whereEqualTo("type",0)
     private val queryApplication= Firebase.firestore.collection("thesis").whereEqualTo("type",1)
     private val queryResearch = Firebase.firestore.collection("thesis").whereEqualTo("type",2)
@@ -69,6 +73,22 @@ class ThesisViewModel() : ViewModel(){
         getCorporateThesis()
         getErasmusThesis()
         getUserData()
+        getImage()
+    }
+
+    fun getImage(){
+        retrieveImage()
+    }
+
+    private fun retrieveImage(){
+        val localFile: File = File.createTempFile("localFile", ".jpg")
+        viewModelScope.launch {
+            storage.child("images/" + user!!.uid).getFile(localFile).addOnSuccessListener {
+
+                val uri: Uri = localFile.absolutePath.toUri()
+                _userImage.value = uri
+            }
+        }
     }
 
     fun removeThesis(thesis: String){
@@ -154,7 +174,7 @@ class ThesisViewModel() : ViewModel(){
                 if(value != null) {
                     val thesis = ArrayList<Thesis>()
                     val documents = value.documents
-                    documents.forEach { it ->
+                    documents.forEach {
                         val temp = it.toObject(Thesis::class.java)
                         if(temp != null){
                             temp.id = it.id
@@ -174,7 +194,7 @@ class ThesisViewModel() : ViewModel(){
                 if(value != null) {
                     val thesis = ArrayList<Thesis>()
                     val documents = value.documents
-                    documents.forEach { it ->
+                    documents.forEach {
                         val temp = it.toObject(Thesis::class.java)
                         if(temp != null){
                             temp.id = it.id
@@ -193,7 +213,7 @@ class ThesisViewModel() : ViewModel(){
                 if(value != null) {
                     val thesis = ArrayList<Thesis>()
                     val documents = value.documents
-                    documents.forEach { it ->
+                    documents.forEach {
                         val temp = it.toObject(Thesis::class.java)
                         if(temp != null){
                             temp.id = it.id
@@ -212,7 +232,7 @@ class ThesisViewModel() : ViewModel(){
                 if(value != null) {
                     val thesis = ArrayList<Thesis>()
                     val documents = value.documents
-                    documents.forEach { it ->
+                    documents.forEach {
                         val temp = it.toObject(Thesis::class.java)
                         if(temp != null){
                             temp.id = it.id
@@ -231,7 +251,7 @@ class ThesisViewModel() : ViewModel(){
                 if(value != null) {
                     val thesis = ArrayList<Thesis>()
                     val documents = value.documents
-                    documents.forEach { it ->
+                    documents.forEach {
                         val temp = it.toObject(Thesis::class.java)
                         if(temp != null){
                             temp.id = it.id

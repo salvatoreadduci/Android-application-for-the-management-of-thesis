@@ -1,9 +1,7 @@
 package com.whyskey.tesiunical.ui
 
 
-import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContract
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -22,11 +20,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
-import coil.compose.rememberImagePainter
 import com.whyskey.tesiunical.R
 import com.whyskey.tesiunical.model.ThesisViewModel
 import com.whyskey.tesiunical.ui.components.ChangeOptionDialog
@@ -106,15 +102,13 @@ fun Settings(
         )
     )
 
-    var selectedImage by remember {
-        mutableStateOf<Uri?>(null)
+    var uri by remember {
+        mutableStateOf(viewModel.userImage.value)
     }
-
     val launcher = rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent()){
-        selectedImage = it
+        viewModel.storage.child("images/" + viewModel.user!!.uid).putFile(it)
+        uri = it
     }
-
-
 
     Column(
         modifier = Modifier
@@ -124,7 +118,7 @@ fun Settings(
     ) {
 
         Image(
-            painter = rememberAsyncImagePainter(model = selectedImage),
+            painter = rememberAsyncImagePainter(model = uri),
             contentDescription = null,
             contentScale = ContentScale.Crop,
             modifier = Modifier
@@ -133,9 +127,9 @@ fun Settings(
                 .clip(CircleShape)
                 .clickable {
                     launcher.launch("image/*")
+                    viewModel.getImage()
                 }
         )
-
         Spacer(Modifier.height(8.dp))
 
         SettingsBody(

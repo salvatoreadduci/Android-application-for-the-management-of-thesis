@@ -23,6 +23,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
+import coil.compose.rememberAsyncImagePainter
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.whyskey.tesiunical.R
@@ -72,13 +73,12 @@ private fun ProfileCard(
         Column(horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.padding(top = 16.dp)) {
             Image(
-                painter = painterResource(id = R.drawable.io),
+                painter = rememberAsyncImagePainter(model = viewModel.userImage.value),
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .size(88.dp)
                     .clip(CircleShape)
-
             )
 
             Text(viewModel.userData.value.name)
