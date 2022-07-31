@@ -34,6 +34,8 @@ import com.whyskey.tesiunical.ui.components.SettingsRow
 fun Settings(
     viewModel: ThesisViewModel
 ) {
+    viewModel.getImage()
+
     ChangeOptionDialog(
         show = viewModel.showOptionNameDialog.collectAsState().value,
         title = stringResource(id = R.string.change_name),
@@ -127,7 +129,6 @@ fun Settings(
                 .clip(CircleShape)
                 .clickable {
                     launcher.launch("image/*")
-                    viewModel.getImage()
                 }
         )
         Spacer(Modifier.height(8.dp))

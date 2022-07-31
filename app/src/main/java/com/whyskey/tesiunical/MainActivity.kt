@@ -49,8 +49,13 @@ class MainActivity : ComponentActivity() {
                     )
                 )
 
-                if(viewModel.auth.currentUser != null){
-                    ThesisApp(viewModel)
+                if(viewModel.user != null){
+                    if(viewModel.userData.value.professor){
+                        ThesisApp(viewModel)
+                    } else {
+                        ThesisApp(viewModel = viewModel)
+                    }
+
                 } else {
                     LoginActivity(viewModel = viewModel)
                 }
@@ -70,7 +75,7 @@ fun ThesisApp(viewModel: ThesisViewModel) {
         val currentScreen = ThesisScreen.fromRoute(
             backstackEntry.value?.destination?.route
         )
-        
+
         AddThesisDialog(
             show = viewModel.showDialog.collectAsState().value,
             onDismiss = viewModel::onDialogDismiss,
@@ -125,8 +130,6 @@ fun ThesisNavHost(
                 //list = allThesis,
                 viewModel = viewModel
             )
-
-
         }
 
         composable(ThesisScreen.Analytics.name) {

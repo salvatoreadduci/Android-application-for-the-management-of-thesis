@@ -4,6 +4,7 @@ data class Account(
     val name: String = "",
     val email: String = "",
     val web_site: String = "",
+    val professor: Boolean = false,
     val max_compilation: Int = 0,
     val max_applicative: Int = 0,
     val max_research: Int = 0,

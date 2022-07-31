@@ -52,7 +52,7 @@ fun Profile(
         Spacer(Modifier.height(16.dp))
         ApplicationThesisCard(onClickSeeAll = onClickSeeAll,allExperimental,viewModel)
         Spacer(Modifier.height(16.dp))
-        ApplicationThesisCard(onClickSeeAll = onClickSeeAll,allResearch,viewModel)
+        ResearchThesisCard(onClickSeeAll = onClickSeeAll,allResearch,viewModel)
     }
 }
 
@@ -61,6 +61,7 @@ private fun ProfileCard(
     viewModel: ThesisViewModel
 ){
 
+    viewModel.getImage()
     val webIntent = Intent(Intent.ACTION_VIEW, Uri.parse("http://${viewModel.userData.value.web_site}"))
     val emailIntent = Intent(Intent.ACTION_SEND).apply {
         type = "text/plain"
