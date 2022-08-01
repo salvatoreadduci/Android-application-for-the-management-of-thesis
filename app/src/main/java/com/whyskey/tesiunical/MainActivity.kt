@@ -4,6 +4,7 @@ import android.app.Application
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -27,12 +28,14 @@ import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
 import com.whyskey.tesiunical.data.Thesis
 import com.whyskey.tesiunical.model.ThesisViewModel
+import com.whyskey.tesiunical.model.UserState
+import com.whyskey.tesiunical.model.UserStateViewModel
 import com.whyskey.tesiunical.ui.*
 import com.whyskey.tesiunical.ui.components.AddThesisDialog
 import com.whyskey.tesiunical.ui.theme.TesiUnicalTheme
 
 class MainActivity : ComponentActivity() {
-
+    private val userState by viewModels<UserStateViewModel>()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -49,18 +52,30 @@ class MainActivity : ComponentActivity() {
                     )
                 )
 
-                if(viewModel.user != null){
-                    if(viewModel.userData.value.professor){
-                        ThesisApp(viewModel)
-                    } else {
-                        ThesisApp(viewModel = viewModel)
-                    }
+                if( viewModel.user != null){
+                    userState.isLoggedIn = true
+                }
 
-                } else {
-                    LoginActivity(viewModel = viewModel)
+                CompositionLocalProvider(UserState provides userState) {
+                    ApplicationSwitcher(viewModel)
                 }
             }
         }
+    }
+}
+
+@Composable
+fun ApplicationSwitcher(viewModel: ThesisViewModel) {
+    val vm = UserState.current
+    if (vm.isLoggedIn) {
+        if(viewModel.userData.value.professor){
+            ThesisApp(viewModel)
+        } else {
+            ThesisAppStudent(viewModel = viewModel)
+        }
+
+    } else {
+        Login(viewModel)
     }
 }
 
@@ -94,6 +109,39 @@ fun ThesisApp(viewModel: ThesisViewModel) {
             floatingActionButton = {
                 AddFloatingActionButton(
                     onClick = { viewModel.onOpenDialogClicked() }
+                )
+            }
+        ) { innerPadding ->
+            ThesisNavHost(
+                navController = navController,
+                modifier = Modifier.padding(innerPadding),
+                allCompilation = viewModel.compilationThesis.value,
+                allExperimental = viewModel.applicationThesis.value,
+                allResearch = viewModel.researchThesis.value,
+                viewModel = viewModel
+            )
+        }
+    }
+}
+
+@Composable
+fun ThesisAppStudent(viewModel: ThesisViewModel) {
+    TesiUnicalTheme {
+
+        //Navigation
+        val allScreens = ThesisScreen.values().toList()
+        val navController = rememberNavController()
+        val backstackEntry = navController.currentBackStackEntryAsState()
+        val currentScreen = ThesisScreen.fromRoute(
+            backstackEntry.value?.destination?.route
+        )
+
+        Scaffold(
+            topBar = {
+                com.whyskey.tesiunical.ui.components.TabRow(
+                    allScreens =  allScreens,
+                    onTabSelected = { screen -> navController.navigate(screen.name) },
+                    currentScreen = currentScreen
                 )
             }
         ) { innerPadding ->

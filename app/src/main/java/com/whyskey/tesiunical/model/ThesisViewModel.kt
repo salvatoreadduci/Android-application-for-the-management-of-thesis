@@ -53,7 +53,6 @@ class ThesisViewModel() : ViewModel(){
     val userData: State<Account>
         get() = _userData
 
-    //var userImage = mutableStateOf<Uri?>(null)
     private val _userImage = mutableStateOf<Uri?>(null)
     val userImage: State<Uri?>
         get() = _userImage
@@ -64,20 +63,26 @@ class ThesisViewModel() : ViewModel(){
     private val queryResearch = Firebase.firestore.collection("thesis").whereEqualTo("type",2)
     private val queryCorporate= Firebase.firestore.collection("thesis").whereEqualTo("type",3)
     private val queryErasmus = Firebase.firestore.collection("thesis").whereEqualTo("type",4)
-    private val queryUser = Firebase.firestore.collection("account").document(user!!.uid)
 
     init {
+
+        if(user != null){
+            getAllData()
+        }
+    }
+
+    fun getImage(){
+        retrieveImage()
+    }
+
+    fun getAllData(){
         getCompilationThesis()
         getApplicationThesis()
         getResearchThesis()
         getCorporateThesis()
         getErasmusThesis()
-        getUserData()
+        getUserData(user!!.uid)
         getImage()
-    }
-
-    fun getImage(){
-        retrieveImage()
     }
 
     private fun retrieveImage(){
@@ -264,9 +269,10 @@ class ThesisViewModel() : ViewModel(){
         }
     }
 
-    private fun getUserData(){
+    private fun getUserData(user: String){
         viewModelScope.launch {
-            queryUser.addSnapshotListener { value, _ ->
+            Firebase.firestore.collection("account").document(user)
+                .addSnapshotListener { value, _ ->
                 if(value != null) {
                     _userData.value = value.toObject()!!
                 }

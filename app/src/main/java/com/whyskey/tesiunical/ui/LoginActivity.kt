@@ -11,15 +11,15 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
-import com.whyskey.tesiunical.ThesisApp
 import com.whyskey.tesiunical.model.ThesisViewModel
+import com.whyskey.tesiunical.model.UserState
 
 @Composable
-fun LoginActivity(
+fun Login(
     viewModel: ThesisViewModel
 ) {
+    val vm = UserState.current
 
     Column(modifier = Modifier
         .fillMaxSize()
@@ -56,12 +56,13 @@ fun LoginActivity(
                 .fillMaxWidth(),
             onClick = {
                 viewModel.auth.signInWithEmailAndPassword(emailValue.value,passwordValue.value)
-
+                    .addOnCompleteListener {
+                        vm.signIn(emailValue.value,passwordValue.value)
+                        viewModel.getAllData()
+                    }
             }
         ){
             Text(text = "Login")
         }
-
-
     }
 }

@@ -28,7 +28,7 @@ enum class ThesisScreen(
                     Profile.name -> Profile
                     Settings.name -> Settings
                     null -> Home
-                    else -> throw IllegalArgumentException("Route $route is not recognized.")
+                    else -> Home //throw IllegalArgumentException("Route $route is not recognized.")
                 }
         }
 }
