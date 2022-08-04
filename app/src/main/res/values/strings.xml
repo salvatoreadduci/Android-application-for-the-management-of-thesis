@@ -29,8 +29,11 @@
     <string name="change_name">Change your name</string>
     <string name="change_email">Change your email</string>
     <string name="change_web">Change your web site</string>
-    <string name="change_thesis">Change the thesis limit you want to follow</string>
+    <string name="change_thesis">Cambia il limite delle tesi che vuoi seguire</string>
     <string name="title_activity_register">RegisterActivity</string>
-
+    <string name="assigned_thesis">Tesi assegnata:</string>
+    <string name="professor">Professore:</string>
+    <string name="type">Tipo:</string>
+    <string name="change_exams">Esami non passati</string>
 
 </resources>

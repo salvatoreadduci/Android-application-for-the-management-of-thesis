@@ -18,5 +18,6 @@ data class Thesis(
     val title: String = "",
     val type: Int = 0,
     val description: String = "",
-    var id: String = ""
+    var id: String = "",
+    val id_professor: String = ""
 )

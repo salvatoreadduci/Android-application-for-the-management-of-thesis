@@ -57,7 +57,7 @@ fun Login(
             onClick = {
                 viewModel.auth.signInWithEmailAndPassword(emailValue.value,passwordValue.value)
                     .addOnCompleteListener {
-                        vm.signIn(emailValue.value,passwordValue.value)
+                        vm.signIn()
                         viewModel.getAllData()
                     }
             }

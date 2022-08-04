@@ -43,7 +43,7 @@ fun SettingsRow(
             )
             Spacer(modifier = Modifier.width(16.dp))
 
-            Column() {
+            Column {
                 Text(text = title)
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(text = "$value")
@@ -60,7 +60,6 @@ fun SettingsRow(
     Divider()
 }
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun LimitThesisRow(
     title: String,

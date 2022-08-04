@@ -3,6 +3,9 @@ package com.whyskey.tesiunical
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.navigation.NavType
+import androidx.navigation.navArgument
+import androidx.navigation.navDeepLink
 
 enum class ThesisScreen(
     val icon: ImageVector
@@ -28,7 +31,7 @@ enum class ThesisScreen(
                     Profile.name -> Profile
                     Settings.name -> Settings
                     null -> Home
-                    else -> Home //throw IllegalArgumentException("Route $route is not recognized.")
+                    else -> throw IllegalArgumentException("Route $route is not recognized.")
                 }
         }
 }

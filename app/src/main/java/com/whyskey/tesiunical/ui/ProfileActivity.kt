@@ -3,6 +3,7 @@ package com.whyskey.tesiunical.ui
 import android.content.Intent
 import android.net.Uri
 import android.util.Log
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -12,6 +13,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Email
+import androidx.compose.material.icons.rounded.Info
 import androidx.compose.material.icons.rounded.Language
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -19,14 +21,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import coil.compose.rememberAsyncImagePainter
-import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.ktx.Firebase
 import com.whyskey.tesiunical.R
+import com.whyskey.tesiunical.data.Account
 import com.whyskey.tesiunical.data.Thesis
 import com.whyskey.tesiunical.model.ThesisViewModel
 import com.whyskey.tesiunical.ui.components.ThesisCard
@@ -38,34 +39,62 @@ fun Profile(
     allCompilation: List<Thesis>,
     allExperimental: List<Thesis>,
     allResearch: List<Thesis>,
-    viewModel: ThesisViewModel
+    viewModel: ThesisViewModel,
+    id:String
 ) {
+
+    val profile = viewModel.accounts.value.find { account -> id == account.id }
+    viewModel.getCompilationThesis(profile!!.id)
+    Log.d("TAG",viewModel.compilationThesis.value.toString())
 
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .verticalScroll(rememberScrollState())
     ) {
-        ProfileCard(viewModel)
+        ProfileCard(viewModel,profile)
         Spacer(Modifier.height(16.dp))
-        CompilationThesisCard(onClickSeeAll = onClickSeeAll,allCompilation,viewModel)
-        Spacer(Modifier.height(16.dp))
-        ApplicationThesisCard(onClickSeeAll = onClickSeeAll,allExperimental,viewModel)
-        Spacer(Modifier.height(16.dp))
-        ResearchThesisCard(onClickSeeAll = onClickSeeAll,allResearch,viewModel)
+        if(profile.isProfessor){
+            CompilationThesisCard(onClickSeeAll = onClickSeeAll,allCompilation,viewModel)
+            Spacer(Modifier.height(16.dp))
+            ApplicationThesisCard(onClickSeeAll = onClickSeeAll,allExperimental,viewModel)
+            Spacer(Modifier.height(16.dp))
+            ResearchThesisCard(onClickSeeAll = onClickSeeAll,allResearch,viewModel)
+        } else {
+            var expandedThesis by remember { mutableStateOf<String?>(null) }
+            AssignedThesis(
+                profile,
+                viewModel,
+                expandedThesis == viewModel.userData.value.thesis,
+                onClick = {
+                    expandedThesis = if (expandedThesis == viewModel.userData.value.thesis) null else viewModel.userData.value.thesis
+                }
+            )
+            Spacer(Modifier.height(16.dp))
+            NotPassedExams(profile,viewModel)
+            
+        }
+
+
     }
 }
 
 @Composable
 private fun ProfileCard(
-    viewModel: ThesisViewModel
+    viewModel: ThesisViewModel,
+    profile: Account
 ){
 
     viewModel.getImage()
-    val webIntent = Intent(Intent.ACTION_VIEW, Uri.parse("http://${viewModel.userData.value.web_site}"))
+    val webIntent = if(profile.isProfessor){
+        Intent(Intent.ACTION_VIEW, Uri.parse("http://${profile.web_site}"))
+    } else {
+        Intent()
+    }
+
     val emailIntent = Intent(Intent.ACTION_SEND).apply {
         type = "text/plain"
-        putExtra(Intent.EXTRA_EMAIL, arrayOf(viewModel.userData.value.email))
+        putExtra(Intent.EXTRA_EMAIL, arrayOf(profile.email))
     }
     val context = LocalContext.current
 
@@ -81,18 +110,18 @@ private fun ProfileCard(
                     .size(88.dp)
                     .clip(CircleShape)
             )
-
-            Text(viewModel.userData.value.name)
-
+            Text(profile.name)
             Row(Modifier.padding(8.dp)) {
 
-                Icon(
-                    Icons.Rounded.Language ,
-                    contentDescription = null,
-                    modifier = Modifier
-                        .padding(end = 8.dp)
-                        .clickable { ContextCompat.startActivity(context, webIntent, null) }
-                )
+                if(profile.isProfessor) {
+                    Icon(
+                        Icons.Rounded.Language,
+                        contentDescription = null,
+                        modifier = Modifier
+                            .padding(end = 8.dp)
+                            .clickable { ContextCompat.startActivity(context, webIntent, null) }
+                    )
+                }
                 Icon(
                     Icons.Rounded.Email ,
                     contentDescription = null,
@@ -178,5 +207,75 @@ private fun ResearchThesisCard(
             },
             onDelete = { viewModel.removeThesis(thesis.id) }
         )
+    }
+}
+
+@OptIn(ExperimentalMaterialApi::class)
+@Composable
+private fun AssignedThesis(
+    profile: Account,
+    viewModel: ThesisViewModel,
+    expanded: Boolean,
+    onClick: () -> Unit,
+){
+    Surface(
+        modifier = Modifier
+            .fillMaxWidth(),
+        elevation = 2.dp,
+        onClick = onClick
+    ){
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+                .animateContentSize()
+        ) {
+            Row(
+                modifier = Modifier
+                    .height(40.dp)
+                    .padding(start = 4.dp, end = 4.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ){
+
+                Icon(
+                    imageVector = Icons.Rounded.Info,
+                    contentDescription = null
+                )
+                Spacer(modifier = Modifier.width(16.dp))
+                Text(text = stringResource(id = R.string.assigned_thesis))
+                Spacer(modifier = Modifier.width(16.dp))
+                Text(text = profile.thesis)
+            }
+
+            if (expanded) {
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = stringResource(R.string.lorem_ipsum),
+                    textAlign = TextAlign.Justify
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(text = stringResource(id = R.string.type))
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(text = stringResource(id = R.string.professor))
+            }
+        }
+    }
+}
+
+@Composable
+private fun NotPassedExams(
+    profile: Account,
+    viewModel: ThesisViewModel
+){
+    Card(modifier = Modifier.fillMaxWidth()) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+        ){
+            Text(text = "${stringResource(id = R.string.change_exams)}:")
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(text = profile.exams)
+        }
     }
 }

@@ -18,7 +18,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.io.File
 
-class ThesisViewModel() : ViewModel(){
+class ThesisViewModel : ViewModel(){
 
     private var _auth: FirebaseAuth = Firebase.auth
     val auth = _auth
@@ -57,6 +57,10 @@ class ThesisViewModel() : ViewModel(){
     val userImage: State<Uri?>
         get() = _userImage
 
+    private val _accounts = mutableStateOf<List<Account>>(emptyList())
+    val accounts: State<List<Account>>
+        get() = _accounts
+
 
     private val queryCompilation = Firebase.firestore.collection("thesis").whereEqualTo("type",0)
     private val queryApplication= Firebase.firestore.collection("thesis").whereEqualTo("type",1)
@@ -71,24 +75,65 @@ class ThesisViewModel() : ViewModel(){
         }
     }
 
+    fun setExams(exams: String){
+        updateExams(exams)
+    }
+
+    private fun updateExams(exams:String){
+        viewModelScope.launch {
+            Firebase.firestore.collection("account").document(user!!.uid)
+                .update(mapOf(
+                    "exams" to exams
+                ))
+        }
+    }
+
     fun getImage(){
         retrieveImage()
     }
 
     fun getAllData(){
-        getCompilationThesis()
-        getApplicationThesis()
-        getResearchThesis()
-        getCorporateThesis()
-        getErasmusThesis()
-        getUserData(user!!.uid)
+        getUserData(Firebase.auth.currentUser?.uid)
         getImage()
+
+        if(_userData.value.isProfessor){
+            getCompilationThesis(_userData.value.id)
+            getApplicationThesis(_userData.value.id)
+            getResearchThesis(_userData.value.id)
+            getCorporateThesis(_userData.value.id)
+            getErasmusThesis(_userData.value.id)
+        }
+
+
+    }
+
+    fun getAccountsByType(type: Boolean){
+        getAccounts(type)
+    }
+
+    private fun getAccounts(type: Boolean){
+        viewModelScope.launch {
+            Firebase.firestore.collection("account").whereEqualTo("isProfessor",type).addSnapshotListener { value, _ ->
+                if(value != null) {
+                    val accounts = ArrayList<Account>()
+                    val documents = value.documents
+                    documents.forEach {
+                        val temp = it.toObject(Account::class.java)
+                        if(temp != null){
+                            temp.id = it.id
+                            accounts.add(temp)
+                        }
+                    }
+                    _accounts.value = accounts
+                }
+            }
+        }
     }
 
     private fun retrieveImage(){
         val localFile: File = File.createTempFile("localFile", ".jpg")
         viewModelScope.launch {
-            storage.child("images/" + user!!.uid).getFile(localFile).addOnSuccessListener {
+            storage.child("images/" + user?.uid).getFile(localFile).addOnSuccessListener {
 
                 val uri: Uri = localFile.absolutePath.toUri()
                 _userImage.value = uri
@@ -173,9 +218,9 @@ class ThesisViewModel() : ViewModel(){
         }
     }
 
-    private fun getCompilationThesis(){
+    fun getThesis(id:String,type: Int){
         viewModelScope.launch {
-            queryCompilation.addSnapshotListener { value, _ ->
+            Firebase.firestore.collection("thesis").whereEqualTo("type",type).whereEqualTo("id_professor",id).addSnapshotListener { value, _ ->
                 if(value != null) {
                     val thesis = ArrayList<Thesis>()
                     val documents = value.documents
@@ -192,9 +237,9 @@ class ThesisViewModel() : ViewModel(){
         }
     }
 
-    private fun getApplicationThesis(){
+    private fun getApplicationThesis(id: String){
         viewModelScope.launch {
-            queryApplication.addSnapshotListener { value, _ ->
+            queryApplication.whereEqualTo("id_professor",id).addSnapshotListener { value, _ ->
 
                 if(value != null) {
                     val thesis = ArrayList<Thesis>()
@@ -212,9 +257,9 @@ class ThesisViewModel() : ViewModel(){
         }
     }
 
-    private fun getResearchThesis(){
+    private fun getResearchThesis(id: String){
         viewModelScope.launch {
-            queryResearch.addSnapshotListener { value, _ ->
+            queryResearch.whereEqualTo("id_professor",id).addSnapshotListener { value, _ ->
                 if(value != null) {
                     val thesis = ArrayList<Thesis>()
                     val documents = value.documents
@@ -231,9 +276,9 @@ class ThesisViewModel() : ViewModel(){
         }
     }
 
-    private fun getCorporateThesis(){
+    private fun getCorporateThesis(id: String){
         viewModelScope.launch {
-            queryCorporate.addSnapshotListener { value, _ ->
+            queryCorporate.whereEqualTo("id_professor",id).addSnapshotListener { value, _ ->
                 if(value != null) {
                     val thesis = ArrayList<Thesis>()
                     val documents = value.documents
@@ -250,9 +295,9 @@ class ThesisViewModel() : ViewModel(){
         }
     }
 
-    private fun getErasmusThesis(){
+    private fun getErasmusThesis(id: String){
         viewModelScope.launch {
-            queryErasmus.addSnapshotListener { value, _ ->
+            queryErasmus.whereEqualTo("id_professor",id).addSnapshotListener { value, _ ->
                 if(value != null) {
                     val thesis = ArrayList<Thesis>()
                     val documents = value.documents
@@ -269,12 +314,17 @@ class ThesisViewModel() : ViewModel(){
         }
     }
 
-    private fun getUserData(user: String){
+    private fun getUserData(user: String?){
         viewModelScope.launch {
-            Firebase.firestore.collection("account").document(user)
+            Firebase.firestore.collection("account").document(user!!)
                 .addSnapshotListener { value, _ ->
                 if(value != null) {
                     _userData.value = value.toObject()!!
+
+                    Log.d("TAG",value.data!!.getValue("isProfessor").toString())
+                    if(value.data!!.getValue("isProfessor") == false){
+                        _userData.value.isProfessor = false
+                    }
                 }
             }
         }

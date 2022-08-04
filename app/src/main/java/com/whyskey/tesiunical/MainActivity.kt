@@ -2,6 +2,7 @@ package com.whyskey.tesiunical
 
 import android.app.Application
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -18,6 +19,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -51,7 +53,6 @@ class MainActivity : ComponentActivity() {
                                 as Application
                     )
                 )
-
                 if( viewModel.user != null){
                     userState.isLoggedIn = true
                 }
@@ -68,7 +69,7 @@ class MainActivity : ComponentActivity() {
 fun ApplicationSwitcher(viewModel: ThesisViewModel) {
     val vm = UserState.current
     if (vm.isLoggedIn) {
-        if(viewModel.userData.value.professor){
+        if(viewModel.userData.value.isProfessor){
             ThesisApp(viewModel)
         } else {
             ThesisAppStudent(viewModel = viewModel)
@@ -129,7 +130,7 @@ fun ThesisAppStudent(viewModel: ThesisViewModel) {
     TesiUnicalTheme {
 
         //Navigation
-        val allScreens = ThesisScreen.values().toList()
+        val allScreens = listOf(ThesisScreen.Home,ThesisScreen.Profile, ThesisScreen.Settings)
         val navController = rememberNavController()
         val backstackEntry = navController.currentBackStackEntryAsState()
         val currentScreen = ThesisScreen.fromRoute(
@@ -173,17 +174,45 @@ fun ThesisNavHost(
 
     ) {
 
+        val accountTypeArg = "account_id"
+        val routeWithArgs = "${ThesisScreen.Profile.name}/{$accountTypeArg}"
+        val arguments = listOf(
+            navArgument(accountTypeArg) { type = NavType.StringType }
+        )
+        val deepLinks = listOf(
+            navDeepLink { uriPattern = "thesis://${ThesisScreen.Profile.name}/{$accountTypeArg}" }
+        )
+
+        composable(
+            route = routeWithArgs,
+            arguments = arguments,
+            deepLinks = deepLinks
+        ) { navBackStackEntry ->
+            val accountType =
+                navBackStackEntry.arguments?.getString(accountTypeArg)
+            Profile(
+                onClickSeeAll = { name -> navigateToFullScreenThesis(navController, name) },
+                allCompilation = allCompilation,
+                allExperimental = allExperimental,
+                allResearch = allResearch,
+                viewModel = viewModel,
+                id = accountType!!
+            )
+        }
+
         composable(ThesisScreen.Home.name){
             Home(
-                //list = allThesis,
+                onClick = { id -> navController.navigateToProfile(id) },
                 viewModel = viewModel
             )
         }
 
-        composable(ThesisScreen.Analytics.name) {
-            Analytics(
-                viewModel = viewModel
-            )
+        if(viewModel.userData.value.isProfessor){
+            composable(ThesisScreen.Analytics.name) {
+                Analytics(
+                    viewModel = viewModel
+                )
+            }
         }
 
         composable(ThesisScreen.Profile.name) {
@@ -192,7 +221,8 @@ fun ThesisNavHost(
                 allCompilation = allCompilation,
                 allExperimental = allExperimental,
                 allResearch = allResearch,
-                viewModel = viewModel
+                viewModel = viewModel,
+                id = viewModel.user!!.uid
             )
         }
 
@@ -233,7 +263,6 @@ fun ThesisNavHost(
                         title = stringResource(id = R.string.research_thesis)
                     )
             }
-
         }
     }
 }
@@ -243,6 +272,12 @@ private fun navigateToFullScreenThesis(
     listName: String
 ) {
     navController.navigate("${ThesisScreen.Profile.name}/$listName")
+}
+
+private fun NavHostController.navigateToProfile(
+    id: String
+) {
+    this.navigateSingleTopTo("${ThesisScreen.Profile.name}/$id")
 }
 
 @Suppress("UNCHECKED_CAST")
@@ -266,3 +301,20 @@ private fun  AddFloatingActionButton(onClick: () -> Unit){
         }
     }
 }
+
+fun NavHostController.navigateSingleTopTo(route: String) =
+    this.navigate(route) {
+        // Pop up to the start destination of the graph to
+        // avoid building up a large stack of destinations
+        // on the back stack as users select items
+        popUpTo(
+            this@navigateSingleTopTo.graph.findStartDestination().id
+        ) {
+            saveState = true
+        }
+        // Avoid multiple copies of the same destination when
+        // reselecting the same item
+        launchSingleTop = true
+        // Restore state when reselecting a previously selected item
+        restoreState = true
+    }

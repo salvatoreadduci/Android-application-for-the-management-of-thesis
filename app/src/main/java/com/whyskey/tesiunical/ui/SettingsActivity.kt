@@ -11,10 +11,13 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.School
 import androidx.compose.material.icons.rounded.Email
 import androidx.compose.material.icons.rounded.Language
 import androidx.compose.material.icons.rounded.Person
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -22,6 +25,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberAsyncImagePainter
 import com.whyskey.tesiunical.R
 import com.whyskey.tesiunical.model.ThesisViewModel
@@ -30,11 +34,15 @@ import com.whyskey.tesiunical.ui.components.LimitThesisRow
 import com.whyskey.tesiunical.ui.components.SettingsRow
 
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun Settings(
     viewModel: ThesisViewModel
 ) {
     viewModel.getImage()
+
+    val openDialog = remember { mutableStateOf(false) }
+    changeThesisDialog(openDialog = openDialog,viewModel = viewModel)
 
     ChangeOptionDialog(
         show = viewModel.showOptionNameDialog.collectAsState().value,
@@ -81,29 +89,6 @@ fun Settings(
         )
     )
 
-    val list: List<LimitThesis> = listOf(
-        LimitThesis(
-            stringResource(id = R.string.compilation_thesis),
-            viewModel.userData.value.max_compilation
-        ),
-        LimitThesis(
-            stringResource(id = R.string.application_thesis),
-            viewModel.userData.value.max_applicative
-        ),
-        LimitThesis(
-            stringResource(id = R.string.research_thesis),
-            viewModel.userData.value.max_research
-        ),
-        LimitThesis(
-            stringResource(id = R.string.corporate_thesis),
-            viewModel.userData.value.max_corporate
-        ),
-        LimitThesis(
-            stringResource(id = R.string.erasmus_thesis),
-            viewModel.userData.value.max_erasmus
-        )
-    )
-
     var uri by remember {
         mutableStateOf(viewModel.userImage.value)
     }
@@ -137,28 +122,90 @@ fun Settings(
             title = stringResource(id = R.string.account_settings),
             items = settingsList,
             rows = {
-                SettingsRow(
-                    image = it.image,
-                    title = it.title,
-                    value = it.value,
-                    onClick = {
-                        viewModel.onOptionDialogClicked(it.dialog)
-                    }
-                )
+                if(
+                    (!viewModel.userData.value.isProfessor && it.title != stringResource(id = R.string.web_site))
+                ){
+                    SettingsRow(
+                        image = it.image,
+                        title = it.title,
+                        value = it.value,
+                        onClick = {
+                            viewModel.onOptionDialogClicked(it.dialog)
+                        }
+                    )
+                }
+
+
             }
         )
         Spacer(Modifier.height(8.dp))
-        
-        LimitThesisBody(
-            title = stringResource(id = R.string.thesis_limit),
-            items = list
-        ) {
-            LimitThesisRow(
-                title = it.title,
-                value = it.value,
-                viewModel = viewModel
+
+        if(viewModel.userData.value.isProfessor){
+            val list: List<LimitThesis> = listOf(
+                LimitThesis(
+                    stringResource(id = R.string.compilation_thesis),
+                    viewModel.userData.value.max_compilation
+                ),
+                LimitThesis(
+                    stringResource(id = R.string.application_thesis),
+                    viewModel.userData.value.max_applicative
+                ),
+                LimitThesis(
+                    stringResource(id = R.string.research_thesis),
+                    viewModel.userData.value.max_research
+                ),
+                LimitThesis(
+                    stringResource(id = R.string.corporate_thesis),
+                    viewModel.userData.value.max_corporate
+                ),
+                LimitThesis(
+                    stringResource(id = R.string.erasmus_thesis),
+                    viewModel.userData.value.max_erasmus
                 )
+            )
+
+            LimitThesisBody(
+                title = stringResource(id = R.string.thesis_limit),
+                items = list
+            ) {
+                LimitThesisRow(
+                    title = it.title,
+                    value = it.value,
+                    viewModel = viewModel
+                )
+            }
+        } else {
+            Card{
+                Surface(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    onClick = {
+                        openDialog.value = !openDialog.value
+                    }
+                ){
+                    Row(
+                        modifier = Modifier
+                            .height(68.dp)
+                            .padding(start = 4.dp, end = 4.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.School,
+                            contentDescription = null,
+                        )
+                        Spacer(modifier = Modifier.width(16.dp))
+                        Text(text = stringResource(id = R.string.change_exams))
+                        Spacer(modifier = Modifier.weight(1f))
+                        Icon(
+                            imageVector = Icons.Filled.Edit,
+                            contentDescription = "Edit"
+                        )
+                    }
+                }
+            }
+
         }
+
     }
 }
 
@@ -210,7 +257,6 @@ fun <T> LimitThesisBody(
                 )
                 Spacer(modifier = Modifier.weight(1f))
                 Switch(checked = false, onCheckedChange =  {} )
-
             }
 
             items.forEach { item ->
@@ -219,4 +265,49 @@ fun <T> LimitThesisBody(
             
         }
     }
+}
+
+@Composable
+private fun changeThesisDialog(
+    openDialog: MutableState<Boolean>,
+    viewModel: ThesisViewModel
+){
+    var examsInput by rememberSaveable { mutableStateOf(viewModel.userData.value.exams) }
+    if (openDialog.value) {
+        AlertDialog(
+            onDismissRequest = {
+                openDialog.value = false
+            },
+            title = {
+                Text(text = stringResource(id = R.string.change_exams))
+            },
+            text = {
+                TextField(
+                    modifier = Modifier.height(180.dp),
+                    value = examsInput,
+                    onValueChange = {examsInput = it},
+                )
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                       viewModel.setExams(examsInput)
+                        openDialog.value = false
+                    }
+                ) {
+                    Text("Confirm")
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = {
+                        openDialog.value = false
+                    }
+                ) {
+                    Text("Dismiss")
+                }
+            }
+        )
+    }
+
 }
