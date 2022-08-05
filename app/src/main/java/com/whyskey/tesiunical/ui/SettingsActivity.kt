@@ -123,7 +123,7 @@ fun Settings(
             items = settingsList,
             rows = {
                 if(
-                    (!viewModel.userData.value.isProfessor && it.title != stringResource(id = R.string.web_site))
+                    (it.title != stringResource(id = R.string.web_site) || viewModel.userData.value.isProfessor)
                 ){
                     SettingsRow(
                         image = it.image,
@@ -134,8 +134,6 @@ fun Settings(
                         }
                     )
                 }
-
-
             }
         )
         Spacer(Modifier.height(8.dp))

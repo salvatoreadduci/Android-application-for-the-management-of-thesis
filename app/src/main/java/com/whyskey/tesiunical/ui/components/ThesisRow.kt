@@ -15,10 +15,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.whyskey.tesiunical.R
+import com.whyskey.tesiunical.model.ThesisViewModel
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun ThesisRow(
+    isProfessor: Boolean,
     name: String,
     expanded: Boolean,
     onClick: () -> Unit,
@@ -49,11 +51,15 @@ fun ThesisRow(
                 )
 
                 Spacer(Modifier.weight(1f))
-                Icon(
-                    Icons.Filled.Close,
-                    contentDescription = "Close",
-                    modifier = Modifier.clickable { onDelete() }
-                )
+                
+                if(isProfessor){
+                    Icon(
+                        Icons.Filled.Close,
+                        contentDescription = "Close",
+                        modifier = Modifier.clickable { onDelete() }
+                    )
+                }
+                
             }
             if (expanded) {
                 Spacer(modifier = Modifier.height(8.dp))
@@ -61,6 +67,12 @@ fun ThesisRow(
                     text = stringResource(R.string.lorem_ipsum),
                     textAlign = TextAlign.Justify
                 )
+                
+                if(!isProfessor){
+                    Button(onClick = { /*TODO*/ }) {
+                        Text(text = stringResource(id = R.string.request))
+                    }
+                }
             }
         }
     }

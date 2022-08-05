@@ -39,6 +39,7 @@ fun ThesisFullScreen(
             ){
                 items(list) { thesis ->
                     ThesisRow(
+                        isProfessor = false,
                         name = thesis.title,
                         expanded = expandedThesis == thesis.title,
                         onClick = {

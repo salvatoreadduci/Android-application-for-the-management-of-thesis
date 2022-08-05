@@ -43,9 +43,11 @@ fun Profile(
     id:String
 ) {
 
-    val profile = viewModel.accounts.value.find { account -> id == account.id }
-    viewModel.getCompilationThesis(profile!!.id)
-    Log.d("TAG",viewModel.compilationThesis.value.toString())
+    val profile:Account = if(id == viewModel.user!!.uid){
+        viewModel.userData.value
+    } else {
+        viewModel.accounts.value.find { account -> id == account.id }!!
+    }
 
     Column(
         modifier = Modifier
@@ -55,6 +57,11 @@ fun Profile(
         ProfileCard(viewModel,profile)
         Spacer(Modifier.height(16.dp))
         if(profile.isProfessor){
+            viewModel.getThesis(profile.id,0)
+            viewModel.getThesis(profile.id,1)
+            viewModel.getThesis(profile.id,2)
+            viewModel.getThesis(profile.id,3)
+            viewModel.getThesis(profile.id,4)
             CompilationThesisCard(onClickSeeAll = onClickSeeAll,allCompilation,viewModel)
             Spacer(Modifier.height(16.dp))
             ApplicationThesisCard(onClickSeeAll = onClickSeeAll,allExperimental,viewModel)
@@ -74,8 +81,6 @@ fun Profile(
             NotPassedExams(profile,viewModel)
             
         }
-
-
     }
 }
 
@@ -150,6 +155,7 @@ private fun CompilationThesisCard(
     ){
             thesis ->
         ThesisRow(
+            isProfessor = viewModel.userData.value.isProfessor,
             name = thesis.title,
             expanded = expandedThesis == thesis.title,
             onClick = { expandedThesis = if (expandedThesis == thesis.title) null else thesis.title },
@@ -174,6 +180,7 @@ private fun ApplicationThesisCard(
     ){
             thesis ->
         ThesisRow(
+            isProfessor = viewModel.userData.value.isProfessor,
             name = thesis.title,
             expanded = expandedThesis == thesis.title,
             onClick = {
@@ -200,6 +207,7 @@ private fun ResearchThesisCard(
     ){
             thesis ->
         ThesisRow(
+            isProfessor = viewModel.userData.value.isProfessor,
             name = thesis.title,
             expanded = expandedThesis == thesis.title,
             onClick = {
@@ -236,7 +244,6 @@ private fun AssignedThesis(
                     .padding(start = 4.dp, end = 4.dp),
                 verticalAlignment = Alignment.CenterVertically
             ){
-
                 Icon(
                     imageVector = Icons.Rounded.Info,
                     contentDescription = null

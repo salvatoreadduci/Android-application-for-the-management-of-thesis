@@ -35,5 +35,6 @@
     <string name="professor">Professore:</string>
     <string name="type">Tipo:</string>
     <string name="change_exams">Esami non passati</string>
+    <string name="request">Richiedi</string>
 
 </resources>

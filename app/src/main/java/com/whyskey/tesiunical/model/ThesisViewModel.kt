@@ -61,15 +61,7 @@ class ThesisViewModel : ViewModel(){
     val accounts: State<List<Account>>
         get() = _accounts
 
-
-    private val queryCompilation = Firebase.firestore.collection("thesis").whereEqualTo("type",0)
-    private val queryApplication= Firebase.firestore.collection("thesis").whereEqualTo("type",1)
-    private val queryResearch = Firebase.firestore.collection("thesis").whereEqualTo("type",2)
-    private val queryCorporate= Firebase.firestore.collection("thesis").whereEqualTo("type",3)
-    private val queryErasmus = Firebase.firestore.collection("thesis").whereEqualTo("type",4)
-
     init {
-
         if(user != null){
             getAllData()
         }
@@ -94,17 +86,16 @@ class ThesisViewModel : ViewModel(){
 
     fun getAllData(){
         getUserData(Firebase.auth.currentUser?.uid)
+
         getImage()
 
         if(_userData.value.isProfessor){
-            getCompilationThesis(_userData.value.id)
-            getApplicationThesis(_userData.value.id)
-            getResearchThesis(_userData.value.id)
-            getCorporateThesis(_userData.value.id)
-            getErasmusThesis(_userData.value.id)
+            getThesis(_userData.value.id,0)
+            getThesis(_userData.value.id,1)
+            getThesis(_userData.value.id,2)
+            getThesis(_userData.value.id,3)
+            getThesis(_userData.value.id,4)
         }
-
-
     }
 
     fun getAccountsByType(type: Boolean){
@@ -219,6 +210,7 @@ class ThesisViewModel : ViewModel(){
     }
 
     fun getThesis(id:String,type: Int){
+
         viewModelScope.launch {
             Firebase.firestore.collection("thesis").whereEqualTo("type",type).whereEqualTo("id_professor",id).addSnapshotListener { value, _ ->
                 if(value != null) {
@@ -231,86 +223,17 @@ class ThesisViewModel : ViewModel(){
                             thesis.add(temp)
                         }
                     }
-                    _compilationThesis.value = thesis
-                }
-            }
-        }
-    }
-
-    private fun getApplicationThesis(id: String){
-        viewModelScope.launch {
-            queryApplication.whereEqualTo("id_professor",id).addSnapshotListener { value, _ ->
-
-                if(value != null) {
-                    val thesis = ArrayList<Thesis>()
-                    val documents = value.documents
-                    documents.forEach {
-                        val temp = it.toObject(Thesis::class.java)
-                        if(temp != null){
-                            temp.id = it.id
-                            thesis.add(temp)
-                        }
+                    Log.d("TAG",thesis.toString())
+                    when(type){
+                        0 -> _compilationThesis.value = thesis
+                        1 -> _applicationThesis.value = thesis
+                        2 -> _researchThesis.value = thesis
+                        3 -> _corporateThesis.value = thesis
+                        4 -> _erasmusThesis.value = thesis
                     }
-                    _applicationThesis.value = thesis
                 }
             }
-        }
-    }
 
-    private fun getResearchThesis(id: String){
-        viewModelScope.launch {
-            queryResearch.whereEqualTo("id_professor",id).addSnapshotListener { value, _ ->
-                if(value != null) {
-                    val thesis = ArrayList<Thesis>()
-                    val documents = value.documents
-                    documents.forEach {
-                        val temp = it.toObject(Thesis::class.java)
-                        if(temp != null){
-                            temp.id = it.id
-                            thesis.add(temp)
-                        }
-                    }
-                    _researchThesis.value = thesis
-                }
-            }
-        }
-    }
-
-    private fun getCorporateThesis(id: String){
-        viewModelScope.launch {
-            queryCorporate.whereEqualTo("id_professor",id).addSnapshotListener { value, _ ->
-                if(value != null) {
-                    val thesis = ArrayList<Thesis>()
-                    val documents = value.documents
-                    documents.forEach {
-                        val temp = it.toObject(Thesis::class.java)
-                        if(temp != null){
-                            temp.id = it.id
-                            thesis.add(temp)
-                        }
-                    }
-                    _corporateThesis.value = thesis
-                }
-            }
-        }
-    }
-
-    private fun getErasmusThesis(id: String){
-        viewModelScope.launch {
-            queryErasmus.whereEqualTo("id_professor",id).addSnapshotListener { value, _ ->
-                if(value != null) {
-                    val thesis = ArrayList<Thesis>()
-                    val documents = value.documents
-                    documents.forEach {
-                        val temp = it.toObject(Thesis::class.java)
-                        if(temp != null){
-                            temp.id = it.id
-                            thesis.add(temp)
-                        }
-                    }
-                    _erasmusThesis.value = thesis
-                }
-            }
         }
     }
 
@@ -320,8 +243,7 @@ class ThesisViewModel : ViewModel(){
                 .addSnapshotListener { value, _ ->
                 if(value != null) {
                     _userData.value = value.toObject()!!
-
-                    Log.d("TAG",value.data!!.getValue("isProfessor").toString())
+                    _userData.value.id = user
                     if(value.data!!.getValue("isProfessor") == false){
                         _userData.value.isProfessor = false
                     }
@@ -331,13 +253,11 @@ class ThesisViewModel : ViewModel(){
     }
 
     fun addNewThesis(thesisName: String, thesisType: String,thesisDescription: String) {
-
         val temp = when(thesisType){
             "Tesi Compilativa" -> 0
             "Tesi Applicativa" -> 1
             else -> 2
         }
-
         val newThesis = getNewThesisEntry(thesisName, temp, thesisDescription)
         insertThesis(newThesis)
         onDialogConfirm()
