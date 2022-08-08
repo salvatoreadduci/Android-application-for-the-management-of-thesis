@@ -9,16 +9,10 @@ import androidx.compose.material.Card
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.ktx.Firebase
-import com.whyskey.tesiunical.R
 import com.whyskey.tesiunical.data.Thesis
 import com.whyskey.tesiunical.model.ThesisViewModel
 import com.whyskey.tesiunical.ui.components.ThesisRow
-import com.whyskey.tesiunical.ui.theme.TesiUnicalTheme
 
 @Composable
 fun ThesisFullScreen(
@@ -39,15 +33,16 @@ fun ThesisFullScreen(
             ){
                 items(list) { thesis ->
                     ThesisRow(
-                        isProfessor = false,
+                        viewModel = viewModel,
+                        profile = viewModel.userData.value,
                         name = thesis.title,
                         expanded = expandedThesis == thesis.title,
                         onClick = {
                             expandedThesis = if (expandedThesis == thesis.title) null else thesis.title
                         },
-                        onDelete = { viewModel.removeThesis(thesis.id) }
+                        onDelete = { viewModel.removeThesis(thesis.id) },
+                        onRequest = { }
                     )
-
                 }
             }
         }

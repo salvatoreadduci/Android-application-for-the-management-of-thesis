@@ -42,8 +42,7 @@ fun Analytics(
                 viewModel.userData.value.max_applicative +
                 viewModel.userData.value.max_research +
                 viewModel.userData.value.max_corporate +
-                viewModel.userData.value.max_erasmus
-       ,
+                viewModel.userData.value.max_erasmus,
         label = stringResource(id = R.string.total),
         rows = {
             AnalyticsRow(title = it.name.toString(), amount = it.amount, max = it.max)

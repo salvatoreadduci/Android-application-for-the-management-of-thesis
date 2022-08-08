@@ -56,7 +56,7 @@ fun Login(
                 .fillMaxWidth(),
             onClick = {
                 viewModel.auth.signInWithEmailAndPassword(emailValue.value,passwordValue.value)
-                    .addOnCompleteListener {
+                    .addOnSuccessListener {
                         vm.signIn()
                         viewModel.getAllData()
                     }

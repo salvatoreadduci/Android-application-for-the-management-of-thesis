@@ -25,7 +25,6 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberAsyncImagePainter
 import com.whyskey.tesiunical.R
 import com.whyskey.tesiunical.model.ThesisViewModel
@@ -42,7 +41,7 @@ fun Settings(
     viewModel.getImage()
 
     val openDialog = remember { mutableStateOf(false) }
-    changeThesisDialog(openDialog = openDialog,viewModel = viewModel)
+    ChangeThesisDialog(openDialog = openDialog,viewModel = viewModel)
 
     ChangeOptionDialog(
         show = viewModel.showOptionNameDialog.collectAsState().value,
@@ -266,7 +265,7 @@ fun <T> LimitThesisBody(
 }
 
 @Composable
-private fun changeThesisDialog(
+private fun ChangeThesisDialog(
     openDialog: MutableState<Boolean>,
     viewModel: ThesisViewModel
 ){

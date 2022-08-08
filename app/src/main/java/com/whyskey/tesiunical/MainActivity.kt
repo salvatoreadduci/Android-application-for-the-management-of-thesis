@@ -28,6 +28,9 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 import com.whyskey.tesiunical.data.Thesis
 import com.whyskey.tesiunical.model.ThesisViewModel
 import com.whyskey.tesiunical.model.UserState
@@ -39,6 +42,7 @@ import com.whyskey.tesiunical.ui.theme.TesiUnicalTheme
 class MainActivity : ComponentActivity() {
     private val userState by viewModels<UserStateViewModel>()
     override fun onCreate(savedInstanceState: Bundle?) {
+        //Firebase.firestore.clearPersistence()
         super.onCreate(savedInstanceState)
         setContent {
 
@@ -222,7 +226,7 @@ fun ThesisNavHost(
                 allExperimental = allExperimental,
                 allResearch = allResearch,
                 viewModel = viewModel,
-                id = viewModel.user!!.uid
+                id = viewModel.userData.value.id
             )
         }
 

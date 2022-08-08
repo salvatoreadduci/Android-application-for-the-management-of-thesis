@@ -3,26 +3,90 @@ package com.whyskey.tesiunical.ui.components
 import android.content.res.Configuration
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Done
+import androidx.compose.material.icons.outlined.ArrowBack
+import androidx.compose.material.icons.outlined.ArrowForward
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.whyskey.tesiunical.R
 import com.whyskey.tesiunical.data.Account
+import com.whyskey.tesiunical.model.ThesisViewModel
+
+
+@Composable
+fun AccountCollection(
+    title: String,
+    profileCollection: List<Account>,
+    viewModel: ThesisViewModel,
+    onClick: (String) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Column(modifier = modifier) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .heightIn(min = 56.dp)
+                .padding(start = 24.dp)
+        ) {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.h6,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier
+                    .weight(1f)
+                    .wrapContentWidth(Alignment.Start)
+            )
+            IconButton(
+                onClick = { /* todo */ },
+                modifier = Modifier.align(Alignment.CenterVertically)
+            ) {
+                Icon(
+                    imageVector = mirroringIcon(
+                        ltrIcon = Icons.Outlined.ArrowForward,
+                        rtlIcon = Icons.Outlined.ArrowBack
+                    ),
+                    contentDescription = null
+                )
+            }
+        }
+        LazyRow(
+            modifier = modifier,
+            contentPadding = PaddingValues(start = 12.dp, end = 12.dp)
+        ) {
+            items(profileCollection){ it ->
+                ProfileItem(profile = it, viewModel = viewModel, onClick = onClick)
+            }
+        }
+    }
+}
 
 @Composable
 fun ProfileItem(
     profile: Account,
+    viewModel: ThesisViewModel,
     onClick: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -53,6 +117,30 @@ fun ProfileItem(
                 color = MaterialTheme.colors.onSecondary,
                 modifier = Modifier.padding(top = 8.dp)
             )
+
+            if(!profile.isProfessor){
+                Text(
+                    text = profile.thesis,
+                    style = MaterialTheme.typography.subtitle2,
+                    color = MaterialTheme.colors.onSecondary,
+                    modifier = Modifier.padding(top = 8.dp)
+                )
+                if(viewModel.accountsToAccept.value.contains(profile)){
+                    Row(){
+                        Icon(
+                            Icons.Filled.Done,
+                            contentDescription = "Close",
+                            modifier = Modifier.clickable { viewModel.changeRequest(profile.id,true) }
+                        )
+                        Spacer(modifier = Modifier.width(16.dp))
+                        Icon(
+                            Icons.Filled.Close,
+                            contentDescription = "Close",
+                            modifier = Modifier.clickable { viewModel.changeRequest(profile.id,false) }
+                        )
+                    }
+                }
+            }
         }
     }
 }
@@ -76,23 +164,21 @@ fun ProfileImage(
                 .crossfade(true)
                 .build(),
             contentDescription = contentDescription,
-            placeholder = painterResource(R.drawable.io),
+            placeholder = painterResource(id = R.drawable.user),
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop,
         )
     }
 }
 
-@Preview("default")
-@Preview("dark theme", uiMode = Configuration.UI_MODE_NIGHT_YES)
-@Preview("large font", fontScale = 2f)
 @Composable
-fun SnackCardPreview() {
-    JetsnackSurface() {
-        val snack = Account()
-        ProfileItem(
-            profile = snack,
-            onClick = { }
-        )
-    }
-}
+fun mirroringIcon(ltrIcon: ImageVector, rtlIcon: ImageVector): ImageVector =
+    if (LocalLayoutDirection.current == LayoutDirection.Ltr) ltrIcon else rtlIcon
+
+/**
+ * Returns the correct back navigation icon based on the current layout direction.
+ */
+@Composable
+fun mirroringBackIcon() = mirroringIcon(
+    ltrIcon = Icons.Outlined.ArrowBack, rtlIcon = Icons.Outlined.ArrowForward
+)

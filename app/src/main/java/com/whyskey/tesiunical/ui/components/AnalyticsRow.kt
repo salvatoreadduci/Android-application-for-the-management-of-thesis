@@ -15,7 +15,6 @@ fun AnalyticsRow(
     amount: Any,
     max: Any
 ) {
-
     Row(
         modifier = modifier
             .height(68.dp),

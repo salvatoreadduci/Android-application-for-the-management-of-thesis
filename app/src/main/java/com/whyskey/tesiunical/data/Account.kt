@@ -11,6 +11,7 @@ data class Account(
     val max_corporate: Int = 0,
     val max_erasmus: Int = 0,
     val exams: String = "",
-    val thesis: String = "",
-    var id: String = ""
+    var thesis: String = "",
+    var id: String = "",
+    var image: String = ""
 )

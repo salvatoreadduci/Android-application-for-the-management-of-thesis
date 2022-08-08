@@ -15,16 +15,19 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.whyskey.tesiunical.R
+import com.whyskey.tesiunical.data.Account
 import com.whyskey.tesiunical.model.ThesisViewModel
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun ThesisRow(
-    isProfessor: Boolean,
+    viewModel: ThesisViewModel,
+    profile: Account,
     name: String,
     expanded: Boolean,
     onClick: () -> Unit,
-    onDelete: () -> Unit
+    onDelete: () -> Unit,
+    onRequest: () -> Unit
 ) {
     ThesisRowSpacer(visible = expanded)
     Surface(
@@ -52,7 +55,7 @@ fun ThesisRow(
 
                 Spacer(Modifier.weight(1f))
                 
-                if(isProfessor){
+                if(viewModel.userData.value.isProfessor){
                     Icon(
                         Icons.Filled.Close,
                         contentDescription = "Close",
@@ -68,8 +71,8 @@ fun ThesisRow(
                     textAlign = TextAlign.Justify
                 )
                 
-                if(!isProfessor){
-                    Button(onClick = { /*TODO*/ }) {
+                if(!viewModel.userData.value.isProfessor){
+                    Button(onClick = { onRequest() }) {
                         Text(text = stringResource(id = R.string.request))
                     }
                 }
@@ -79,7 +82,6 @@ fun ThesisRow(
     ThesisRowSpacer(visible = expanded)
 }
 
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun ThesisRowSpacer(visible: Boolean) {
     AnimatedVisibility(visible = visible) {

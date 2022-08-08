@@ -2,7 +2,6 @@ package com.whyskey.tesiunical.ui
 
 import android.content.Intent
 import android.net.Uri
-import android.util.Log
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -43,10 +42,12 @@ fun Profile(
     id:String
 ) {
 
-    val profile:Account = if(id == viewModel.user!!.uid){
+
+    val profile = if(id == viewModel.userData.value.id){
         viewModel.userData.value
     } else {
-        viewModel.accounts.value.find { account -> id == account.id }!!
+        viewModel.accounts.value.find { account -> id == account.id }
+            ?: viewModel.accountsToAccept.value.find { account -> id == account.id }!!
     }
 
     Column(
@@ -62,11 +63,11 @@ fun Profile(
             viewModel.getThesis(profile.id,2)
             viewModel.getThesis(profile.id,3)
             viewModel.getThesis(profile.id,4)
-            CompilationThesisCard(onClickSeeAll = onClickSeeAll,allCompilation,viewModel)
+            CompilationThesisCard(onClickSeeAll = onClickSeeAll,allCompilation,viewModel,profile)
             Spacer(Modifier.height(16.dp))
-            ApplicationThesisCard(onClickSeeAll = onClickSeeAll,allExperimental,viewModel)
+            ApplicationThesisCard(onClickSeeAll = onClickSeeAll,allExperimental,viewModel,profile)
             Spacer(Modifier.height(16.dp))
-            ResearchThesisCard(onClickSeeAll = onClickSeeAll,allResearch,viewModel)
+            ResearchThesisCard(onClickSeeAll = onClickSeeAll,allResearch,viewModel,profile)
         } else {
             var expandedThesis by remember { mutableStateOf<String?>(null) }
             AssignedThesis(
@@ -112,7 +113,7 @@ private fun ProfileCard(
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
-                    .size(88.dp)
+                    .size(140.dp)
                     .clip(CircleShape)
             )
             Text(profile.name)
@@ -143,7 +144,8 @@ private fun ProfileCard(
 private fun CompilationThesisCard(
     onClickSeeAll: (String) -> Unit,
     list: List<Thesis>,
-    viewModel: ThesisViewModel
+    viewModel: ThesisViewModel,
+    profile: Account,
 ){
     var expandedThesis by remember { mutableStateOf<String?>(null) }
     val title = stringResource(id = R.string.compilation_thesis)
@@ -155,11 +157,16 @@ private fun CompilationThesisCard(
     ){
             thesis ->
         ThesisRow(
-            isProfessor = viewModel.userData.value.isProfessor,
+            viewModel = viewModel,
+            profile = profile,
             name = thesis.title,
             expanded = expandedThesis == thesis.title,
             onClick = { expandedThesis = if (expandedThesis == thesis.title) null else thesis.title },
-            onDelete = { viewModel.removeThesis(thesis.id) }
+            onDelete = { viewModel.removeThesis(thesis.id) },
+            onRequest = {
+                viewModel.addNewRequest(viewModel.userData.value.id, profile.id,thesis.id)
+                viewModel.getThesis(profile.id, thesis.type)
+            }
         )
     }
 }
@@ -168,7 +175,8 @@ private fun CompilationThesisCard(
 private fun ApplicationThesisCard(
     onClickSeeAll: (String) -> Unit,
     list: List<Thesis>,
-    viewModel: ThesisViewModel
+    viewModel: ThesisViewModel,
+    profile: Account
 ){
     var expandedThesis by remember { mutableStateOf<String?>(null) }
     val title = stringResource(id = R.string.application_thesis)
@@ -180,13 +188,15 @@ private fun ApplicationThesisCard(
     ){
             thesis ->
         ThesisRow(
-            isProfessor = viewModel.userData.value.isProfessor,
+            viewModel = viewModel,
+            profile = profile,
             name = thesis.title,
             expanded = expandedThesis == thesis.title,
             onClick = {
                 expandedThesis = if (expandedThesis == thesis.title) null else thesis.title
             },
-            onDelete = { viewModel.removeThesis(thesis.id) }
+            onDelete = { viewModel.removeThesis(thesis.id) },
+            onRequest = { viewModel.addNewRequest(viewModel.userData.value.id, profile.id,thesis.id) }
         )
     }
 }
@@ -195,7 +205,8 @@ private fun ApplicationThesisCard(
 private fun ResearchThesisCard(
     onClickSeeAll: (String) -> Unit,
     list: List<Thesis>,
-    viewModel: ThesisViewModel
+    viewModel: ThesisViewModel,
+    profile: Account
 ){
     var expandedThesis by remember { mutableStateOf<String?>(null) }
     val title = stringResource(id = R.string.application_thesis)
@@ -207,13 +218,15 @@ private fun ResearchThesisCard(
     ){
             thesis ->
         ThesisRow(
-            isProfessor = viewModel.userData.value.isProfessor,
+            viewModel = viewModel,
+            profile = profile,
             name = thesis.title,
             expanded = expandedThesis == thesis.title,
             onClick = {
                 expandedThesis = if (expandedThesis == thesis.title) null else thesis.title
             },
-            onDelete = { viewModel.removeThesis(thesis.id) }
+            onDelete = { viewModel.removeThesis(thesis.id) },
+            onRequest = {viewModel.addNewRequest(viewModel.userData.value.id, profile.id,thesis.id) }
         )
     }
 }

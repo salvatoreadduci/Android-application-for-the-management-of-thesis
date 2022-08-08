@@ -36,5 +36,7 @@
     <string name="type">Tipo:</string>
     <string name="change_exams">Esami non passati</string>
     <string name="request">Richiedi</string>
+    <string name="followed_students">Studenti seguiti</string>
+    <string name="students_to_follow">Richieste di Tesi</string>
 
 </resources>

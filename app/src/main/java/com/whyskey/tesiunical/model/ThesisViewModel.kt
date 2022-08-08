@@ -61,6 +61,14 @@ class ThesisViewModel : ViewModel(){
     val accounts: State<List<Account>>
         get() = _accounts
 
+    private val _accountsToAccept = mutableStateOf<List<Account>>(emptyList())
+    val accountsToAccept: State<List<Account>>
+        get() = _accountsToAccept
+
+    private val _requests = mutableStateOf<List<Request>>(emptyList())
+    val requests: State<List<Request>>
+        get() = _requests
+
     init {
         if(user != null){
             getAllData()
@@ -73,10 +81,23 @@ class ThesisViewModel : ViewModel(){
 
     private fun updateExams(exams:String){
         viewModelScope.launch {
-            Firebase.firestore.collection("account").document(user!!.uid)
+            Firebase.firestore.collection("account").document(_userData.value.id)
                 .update(mapOf(
                     "exams" to exams
                 ))
+        }
+    }
+
+    fun changeRequest(id: String, accepted: Boolean){
+        val temp = _requests.value.find { request -> id == request.id_student }
+        if(accepted){
+            Firebase.firestore.collection("request").document(temp!!.id)
+                .update(mapOf(
+                    "accepted" to true
+                ))
+        } else {
+            Firebase.firestore.collection("request").document(temp!!.id)
+                .delete()
         }
     }
 
@@ -86,6 +107,7 @@ class ThesisViewModel : ViewModel(){
 
     fun getAllData(){
         getUserData(Firebase.auth.currentUser?.uid)
+        Log.d("TAG",Firebase.auth.currentUser?.uid.toString())
 
         getImage()
 
@@ -102,24 +124,72 @@ class ThesisViewModel : ViewModel(){
         getAccounts(type)
     }
 
-    private fun getAccounts(type: Boolean){
+    private fun getRequest(idProfessor: String) {
         viewModelScope.launch {
-            Firebase.firestore.collection("account").whereEqualTo("isProfessor",type).addSnapshotListener { value, _ ->
-                if(value != null) {
-                    val accounts = ArrayList<Account>()
-                    val documents = value.documents
-                    documents.forEach {
-                        val temp = it.toObject(Account::class.java)
-                        if(temp != null){
-                            temp.id = it.id
-                            accounts.add(temp)
+            val requests = ArrayList<Request>()
+            Firebase.firestore.collection("request").whereEqualTo("id_professor", idProfessor)
+                .addSnapshotListener { value, _ ->
+                    if (value != null) {
+
+                        val documents = value.documents
+                        documents.forEach{
+                            val temp = it.toObject(Request::class.java)
+                            if(temp != null){
+                                temp.id = it.id
+                                requests.add(temp)
+                            }
+                        }
+                        _requests.value = requests
+                    }
+                }
+        }
+    }
+
+    private fun getAccounts(type: Boolean) {
+        viewModelScope.launch {
+            val accounts = ArrayList<Account>()
+            if (type) {
+                Firebase.firestore.collection("account").whereEqualTo("isProfessor", type)
+                    .addSnapshotListener { value, _ ->
+                        if (value != null) {
+                            val documents = value.documents
+                            documents.forEach {
+                                val temp = it.toObject(Account::class.java)
+                                if (temp != null) {
+                                    temp.id = it.id
+                                    accounts.add(temp)
+                                }
+                            }
+                            _accounts.value = accounts
                         }
                     }
-                    _accounts.value = accounts
+            } else {
+                getRequest(_userData.value.id)
+                val accountsToAccept = ArrayList<Account>()
+
+                _requests.value.forEach {
+                    Firebase.firestore.collection("account").document(it.id_student)
+                        .addSnapshotListener { value, _ ->
+                            if (value != null) {
+                                val student = value.toObject(Account::class.java)
+                                if (student != null) {
+                                    student.id = value.id
+                                    student.isProfessor = type
+                                    if(it.accepted){
+                                        accounts.add(student)
+                                    } else {
+                                        accountsToAccept.add(student)
+                                    }
+                                }
+                            }
+                            _accountsToAccept.value = accountsToAccept
+                            _accounts.value = accounts
+                        }
                 }
             }
         }
     }
+
 
     private fun retrieveImage(){
         val localFile: File = File.createTempFile("localFile", ".jpg")
@@ -138,7 +208,6 @@ class ThesisViewModel : ViewModel(){
 
     private fun deleteThesis(thesis: String){
         viewModelScope.launch {
-
             Firebase.firestore.collection("thesis").document(thesis)
                 .delete()
                 .addOnSuccessListener { Log.d("TAG", "DocumentSnapshot successfully deleted!") }
@@ -153,10 +222,11 @@ class ThesisViewModel : ViewModel(){
 
     private fun setName(name:String){
         viewModelScope.launch {
-            Firebase.firestore.collection("account").document(user!!.uid)
+            Firebase.firestore.collection("account").document(_userData.value.id)
                 .update(mapOf(
                     "name" to name
-                ))
+                    )
+                )
         }
     }
 
@@ -167,7 +237,7 @@ class ThesisViewModel : ViewModel(){
 
     private fun setEmail(email:String){
         viewModelScope.launch {
-            Firebase.firestore.collection("account").document(user!!.uid)
+            Firebase.firestore.collection("account").document(_userData.value.id)
                 .update(mapOf(
                     "email" to email
                 ))
@@ -188,7 +258,7 @@ class ThesisViewModel : ViewModel(){
 
     private fun setLimit(type: String, value: Int){
         viewModelScope.launch {
-            Firebase.firestore.collection("account").document(user!!.uid)
+            Firebase.firestore.collection("account").document(_userData.value.id)
                 .update(mapOf(
                     type to value
                 ))
@@ -202,15 +272,25 @@ class ThesisViewModel : ViewModel(){
 
     private fun setWebSite(webSite:String){
         viewModelScope.launch {
-            Firebase.firestore.collection("account").document(user!!.uid)
+            Firebase.firestore.collection("account").document(_userData.value.id)
                 .update(mapOf(
                     "web_site" to webSite
-                ))
+                    )
+                )
+        }
+    }
+
+    private fun setThesis(thesis:String){
+        viewModelScope.launch {
+            Firebase.firestore.collection("account").document(_userData.value.id)
+                .update(mapOf(
+                    "thesis" to thesis
+                    )
+                )
         }
     }
 
     fun getThesis(id:String,type: Int){
-
         viewModelScope.launch {
             Firebase.firestore.collection("thesis").whereEqualTo("type",type).whereEqualTo("id_professor",id).addSnapshotListener { value, _ ->
                 if(value != null) {
@@ -220,10 +300,12 @@ class ThesisViewModel : ViewModel(){
                         val temp = it.toObject(Thesis::class.java)
                         if(temp != null){
                             temp.id = it.id
-                            thesis.add(temp)
+                            getRequest(id)
+                            if(_requests.value.find { request -> temp.id == request.id_thesis } == null){
+                                thesis.add(temp)
+                            }
                         }
                     }
-                    Log.d("TAG",thesis.toString())
                     when(type){
                         0 -> _compilationThesis.value = thesis
                         1 -> _applicationThesis.value = thesis
@@ -252,6 +334,26 @@ class ThesisViewModel : ViewModel(){
         }
     }
 
+    fun addNewRequest(idStudent: String,idProfessor: String,id_thesis: String){
+        val newRequest = getNewRequest(idStudent,idProfessor,id_thesis)
+        insertRequest(newRequest)
+        setThesis(id_thesis)
+    }
+
+    private fun getNewRequest(idStudent: String, idProfessor: String,idThesis: String): Request{
+        return Request(
+            id_student = idStudent,
+            id_professor = idProfessor,
+            id_thesis = idThesis
+        )
+    }
+
+    private fun insertRequest(request: Request){
+        viewModelScope.launch {
+            Firebase.firestore.collection("request").add(request)
+        }
+    }
+
     fun addNewThesis(thesisName: String, thesisType: String,thesisDescription: String) {
         val temp = when(thesisType){
             "Tesi Compilativa" -> 0
@@ -267,7 +369,8 @@ class ThesisViewModel : ViewModel(){
         return Thesis(
             title = thesisName,
             type = thesisType,
-            description = thesisDescription
+            description = thesisDescription,
+            id_professor = userData.value.id
         )
     }
 
@@ -305,7 +408,6 @@ class ThesisViewModel : ViewModel(){
     }
 
     fun onOptionDialogClicked(dialog: Int) {
-
         when(dialog){
             0 -> _showOptionNameDialog.value = true
             1 -> _showOptionEmailDialog.value = true
