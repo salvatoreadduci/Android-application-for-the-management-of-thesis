@@ -11,21 +11,18 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun AnalyticsRow(
     modifier: Modifier = Modifier,
-    title: String,
+    type: String,
     amount: Any,
     max: Any
 ) {
     Row(
         modifier = modifier
-            .height(68.dp),
+            .height(58.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         val typography = MaterialTheme.typography
-        AccountIndicator(
-            modifier = Modifier
-        )
         Spacer(Modifier.width(12.dp))
-        Text(text = title, style = typography.body1)
+        Text(text = type, style = typography.body1)
         Spacer(Modifier.weight(1f))
         Row(
             horizontalArrangement = Arrangement.SpaceBetween
@@ -39,12 +36,4 @@ fun AnalyticsRow(
         }
         Spacer(Modifier.width(16.dp))
     }
-}
-
-@Composable
-private fun AccountIndicator(modifier: Modifier = Modifier) {
-    Spacer(
-        modifier
-            .size(4.dp, 36.dp)
-    )
 }

@@ -37,6 +37,11 @@
     <string name="change_exams">Esami non passati</string>
     <string name="request">Richiedi</string>
     <string name="followed_students">Studenti seguiti</string>
-    <string name="students_to_follow">Richieste di Tesi</string>
+    <string name="march_session">Sessione di Marzo</string>
+    <string name="july_session">Sessione di Luglio</string>
+    <string name="september_session">Sessione di Settembre</string>
+    <string name="december_session">Sessione di Dicembre</string>
+    <string name="students_to_follow">Richieste ricevute</string>
+
 
 </resources>

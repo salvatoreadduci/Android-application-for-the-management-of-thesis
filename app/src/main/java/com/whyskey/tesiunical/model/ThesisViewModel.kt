@@ -245,7 +245,6 @@ class ThesisViewModel : ViewModel(){
     }
 
     fun changeLimit(type: String, value: Int){
-
         val temp = when(type){
             "Tesi Compilativa" -> "max_compilation"
             "Tesi Applicativa" -> "max_applicative"
