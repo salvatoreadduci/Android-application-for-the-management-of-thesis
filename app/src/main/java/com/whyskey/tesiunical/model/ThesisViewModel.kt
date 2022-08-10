@@ -393,6 +393,9 @@ class ThesisViewModel : ViewModel(){
     private val _showOptionWebDialog = MutableStateFlow(false)
     val showOptionWebDialog: StateFlow<Boolean> = _showOptionWebDialog.asStateFlow()
 
+    private val _showLimitDialog = MutableStateFlow(false)
+    val showLimitDialog: StateFlow<Boolean> = _showLimitDialog.asStateFlow()
+
 
     fun onOpenDialogClicked() {
         _showDialog.value = true
@@ -411,6 +414,7 @@ class ThesisViewModel : ViewModel(){
             0 -> _showOptionNameDialog.value = true
             1 -> _showOptionEmailDialog.value = true
             2 -> _showOptionWebDialog.value = true
+            3 -> _showLimitDialog.value = true
         }
     }
 
@@ -418,6 +422,7 @@ class ThesisViewModel : ViewModel(){
         _showOptionNameDialog.value = false
         _showOptionEmailDialog.value = false
         _showOptionWebDialog.value = false
+        _showLimitDialog.value = false
     }
 }
 

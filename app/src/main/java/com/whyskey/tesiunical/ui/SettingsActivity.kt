@@ -1,6 +1,7 @@
 package com.whyskey.tesiunical.ui
 
 
+import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
@@ -13,9 +14,7 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.School
-import androidx.compose.material.icons.rounded.Email
-import androidx.compose.material.icons.rounded.Language
-import androidx.compose.material.icons.rounded.Person
+import androidx.compose.material.icons.rounded.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
@@ -28,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import com.whyskey.tesiunical.R
 import com.whyskey.tesiunical.model.ThesisViewModel
+import com.whyskey.tesiunical.ui.components.ChangeLimitDialog
 import com.whyskey.tesiunical.ui.components.ChangeOptionDialog
 import com.whyskey.tesiunical.ui.components.LimitThesisRow
 import com.whyskey.tesiunical.ui.components.SettingsRow
@@ -138,7 +138,35 @@ fun Settings(
         Spacer(Modifier.height(8.dp))
 
         if(viewModel.userData.value.isProfessor){
-            val list: List<LimitThesis> = listOf(
+
+            val thesisList: List<SettingsData> = listOf(
+                SettingsData(
+                    Icons.Rounded.EmojiNature,
+                    stringResource(id = R.string.march_session),
+                    viewModel.userData.value.march_session,
+                    0
+                ),
+                SettingsData(
+                    Icons.Rounded.BeachAccess,
+                    stringResource(id = R.string.july_session),
+                    viewModel.userData.value.july_session,
+                    1
+                ),
+                SettingsData(
+                    Icons.Rounded.Park,
+                    stringResource(id = R.string.september_session),
+                    viewModel.userData.value.september_session,
+                    2
+                ),
+                SettingsData(
+                    Icons.Rounded.AcUnit,
+                    stringResource(id = R.string.december_session),
+                    viewModel.userData.value.december_session,
+                    2
+                )
+            )
+
+            /*val list: List<LimitThesis> = listOf(
                 LimitThesis(
                     stringResource(id = R.string.compilation_thesis),
                     viewModel.userData.value.max_compilation
@@ -160,8 +188,45 @@ fun Settings(
                     viewModel.userData.value.max_erasmus
                 )
             )
+            val list: List<Map<String,List<Int>>> = listOf(
+                viewModel.userData.value.march_session,
+                viewModel.userData.value.july_session,
+                viewModel.userData.value.september_session,
+                viewModel.userData.value.december_session,
+            )*/
+            var title by rememberSaveable { mutableStateOf("") }
+            var list by remember { mutableStateOf(viewModel.userData.value.march_session)}
+
+            ChangeLimitDialog(
+                show = viewModel.showLimitDialog.collectAsState().value,
+                title = title,
+                onDismiss = { viewModel.onOptionDialogConfirm() },
+                onConfirm = { },
+                items = list.toList(),
+                rows = {
+                       LimitThesisRow(title = it.first, value = it.second[1], viewModel = viewModel)
+                },
+                viewModel = viewModel
+            )
 
             LimitThesisBody(
+                title = stringResource(id = R.string.thesis_limit),
+                items = thesisList,
+                rows = {
+                    SettingsRow(
+                        image = it.image,
+                        title = it.title,
+                        value = it.title,
+                        onClick = {
+                            title = it.title
+                            list = it.value as Map<String, List<Int>>
+                            viewModel.onOptionDialogClicked(3)
+
+                        }
+                    )
+                }
+            )
+            /*LimitThesisBody(
                 title = stringResource(id = R.string.thesis_limit),
                 items = list
             ) {
@@ -170,7 +235,7 @@ fun Settings(
                     value = it.value,
                     viewModel = viewModel
                 )
-            }
+            }*/
         } else {
             Card{
                 Surface(

@@ -56,3 +56,42 @@ fun ChangeOptionDialog(
         )
     }
 }
+
+@Composable
+fun <T> ChangeLimitDialog(
+    show: Boolean,
+    title: String,
+    onDismiss: () -> Unit,
+    onConfirm: (String) -> Unit,
+    items: List<T>,
+    rows: @Composable (T) -> Unit,
+    viewModel: ThesisViewModel
+){
+
+    var input by rememberSaveable { mutableStateOf("") }
+
+    if(show){
+        AlertDialog(
+            onDismissRequest =  onDismiss,
+            confirmButton = {
+                TextButton(onClick = {
+                    onConfirm(input)
+                    input = ""
+                } )
+                { Text(text = stringResource(id = R.string.save)) }
+            },
+            dismissButton = {
+                TextButton(onClick = onDismiss)
+                { Text(text = stringResource(id = R.string.cancel)) }
+            },
+            title = { Text(text = title)},
+            text = {
+                Column(modifier = Modifier.padding(8.dp)){
+                   items.forEach {
+                       rows(it)
+                   }
+                }
+            }
+        )
+    }
+}
