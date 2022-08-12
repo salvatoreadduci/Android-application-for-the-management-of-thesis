@@ -9,6 +9,7 @@ import androidx.compose.material.Divider
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import com.whyskey.tesiunical.R
 import com.whyskey.tesiunical.data.Account
 import com.whyskey.tesiunical.model.ThesisViewModel
@@ -57,10 +58,18 @@ private fun ProfilesCollectionList(
             }
         }
     } else {
-        Column() {
-            AccountCollection(title = stringResource(id = R.string.followed_students),profileCollection = viewModel.accounts.value,viewModel = viewModel, onClick)
-            Divider()
-            AccountCollection(title = stringResource(id = R.string.students_to_follow), profileCollection = viewModel.accountsToAccept.value,viewModel = viewModel, onClick)
+        var temp = true
+        LazyColumn(contentPadding = PaddingValues(start = 12.dp, end = 12.dp)){
+
+            items(5){
+                if(temp){
+                    AccountCollection(title = stringResource(id = R.string.students_to_follow), profileCollection = viewModel.accountsToAccept.value,viewModel = viewModel, onClick)
+                    temp = false
+                } else {
+                    Divider()
+                    AccountCollection(title = stringResource(id = R.string.followed_students),profileCollection = viewModel.accounts.value,viewModel = viewModel, onClick)
+                }
+            }
         }
     }
 }

@@ -244,22 +244,21 @@ class ThesisViewModel : ViewModel(){
         }
     }
 
-    fun changeLimit(type: String, value: Int){
-        val temp = when(type){
-            "Tesi Compilativa" -> "max_compilation"
-            "Tesi Applicativa" -> "max_applicative"
-            "Tesi di ricerca" -> "max_research"
-            "Tesi in azienda" -> "max_corporate"
-            else -> "max_erasmus"
+    fun changeLimit(idList: String, type: String, value: Int){
+        val temp = when(idList){
+            "0" -> "march_session"
+            "1" -> "july_session"
+            "2" -> "september_session"
+            else -> "december_session"
         }
-        setLimit(temp,value)
+        setLimit(temp,type,value)
     }
 
-    private fun setLimit(type: String, value: Int){
+    private fun setLimit(idList: String, type: String, value: Int){
         viewModelScope.launch {
             Firebase.firestore.collection("account").document(_userData.value.id)
                 .update(mapOf(
-                    type to value
+                    "$idList.$type.max" to value
                 ))
         }
     }

@@ -18,11 +18,11 @@ import com.whyskey.tesiunical.ui.components.AnalyticsRow
 fun Analytics(
     viewModel: ThesisViewModel
 ) {
-    val list: List<Map<String,List<Int>>> = listOf(
+    val list: List<Map<String,Map<String,Int>>> = listOf(
         viewModel.userData.value.march_session,
         viewModel.userData.value.july_session,
         viewModel.userData.value.september_session,
-        viewModel.userData.value.december_session,
+        viewModel.userData.value.december_session
     )
 
     var count = 0
@@ -43,12 +43,11 @@ fun Analytics(
                 title = title,
                 items = it.toList(),
                 rows = {
-                    AnalyticsRow(type = it.first, amount = it.second[0], max = it.second[1])
+                    AnalyticsRow(type = it.first, amount = it.second.values.toList()[0], max = it.second.values.toList()[1])
                 }
             )
         }
     }
-
 }
 
 @Composable

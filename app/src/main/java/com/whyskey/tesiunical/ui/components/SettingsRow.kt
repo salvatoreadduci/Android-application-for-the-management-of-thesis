@@ -63,7 +63,8 @@ fun SettingsRow(
 @Composable
 fun LimitThesisRow(
     title: String,
-    value: Any,
+    value: Int,
+    idList: String,
     viewModel: ThesisViewModel
 ) {
     var input by rememberSaveable { mutableStateOf("") }
@@ -94,7 +95,7 @@ fun LimitThesisRow(
                         input = it
                         try {
                             if(input != "" && input != value.toString()){
-                               viewModel.changeLimit(title, input.toInt())
+                               viewModel.changeLimit(idList,title, input.toInt())
                             }
 
                         } catch (e: NumberFormatException) {input = "0"}

@@ -41,8 +41,6 @@ fun Profile(
     viewModel: ThesisViewModel,
     id:String
 ) {
-
-
     val profile = if(id == viewModel.userData.value.id){
         viewModel.userData.value
     } else {

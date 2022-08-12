@@ -62,21 +62,17 @@ fun <T> ChangeLimitDialog(
     show: Boolean,
     title: String,
     onDismiss: () -> Unit,
-    onConfirm: (String) -> Unit,
+    onConfirm: () -> Unit,
     items: List<T>,
     rows: @Composable (T) -> Unit,
     viewModel: ThesisViewModel
 ){
-
-    var input by rememberSaveable { mutableStateOf("") }
-
     if(show){
         AlertDialog(
             onDismissRequest =  onDismiss,
             confirmButton = {
                 TextButton(onClick = {
-                    onConfirm(input)
-                    input = ""
+                    onConfirm()
                 } )
                 { Text(text = stringResource(id = R.string.save)) }
             },

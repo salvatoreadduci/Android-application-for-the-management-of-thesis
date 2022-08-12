@@ -76,7 +76,7 @@ fun AccountCollection(
             modifier = modifier,
             contentPadding = PaddingValues(start = 12.dp, end = 12.dp)
         ) {
-            items(profileCollection){ it ->
+            items(profileCollection){
                 ProfileItem(profile = it, viewModel = viewModel, onClick = onClick)
             }
         }
@@ -126,6 +126,13 @@ fun ProfileItem(
                     modifier = Modifier.padding(top = 8.dp)
                 )
                 if(viewModel.accountsToAccept.value.contains(profile)){
+                    Text(
+                        text = profile.session.toString(),
+                        style = MaterialTheme.typography.subtitle2,
+                        color = MaterialTheme.colors.onSecondary,
+                        modifier = Modifier.padding(top = 8.dp)
+                    )
+
                     Row(){
                         Icon(
                             Icons.Filled.Done,

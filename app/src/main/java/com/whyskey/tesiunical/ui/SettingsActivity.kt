@@ -162,7 +162,7 @@ fun Settings(
                     Icons.Rounded.AcUnit,
                     stringResource(id = R.string.december_session),
                     viewModel.userData.value.december_session,
-                    2
+                    3
                 )
             )
 
@@ -195,16 +195,17 @@ fun Settings(
                 viewModel.userData.value.december_session,
             )*/
             var title by rememberSaveable { mutableStateOf("") }
-            var list by remember { mutableStateOf(viewModel.userData.value.march_session)}
+            var list by remember { mutableStateOf(viewModel.userData.value.december_session)}
+            var idList by remember { mutableStateOf("3")}
 
             ChangeLimitDialog(
                 show = viewModel.showLimitDialog.collectAsState().value,
                 title = title,
                 onDismiss = { viewModel.onOptionDialogConfirm() },
-                onConfirm = { },
+                onConfirm = {viewModel.onOptionDialogConfirm() },
                 items = list.toList(),
                 rows = {
-                       LimitThesisRow(title = it.first, value = it.second[1], viewModel = viewModel)
+                       LimitThesisRow(title = it.first, value = it.second.values.toList()[1], idList = idList,viewModel = viewModel)
                 },
                 viewModel = viewModel
             )
@@ -219,9 +220,9 @@ fun Settings(
                         value = it.title,
                         onClick = {
                             title = it.title
-                            list = it.value as Map<String, List<Int>>
+                            idList = it.dialog.toString()
+                            list = it.value as Map<String, Map<String, Int>>
                             viewModel.onOptionDialogClicked(3)
-
                         }
                     )
                 }
