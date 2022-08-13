@@ -66,8 +66,14 @@ private fun ProfilesCollectionList(
                     AccountCollection(title = stringResource(id = R.string.students_to_follow), profileCollection = viewModel.accountsToAccept.value,viewModel = viewModel, onClick)
                     temp = false
                 } else {
+                    val title = when(it-1){
+                        0 -> stringResource(id = R.string.march_session)
+                        1 -> stringResource(id = R.string.july_session)
+                        2 -> stringResource(id = R.string.september_session)
+                        else -> stringResource(id = R.string.december_session)
+                    }
                     Divider()
-                    AccountCollection(title = stringResource(id = R.string.followed_students),profileCollection = viewModel.accounts.value,viewModel = viewModel, onClick)
+                    AccountCollection(title = title,profileCollection = viewModel.accounts.value.filter { account -> account.session == it-1 },viewModel = viewModel, onClick)
                 }
             }
         }
