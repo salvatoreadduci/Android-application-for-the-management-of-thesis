@@ -1,6 +1,5 @@
 package com.whyskey.tesiunical.ui
 
-import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.*
@@ -59,7 +58,10 @@ private fun ProfilesCollectionList(
         }
     } else {
         var temp = true
-        LazyColumn(contentPadding = PaddingValues(start = 12.dp, end = 12.dp)){
+        LazyColumn(
+            contentPadding = PaddingValues(start = 12.dp, end = 12.dp),
+            state = rememberLazyListState()
+        ){
 
             items(5){
                 if(temp){
