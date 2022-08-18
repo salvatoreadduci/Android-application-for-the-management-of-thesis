@@ -12,8 +12,8 @@ import androidx.compose.ui.unit.dp
 fun AnalyticsRow(
     modifier: Modifier = Modifier,
     type: String,
-    amount: Any,
-    max: Any
+    amount: Int?,
+    max: Int?
 ) {
     Row(
         modifier = modifier

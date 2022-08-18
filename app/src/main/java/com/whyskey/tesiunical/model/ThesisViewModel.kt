@@ -53,6 +53,22 @@ class ThesisViewModel : ViewModel(){
     val userData: State<Account>
         get() = _userData
 
+    private val _marchSession = mutableStateOf(Session())
+    val marchSession: State<Session>
+        get() = _marchSession
+
+    private val _julySession = mutableStateOf(Session())
+    val julySession: State<Session>
+        get() = _julySession
+
+    private val _septemberSession = mutableStateOf(Session())
+    val septemberSession: State<Session>
+        get() = _septemberSession
+
+    private val _decemberSession = mutableStateOf(Session())
+    val decemberSession: State<Session>
+        get() = _decemberSession
+
     private val _userImage = mutableStateOf<Uri?>(null)
     val userImage: State<Uri?>
         get() = _userImage
@@ -244,22 +260,28 @@ class ThesisViewModel : ViewModel(){
         }
     }
 
-    fun changeLimit(idList: String, type: String, value: Int){
+    fun changeLimit(idList: String, applicative: String, compilation: String, corporate: String, erasmus: String, research: String){
         val temp = when(idList){
-            "0" -> "march_session"
-            "1" -> "july_session"
-            "2" -> "september_session"
-            else -> "december_session"
+            "0" -> "march"
+            "1" -> "july"
+            "2" -> "september"
+            else -> "december"
         }
-        setLimit(temp,type,value)
+        setLimit(temp,applicative.toInt(),compilation.toInt(),corporate.toInt(),erasmus.toInt(),research.toInt())
+        onOptionDialogConfirm()
     }
 
-    private fun setLimit(idList: String, type: String, value: Int){
+    private fun setLimit(idList: String, applicative: Int, compilation: Int, corporate: Int, erasmus: Int, research: Int){
         viewModelScope.launch {
-            Firebase.firestore.collection("account").document(_userData.value.id)
+            Firebase.firestore.collection("account").document(_userData.value.id).collection("sessions").document(idList)
                 .update(mapOf(
-                    "$idList.$type.max" to value
-                ))
+                    "applicative.max" to applicative,
+                    "compilation.max" to compilation,
+                    "corporate.max" to corporate,
+                    "erasmus.max" to erasmus,
+                    "research.max" to research
+                )
+                )
         }
     }
 
@@ -329,6 +351,32 @@ class ThesisViewModel : ViewModel(){
                     }
                 }
             }
+        }
+    }
+
+    fun session(idList: Int){
+        getSession(idList)
+    }
+
+    private fun getSession(idList: Int){
+        val temp = when(idList){
+            0 -> "march"
+            1 -> "july"
+            2 -> "september"
+            else -> "december"
+        }
+        viewModelScope.launch {
+            Firebase.firestore.collection("account").document(_userData.value.id).collection("sessions").document(temp)
+                .addSnapshotListener { value, _ ->
+                    if(value != null){
+                        when(idList) {
+                            0 -> _marchSession.value = value.toObject(Session::class.java)!!
+                            1 -> _julySession.value = value.toObject(Session::class.java)!!
+                            2 -> _septemberSession.value = value.toObject(Session::class.java)!!
+                            else -> _decemberSession.value = value.toObject(Session::class.java)!!
+                        }
+                    }
+                }
         }
     }
 
@@ -424,4 +472,3 @@ class ThesisViewModel : ViewModel(){
         _showLimitDialog.value = false
     }
 }
-

@@ -26,6 +26,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import com.whyskey.tesiunical.R
+import com.whyskey.tesiunical.data.Session
 import com.whyskey.tesiunical.model.ThesisViewModel
 import com.whyskey.tesiunical.ui.components.ChangeLimitDialog
 import com.whyskey.tesiunical.ui.components.ChangeOptionDialog
@@ -143,100 +144,64 @@ fun Settings(
                 SettingsData(
                     Icons.Rounded.EmojiNature,
                     stringResource(id = R.string.march_session),
-                    viewModel.userData.value.march_session,
+                    viewModel.marchSession.value,
                     0
                 ),
                 SettingsData(
                     Icons.Rounded.BeachAccess,
                     stringResource(id = R.string.july_session),
-                    viewModel.userData.value.july_session,
+                    viewModel.julySession.value,
                     1
                 ),
                 SettingsData(
                     Icons.Rounded.Park,
                     stringResource(id = R.string.september_session),
-                    viewModel.userData.value.september_session,
+                    viewModel.septemberSession.value,
                     2
                 ),
                 SettingsData(
                     Icons.Rounded.AcUnit,
                     stringResource(id = R.string.december_session),
-                    viewModel.userData.value.december_session,
+                    viewModel.decemberSession.value,
                     3
                 )
             )
 
-            /*val list: List<LimitThesis> = listOf(
-                LimitThesis(
-                    stringResource(id = R.string.compilation_thesis),
-                    viewModel.userData.value.max_compilation
-                ),
-                LimitThesis(
-                    stringResource(id = R.string.application_thesis),
-                    viewModel.userData.value.max_applicative
-                ),
-                LimitThesis(
-                    stringResource(id = R.string.research_thesis),
-                    viewModel.userData.value.max_research
-                ),
-                LimitThesis(
-                    stringResource(id = R.string.corporate_thesis),
-                    viewModel.userData.value.max_corporate
-                ),
-                LimitThesis(
-                    stringResource(id = R.string.erasmus_thesis),
-                    viewModel.userData.value.max_erasmus
-                )
-            )
-            val list: List<Map<String,List<Int>>> = listOf(
-                viewModel.userData.value.march_session,
-                viewModel.userData.value.july_session,
-                viewModel.userData.value.september_session,
-                viewModel.userData.value.december_session,
-            )*/
+            for(temp in 0..3){
+                viewModel.session(temp)
+            }
+
             var title by rememberSaveable { mutableStateOf("") }
-            var list by remember { mutableStateOf(viewModel.userData.value.december_session)}
+            var list by remember { mutableStateOf(viewModel.decemberSession.value)}
             var idList by remember { mutableStateOf("3")}
+
 
             ChangeLimitDialog(
                 show = viewModel.showLimitDialog.collectAsState().value,
                 title = title,
                 onDismiss = { viewModel.onOptionDialogConfirm() },
-                onConfirm = {viewModel.onOptionDialogConfirm() },
-                items = list.toList(),
-                rows = {
-                       LimitThesisRow(title = it.first, value = it.second.values.toList()[1], idList = idList,viewModel = viewModel)
-                },
+                onConfirm = viewModel::changeLimit,
+                item = list,
+                idList = idList,
                 viewModel = viewModel
             )
 
             LimitThesisBody(
                 title = stringResource(id = R.string.thesis_limit),
-                items = thesisList,
-                rows = {
-                    SettingsRow(
-                        image = it.image,
-                        title = it.title,
-                        value = it.title,
-                        onClick = {
-                            title = it.title
-                            idList = it.dialog.toString()
-                            list = it.value as Map<String, Map<String, Int>>
-                            viewModel.onOptionDialogClicked(3)
-                        }
-                    )
-                }
-            )
-            /*LimitThesisBody(
-                title = stringResource(id = R.string.thesis_limit),
-                items = list
+                items = thesisList
             ) {
-                LimitThesisRow(
+                SettingsRow(
+                    image = it.image,
                     title = it.title,
-                    value = it.value,
-                    viewModel = viewModel
+                    value = it.title,
+                    onClick = {
+                        title = it.title
+                        idList = it.dialog.toString()
+                        list = it.value as Session
+                        viewModel.onOptionDialogClicked(3)
+                    }
                 )
-            }*/
+            }
         } else {
             Card{
                 Surface(

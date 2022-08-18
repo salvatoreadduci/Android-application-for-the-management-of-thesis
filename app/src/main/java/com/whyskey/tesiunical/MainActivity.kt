@@ -1,6 +1,5 @@
 package com.whyskey.tesiunical
 
-import android.app.Application
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -12,11 +11,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -28,9 +24,6 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.ktx.Firebase
 import com.whyskey.tesiunical.data.Thesis
 import com.whyskey.tesiunical.model.ThesisViewModel
 import com.whyskey.tesiunical.model.UserState
@@ -49,14 +42,7 @@ class MainActivity : ComponentActivity() {
             val owner = LocalViewModelStoreOwner.current
 
             owner?.let {
-                val viewModel: ThesisViewModel = viewModel(
-                    it,
-                    "MainViewModel",
-                    MainViewModelFactory(
-                        LocalContext.current.applicationContext
-                                as Application
-                    )
-                )
+                val viewModel: ThesisViewModel = viewModel()
                 if( viewModel.user != null){
                     userState.isLoggedIn = true
                 }
@@ -282,13 +268,6 @@ private fun NavHostController.navigateToProfile(
     id: String
 ) {
     this.navigateSingleTopTo("${ThesisScreen.Profile.name}/$id")
-}
-
-@Suppress("UNCHECKED_CAST")
-class MainViewModelFactory(private val application: Application) : ViewModelProvider.Factory {
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        return ThesisViewModel() as T
-    }
 }
 
 @Composable
