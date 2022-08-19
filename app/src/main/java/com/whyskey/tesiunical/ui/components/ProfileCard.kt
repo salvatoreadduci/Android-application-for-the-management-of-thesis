@@ -90,6 +90,7 @@ fun ProfileItem(
     onClick: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    //viewModel.getImage(profile.id)
     Card(
         backgroundColor = MaterialTheme.colors.primary,
         shape = MaterialTheme.shapes.medium,
@@ -106,7 +107,7 @@ fun ProfileItem(
                 .padding(8.dp)
         ) {
             ProfileImage(
-                imageUrl = "https://i1.wp.com/fotografiaartistica.it/wp-content/uploads/2019/06/nasa-immagini-gratuite-dello-spazio.jpg?resize=620%2C395&ssl=1",
+                imageUrl = profile.image,
                 elevation = 4.dp,
                 contentDescription = null,
                 modifier = Modifier.size(120.dp)

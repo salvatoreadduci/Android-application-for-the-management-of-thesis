@@ -39,7 +39,7 @@ import com.whyskey.tesiunical.ui.components.SettingsRow
 fun Settings(
     viewModel: ThesisViewModel
 ) {
-    viewModel.getImage()
+    viewModel.getImage(viewModel.userData.value)
 
     val openDialog = remember { mutableStateOf(false) }
     ChangeThesisDialog(openDialog = openDialog,viewModel = viewModel)

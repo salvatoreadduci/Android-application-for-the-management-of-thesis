@@ -24,6 +24,8 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 import com.whyskey.tesiunical.data.Thesis
 import com.whyskey.tesiunical.model.ThesisViewModel
 import com.whyskey.tesiunical.model.UserState
@@ -106,9 +108,6 @@ fun ThesisApp(viewModel: ThesisViewModel) {
             ThesisNavHost(
                 navController = navController,
                 modifier = Modifier.padding(innerPadding),
-                allCompilation = viewModel.compilationThesis.value,
-                allExperimental = viewModel.applicationThesis.value,
-                allResearch = viewModel.researchThesis.value,
                 viewModel = viewModel
             )
         }
@@ -139,9 +138,6 @@ fun ThesisAppStudent(viewModel: ThesisViewModel) {
             ThesisNavHost(
                 navController = navController,
                 modifier = Modifier.padding(innerPadding),
-                allCompilation = viewModel.compilationThesis.value,
-                allExperimental = viewModel.applicationThesis.value,
-                allResearch = viewModel.researchThesis.value,
                 viewModel = viewModel
             )
         }
@@ -152,9 +148,6 @@ fun ThesisAppStudent(viewModel: ThesisViewModel) {
 fun ThesisNavHost(
     navController: NavHostController,
     modifier: Modifier = Modifier,
-    allCompilation: List<Thesis>,
-    allExperimental: List<Thesis>,
-    allResearch: List<Thesis>,
     viewModel: ThesisViewModel
 ) {
     NavHost(
@@ -182,9 +175,6 @@ fun ThesisNavHost(
                 navBackStackEntry.arguments?.getString(accountTypeArg)
             Profile(
                 onClickSeeAll = { name -> navigateToFullScreenThesis(navController, name) },
-                allCompilation = allCompilation,
-                allExperimental = allExperimental,
-                allResearch = allResearch,
                 viewModel = viewModel,
                 id = accountType!!
             )
@@ -208,9 +198,6 @@ fun ThesisNavHost(
         composable(ThesisScreen.Profile.name) {
             Profile(
                 onClickSeeAll = { name -> navigateToFullScreenThesis(navController, name) },
-                allCompilation = allCompilation,
-                allExperimental = allExperimental,
-                allResearch = allResearch,
                 viewModel = viewModel,
                 id = viewModel.userData.value.id
             )
@@ -236,19 +223,19 @@ fun ThesisNavHost(
             when(entry.arguments?.getString("name")){
                 stringResource(id = R.string.compilation_thesis) ->
                     ThesisFullScreen(
-                        list = allCompilation,
+                        list = viewModel.compilationThesis.value,
                         viewModel = viewModel,
                         title = stringResource(id = R.string.compilation_thesis)
                     )
                 stringResource(id = R.string.application_thesis) ->
                     ThesisFullScreen(
-                        list = allExperimental,
+                        list = viewModel.applicationThesis.value,
                         viewModel = viewModel,
                         title = stringResource(id = R.string.application_thesis)
                     )
                 stringResource(id = R.string.research_thesis) ->
                     ThesisFullScreen(
-                        list = allResearch,
+                        list = viewModel.researchThesis.value,
                         viewModel = viewModel,
                         title = stringResource(id = R.string.research_thesis)
                     )

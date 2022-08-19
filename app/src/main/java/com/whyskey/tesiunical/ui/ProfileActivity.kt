@@ -2,6 +2,7 @@ package com.whyskey.tesiunical.ui
 
 import android.content.Intent
 import android.net.Uri
+import android.util.Log
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -35,9 +36,6 @@ import com.whyskey.tesiunical.ui.components.ThesisRow
 @Composable
 fun Profile(
     onClickSeeAll: (String) -> Unit = {},
-    allCompilation: List<Thesis>,
-    allExperimental: List<Thesis>,
-    allResearch: List<Thesis>,
     viewModel: ThesisViewModel,
     id:String
 ) {
@@ -61,11 +59,11 @@ fun Profile(
             viewModel.getThesis(profile.id,2)
             viewModel.getThesis(profile.id,3)
             viewModel.getThesis(profile.id,4)
-            CompilationThesisCard(onClickSeeAll = onClickSeeAll,allCompilation,viewModel,profile)
+            CompilationThesisCard(onClickSeeAll = onClickSeeAll,viewModel.compilationThesis.value,viewModel,profile)
             Spacer(Modifier.height(16.dp))
-            ApplicationThesisCard(onClickSeeAll = onClickSeeAll,allExperimental,viewModel,profile)
+            ApplicationThesisCard(onClickSeeAll = onClickSeeAll,viewModel.applicationThesis.value,viewModel,profile)
             Spacer(Modifier.height(16.dp))
-            ResearchThesisCard(onClickSeeAll = onClickSeeAll,allResearch,viewModel,profile)
+            ResearchThesisCard(onClickSeeAll = onClickSeeAll,viewModel.researchThesis.value,viewModel,profile)
         } else {
             var expandedThesis by remember { mutableStateOf<String?>(null) }
             AssignedThesis(
@@ -89,7 +87,7 @@ private fun ProfileCard(
     profile: Account
 ){
 
-    viewModel.getImage()
+    viewModel.getImage(profile)
     val webIntent = if(profile.isProfessor){
         Intent(Intent.ACTION_VIEW, Uri.parse("http://${profile.web_site}"))
     } else {

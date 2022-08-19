@@ -117,23 +117,13 @@ class ThesisViewModel : ViewModel(){
         }
     }
 
-    fun getImage(){
-        retrieveImage()
+    fun getImage(profile:Account){
+        retrieveImage(profile)
     }
 
     fun getAllData(){
         getUserData(Firebase.auth.currentUser?.uid)
-        Log.d("TAG",Firebase.auth.currentUser?.uid.toString())
-
-        getImage()
-
-        if(_userData.value.isProfessor){
-            getThesis(_userData.value.id,0)
-            getThesis(_userData.value.id,1)
-            getThesis(_userData.value.id,2)
-            getThesis(_userData.value.id,3)
-            getThesis(_userData.value.id,4)
-        }
+        getImage(_userData.value)
     }
 
     fun getAccountsByType(type: Boolean){
@@ -146,7 +136,6 @@ class ThesisViewModel : ViewModel(){
             Firebase.firestore.collection("request").whereEqualTo("id_professor", idProfessor)
                 .addSnapshotListener { value, _ ->
                     if (value != null) {
-
                         val documents = value.documents
                         documents.forEach{
                             val temp = it.toObject(Request::class.java)
@@ -206,14 +195,18 @@ class ThesisViewModel : ViewModel(){
         }
     }
 
-
-    private fun retrieveImage(){
+    private fun retrieveImage(profile: Account){
         val localFile: File = File.createTempFile("localFile", ".jpg")
         viewModelScope.launch {
-            storage.child("images/" + user?.uid).getFile(localFile).addOnSuccessListener {
+            storage.child("images/${profile.id}").getFile(localFile).addOnSuccessListener {
 
                 val uri: Uri = localFile.absolutePath.toUri()
-                _userImage.value = uri
+                if(profile.id == _userData.value.id){
+                    _userImage.value = uri
+                } else {
+                    profile.image = uri.toString()
+                }
+
             }
         }
     }
@@ -312,30 +305,37 @@ class ThesisViewModel : ViewModel(){
 
     fun getThesis(id:String,type: Int){
         viewModelScope.launch {
-            Firebase.firestore.collection("thesis").whereEqualTo("type",type).whereEqualTo("id_professor",id).addSnapshotListener { value, _ ->
-                if(value != null) {
-                    val thesis = ArrayList<Thesis>()
-                    val documents = value.documents
-                    documents.forEach {
-                        val temp = it.toObject(Thesis::class.java)
-                        if(temp != null){
-                            temp.id = it.id
-                            getRequest(id)
-                            if(_requests.value.find { request -> temp.id == request.id_thesis } == null){
-                                thesis.add(temp)
+            Firebase.firestore.collection("account").document(id).collection("thesis").whereEqualTo("type",type)
+                .addSnapshotListener { value, e ->
+                    if(value != null) {
+                        if (e != null) {
+                            Log.w("TAG", "Listen failed.", e)
+                            return@addSnapshotListener
+                        }
+
+                        val thesis = ArrayList<Thesis>()
+                        val documents = value.documents
+                        documents.forEach {
+                            val temp = it.toObject(Thesis::class.java)
+                            if(temp != null){
+                                temp.id = it.id
+                                temp.id_professor = id
+                                getRequest(id)
+                                if(_requests.value.find { request -> temp.id == request.id_thesis } == null){
+                                    thesis.add(temp)
+                                }
                             }
                         }
+                        when(type){
+                            0 -> _compilationThesis.value = thesis
+                            1 -> _applicationThesis.value = thesis
+                            2 -> _researchThesis.value = thesis
+                            3 -> _corporateThesis.value = thesis
+                            4 -> _erasmusThesis.value = thesis
+                        }
+                        Log.d("THESIS",compilationThesis.value.toString())
                     }
-                    when(type){
-                        0 -> _compilationThesis.value = thesis
-                        1 -> _applicationThesis.value = thesis
-                        2 -> _researchThesis.value = thesis
-                        3 -> _corporateThesis.value = thesis
-                        4 -> _erasmusThesis.value = thesis
-                    }
-                }
             }
-
         }
     }
 
@@ -422,7 +422,7 @@ class ThesisViewModel : ViewModel(){
 
     private fun insertThesis(thesis: Thesis) {
         viewModelScope.launch {
-            Firebase.firestore.collection("thesis").add(thesis)
+            Firebase.firestore.collection("account").document(thesis.id_professor).collection("thesis").add(thesis)
         }
     }
 
