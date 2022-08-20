@@ -42,8 +42,7 @@ fun Profile(
     val profile = if(id == viewModel.userData.value.id){
         viewModel.userData.value
     } else {
-        viewModel.accounts.value.find { account -> id == account.id }
-            ?: viewModel.accountsToAccept.value.find { account -> id == account.id }!!
+        viewModel.accounts.value.find { account -> id == account.id }!!
     }
 
     Column(
@@ -69,9 +68,9 @@ fun Profile(
             AssignedThesis(
                 profile,
                 viewModel,
-                expandedThesis == viewModel.userData.value.thesis,
+                expandedThesis == null, //viewModel.userData.value.thesis.toString(),
                 onClick = {
-                    expandedThesis = if (expandedThesis == viewModel.userData.value.thesis) null else viewModel.userData.value.thesis
+                    //expandedThesis = if (expandedThesis == viewModel.userData.value.thesis) null else viewModel.userData.value.thesis
                 }
             )
             Spacer(Modifier.height(16.dp))
@@ -160,8 +159,8 @@ private fun CompilationThesisCard(
             onClick = { expandedThesis = if (expandedThesis == thesis.title) null else thesis.title },
             onDelete = { viewModel.removeThesis(thesis.id) },
             onRequest = {
-                viewModel.addNewRequest(viewModel.userData.value.id, profile.id,thesis.id)
-                viewModel.getThesis(profile.id, thesis.type)
+                viewModel.addNewRequest(viewModel.userData.value.id, profile.id,thesis.id,viewModel.userData.value.name, 0, thesis.title,thesis)
+                //viewModel.getThesis(profile.id, thesis.type)
             }
         )
     }
@@ -192,7 +191,10 @@ private fun ApplicationThesisCard(
                 expandedThesis = if (expandedThesis == thesis.title) null else thesis.title
             },
             onDelete = { viewModel.removeThesis(thesis.id) },
-            onRequest = { viewModel.addNewRequest(viewModel.userData.value.id, profile.id,thesis.id) }
+            onRequest = {
+                viewModel.addNewRequest(viewModel.userData.value.id, profile.id,thesis.id,viewModel.userData.value.name, 0, thesis.title,thesis)
+                //viewModel.getThesis(profile.id, thesis.type)
+            }
         )
     }
 }
@@ -222,7 +224,10 @@ private fun ResearchThesisCard(
                 expandedThesis = if (expandedThesis == thesis.title) null else thesis.title
             },
             onDelete = { viewModel.removeThesis(thesis.id) },
-            onRequest = {viewModel.addNewRequest(viewModel.userData.value.id, profile.id,thesis.id) }
+            onRequest = {
+                viewModel.addNewRequest(viewModel.userData.value.id, profile.id,thesis.id,viewModel.userData.value.name, 0, thesis.title,thesis)
+                //viewModel.getThesis(profile.id, thesis.type)
+            }
         )
     }
 }
@@ -260,7 +265,7 @@ private fun AssignedThesis(
                 Spacer(modifier = Modifier.width(16.dp))
                 Text(text = stringResource(id = R.string.assigned_thesis))
                 Spacer(modifier = Modifier.width(16.dp))
-                Text(text = profile.thesis)
+                Text(text = "")
             }
 
             if (expanded) {

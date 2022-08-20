@@ -9,6 +9,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.firestore.ktx.toObject
+import com.google.firebase.firestore.ktx.toObjects
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
 import com.whyskey.tesiunical.data.*
@@ -77,10 +78,6 @@ class ThesisViewModel : ViewModel(){
     val accounts: State<List<Account>>
         get() = _accounts
 
-    private val _accountsToAccept = mutableStateOf<List<Account>>(emptyList())
-    val accountsToAccept: State<List<Account>>
-        get() = _accountsToAccept
-
     private val _requests = mutableStateOf<List<Request>>(emptyList())
     val requests: State<List<Request>>
         get() = _requests
@@ -105,14 +102,13 @@ class ThesisViewModel : ViewModel(){
     }
 
     fun changeRequest(id: String, accepted: Boolean){
-        val temp = _requests.value.find { request -> id == request.id_student }
         if(accepted){
-            Firebase.firestore.collection("request").document(temp!!.id)
+            Firebase.firestore.collection("requests").document(id)
                 .update(mapOf(
                     "accepted" to true
                 ))
         } else {
-            Firebase.firestore.collection("request").document(temp!!.id)
+            Firebase.firestore.collection("requests").document(id)
                 .delete()
         }
     }
@@ -130,67 +126,60 @@ class ThesisViewModel : ViewModel(){
         getAccounts(type)
     }
 
-    private fun getRequest(idProfessor: String) {
-        viewModelScope.launch {
-            val requests = ArrayList<Request>()
-            Firebase.firestore.collection("request").whereEqualTo("id_professor", idProfessor)
-                .addSnapshotListener { value, _ ->
-                    if (value != null) {
-                        val documents = value.documents
-                        documents.forEach{
-                            val temp = it.toObject(Request::class.java)
-                            if(temp != null){
-                                temp.id = it.id
-                                requests.add(temp)
-                            }
-                        }
-                        _requests.value = requests
-                    }
-                }
-        }
-    }
-
     private fun getAccounts(type: Boolean) {
         viewModelScope.launch {
-            val accounts = ArrayList<Account>()
-            if (type) {
-                Firebase.firestore.collection("account").whereEqualTo("isProfessor", type)
-                    .addSnapshotListener { value, _ ->
-                        if (value != null) {
+            if(type){
+                Firebase.firestore.collection("account").whereEqualTo("isProfessor",type)
+                    .addSnapshotListener { value, e ->
+                        if(value != null){
+                            if (e != null) {
+                                Log.w("TAG", "Listen failed.", e)
+                                return@addSnapshotListener
+                            }
+                            val accounts = ArrayList<Account>()
                             val documents = value.documents
                             documents.forEach {
                                 val temp = it.toObject(Account::class.java)
-                                if (temp != null) {
+                                if(temp != null){
                                     temp.id = it.id
                                     accounts.add(temp)
                                 }
                             }
-                            _accounts.value = accounts
+
+                            val requests = ArrayList<Request>()
+                            accounts.forEach {
+                                requests.add(
+                                    Request(
+                                        id_professor = it.id,
+                                        name = it.name,
+                                        image = it.image
+                                    )
+                                )
+                            }
+                            _requests.value = requests
                         }
                     }
             } else {
-                getRequest(_userData.value.id)
-                val accountsToAccept = ArrayList<Account>()
-
-                _requests.value.forEach {
-                    Firebase.firestore.collection("account").document(it.id_student)
-                        .addSnapshotListener { value, _ ->
-                            if (value != null) {
-                                val student = value.toObject(Account::class.java)
-                                if (student != null) {
-                                    student.id = value.id
-                                    student.isProfessor = type
-                                    if(it.accepted){
-                                        accounts.add(student)
-                                    } else {
-                                        accountsToAccept.add(student)
-                                    }
+                Firebase.firestore.collection("requests").whereEqualTo("id_professor",_userData.value.id)
+                    .addSnapshotListener { value, e ->
+                        if(value != null){
+                            if (e != null) {
+                                Log.w("TAG", "Listen failed.", e)
+                                return@addSnapshotListener
+                            }
+                            val requests = ArrayList<Request>()
+                            val documents = value.documents
+                            documents.forEach {
+                                val temp = it.toObject(Request::class.java)
+                                if(temp != null){
+                                    temp.id = it.id
+                                    requests.add(temp)
                                 }
                             }
-                            _accountsToAccept.value = accountsToAccept
-                            _accounts.value = accounts
+
+                            _requests.value = requests
                         }
-                }
+                    }
             }
         }
     }
@@ -293,16 +282,6 @@ class ThesisViewModel : ViewModel(){
         }
     }
 
-    private fun setThesis(thesis:String){
-        viewModelScope.launch {
-            Firebase.firestore.collection("account").document(_userData.value.id)
-                .update(mapOf(
-                    "thesis" to thesis
-                    )
-                )
-        }
-    }
-
     fun getThesis(id:String,type: Int){
         viewModelScope.launch {
             Firebase.firestore.collection("account").document(id).collection("thesis").whereEqualTo("type",type)
@@ -320,10 +299,7 @@ class ThesisViewModel : ViewModel(){
                             if(temp != null){
                                 temp.id = it.id
                                 temp.id_professor = id
-                                getRequest(id)
-                                if(_requests.value.find { request -> temp.id == request.id_thesis } == null){
-                                    thesis.add(temp)
-                                }
+                                thesis.add(temp)
                             }
                         }
                         when(type){
@@ -333,7 +309,6 @@ class ThesisViewModel : ViewModel(){
                             3 -> _corporateThesis.value = thesis
                             4 -> _erasmusThesis.value = thesis
                         }
-                        Log.d("THESIS",compilationThesis.value.toString())
                     }
             }
         }
@@ -379,18 +354,30 @@ class ThesisViewModel : ViewModel(){
                 }
         }
     }
+    private fun setThesis(professor: String, idThesis:String,thesis: Thesis){
+        viewModelScope.launch {
+            Firebase.firestore.collection("account").document(professor).collection("thesis").document(idThesis)
+                .delete()
 
-    fun addNewRequest(idStudent: String,idProfessor: String,id_thesis: String){
-        val newRequest = getNewRequest(idStudent,idProfessor,id_thesis)
-        insertRequest(newRequest)
-        setThesis(id_thesis)
+            Firebase.firestore.collection("account").document(_userData.value.id).collection("thesis")
+                .add(thesis)
+        }
     }
 
-    private fun getNewRequest(idStudent: String, idProfessor: String,idThesis: String): Request{
+    fun addNewRequest(idStudent: String,idProfessor: String,id_thesis: String, name: String, session: Int, thesisTitle: String,thesis: Thesis){
+        val newRequest = getNewRequest(idStudent,idProfessor,name,session,thesisTitle)
+        insertRequest(newRequest)
+        setThesis(idProfessor,id_thesis,thesis)
+    }
+
+    private fun getNewRequest(idStudent: String, idProfessor: String, name: String, session: Int, thesisTitle: String): Request{
         return Request(
             id_student = idStudent,
             id_professor = idProfessor,
-            id_thesis = idThesis
+            name = name,
+            session = session,
+            thesis = thesisTitle,
+            accepted = false
         )
     }
 

@@ -11,6 +11,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.whyskey.tesiunical.R
 import com.whyskey.tesiunical.data.Account
+import com.whyskey.tesiunical.data.Request
 import com.whyskey.tesiunical.model.ThesisViewModel
 import com.whyskey.tesiunical.ui.components.AccountCollection
 import com.whyskey.tesiunical.ui.components.ProfileItem
@@ -26,13 +27,13 @@ fun Home(
     } else {
         viewModel.getAccountsByType(true)
     }
-    val temp = viewModel.accounts.value + viewModel.accountsToAccept.value
+    val temp = viewModel.requests.value
 
     HomeBody(temp, viewModel,onClick)
 }
 @Composable
 private fun HomeBody(
-    accounts: List<Account>,
+    accounts: List<Request>,
     viewModel: ThesisViewModel,
     onClick: (String) -> Unit
 ){
@@ -44,7 +45,7 @@ private fun HomeBody(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun ProfilesCollectionList(
-    accounts: List<Account>,
+    accounts: List<Request>,
     viewModel: ThesisViewModel,
     onClick: (String) -> Unit
 ){
@@ -64,10 +65,10 @@ private fun ProfilesCollectionList(
         ){
 
             items(5){
-                /*if(temp){
-                    AccountCollection(title = stringResource(id = R.string.students_to_follow), profileCollection = viewModel.accountsToAccept.value,viewModel = viewModel, onClick)
+                if(temp){
+                    AccountCollection(title = stringResource(id = R.string.students_to_follow), profileCollection = viewModel.requests.value.filter { request -> !request.accepted },viewModel = viewModel, onClick)
                     temp = false
-                } else {*/
+                } else {
                     val title = when(it-1){
                         0 -> stringResource(id = R.string.march_session)
                         1 -> stringResource(id = R.string.july_session)
@@ -75,8 +76,8 @@ private fun ProfilesCollectionList(
                         else -> stringResource(id = R.string.december_session)
                     }
                     Divider()
-                    AccountCollection(title = title,profileCollection = viewModel.accounts.value.filter { account -> account.session == it-1 },viewModel = viewModel, onClick)
-                //}
+                    AccountCollection(title = title,profileCollection = viewModel.requests.value.filter { request -> request.session == it-1 },viewModel = viewModel, onClick)
+                }
             }
         }
     }

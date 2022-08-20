@@ -1,6 +1,7 @@
 package com.whyskey.tesiunical.ui.components
 
 import android.content.res.Configuration
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
@@ -32,13 +33,14 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.whyskey.tesiunical.R
 import com.whyskey.tesiunical.data.Account
+import com.whyskey.tesiunical.data.Request
 import com.whyskey.tesiunical.model.ThesisViewModel
 
 
 @Composable
 fun AccountCollection(
     title: String,
-    profileCollection: List<Account>,
+    profileCollection: List<Request>,
     viewModel: ThesisViewModel,
     onClick: (String) -> Unit,
     modifier: Modifier = Modifier
@@ -85,11 +87,12 @@ fun AccountCollection(
 
 @Composable
 fun ProfileItem(
-    profile: Account,
+    profile: Request,
     viewModel: ThesisViewModel,
     onClick: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    Log.d("TAG",profile.toString())
     //viewModel.getImage(profile.id)
     Card(
         backgroundColor = MaterialTheme.colors.primary,
@@ -119,14 +122,14 @@ fun ProfileItem(
                 modifier = Modifier.padding(top = 8.dp)
             )
 
-            if(!profile.isProfessor){
+            if(viewModel.userData.value.isProfessor){
                 Text(
                     text = profile.thesis,
                     style = MaterialTheme.typography.subtitle2,
                     color = MaterialTheme.colors.onSecondary,
                     modifier = Modifier.padding(top = 8.dp)
                 )
-                if(viewModel.accountsToAccept.value.contains(profile)){
+                if(!profile.accepted){
                     Text(
                         text = profile.session.toString(),
                         style = MaterialTheme.typography.subtitle2,

@@ -24,6 +24,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
+import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.whyskey.tesiunical.data.Thesis
@@ -38,11 +39,10 @@ class MainActivity : ComponentActivity() {
     private val userState by viewModels<UserStateViewModel>()
     override fun onCreate(savedInstanceState: Bundle?) {
         //Firebase.firestore.clearPersistence()
+        Firebase.auth.signOut()
         super.onCreate(savedInstanceState)
         setContent {
-
             val owner = LocalViewModelStoreOwner.current
-
             owner?.let {
                 val viewModel: ThesisViewModel = viewModel()
                 if( viewModel.user != null){
