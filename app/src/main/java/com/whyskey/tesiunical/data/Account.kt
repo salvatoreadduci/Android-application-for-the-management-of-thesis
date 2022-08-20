@@ -9,6 +9,7 @@ data class Account(
     val email: String = "",
     val web_site: String = "",
     var isProfessor: Boolean = true,
+    var hasThesis: Boolean = false,
     var exams: String = "",
     var id: String = "",
     var image: String = ""

@@ -64,17 +64,19 @@ fun Profile(
             Spacer(Modifier.height(16.dp))
             ResearchThesisCard(onClickSeeAll = onClickSeeAll,viewModel.researchThesis.value,viewModel,profile)
         } else {
+
+            viewModel.returnThesis()
             var expandedThesis by remember { mutableStateOf<String?>(null) }
             AssignedThesis(
                 profile,
                 viewModel,
-                expandedThesis == null, //viewModel.userData.value.thesis.toString(),
+                expandedThesis == viewModel.thesis.value.id,
                 onClick = {
-                    //expandedThesis = if (expandedThesis == viewModel.userData.value.thesis) null else viewModel.userData.value.thesis
+                    expandedThesis = if (expandedThesis == viewModel.thesis.value.id) null else viewModel.thesis.value.id
                 }
             )
             Spacer(Modifier.height(16.dp))
-            NotPassedExams(profile,viewModel)
+            NotPassedExams(profile)
             
         }
     }
@@ -265,19 +267,21 @@ private fun AssignedThesis(
                 Spacer(modifier = Modifier.width(16.dp))
                 Text(text = stringResource(id = R.string.assigned_thesis))
                 Spacer(modifier = Modifier.width(16.dp))
-                Text(text = "")
-            }
-
-            if (expanded) {
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(
-                    text = stringResource(R.string.lorem_ipsum),
-                    textAlign = TextAlign.Justify
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(text = stringResource(id = R.string.type))
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(text = stringResource(id = R.string.professor))
+                if(profile.hasThesis){
+                    Text(text = viewModel.thesis.value.title)
+                    if (expanded) {
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            text = viewModel.thesis.value.description,
+                            textAlign = TextAlign.Justify
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(text = "${stringResource(id = R.string.type)} ${viewModel.thesis.value.type}")
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(text = "${stringResource(id = R.string.professor)} ${viewModel.thesis.value.id_professor}")
+                    }
+                }
+                Text(text = stringResource(id = R.string.not_assigned))
             }
         }
     }
@@ -285,8 +289,7 @@ private fun AssignedThesis(
 
 @Composable
 private fun NotPassedExams(
-    profile: Account,
-    viewModel: ThesisViewModel
+    profile: Account
 ){
     Card(modifier = Modifier.fillMaxWidth()) {
         Column(

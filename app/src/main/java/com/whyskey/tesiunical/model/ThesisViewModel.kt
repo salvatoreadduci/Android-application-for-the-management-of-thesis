@@ -9,7 +9,6 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.firestore.ktx.toObject
-import com.google.firebase.firestore.ktx.toObjects
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
 import com.whyskey.tesiunical.data.*
@@ -50,6 +49,10 @@ class ThesisViewModel : ViewModel(){
     val erasmusThesis: State<List<Thesis>>
         get() = _erasmusThesis
 
+    private val _thesis = mutableStateOf(Thesis())
+    val thesis: State<Thesis>
+        get() = _thesis
+
     private val _userData = mutableStateOf(Account())
     val userData: State<Account>
         get() = _userData
@@ -88,6 +91,26 @@ class ThesisViewModel : ViewModel(){
         }
     }
 
+    fun returnThesis(){
+        getThesis()
+    }
+
+    private fun getThesis(){
+        viewModelScope.launch {
+            Firebase.firestore.collection("account").document(_userData.value.id).collection("thesis").document().addSnapshotListener { value, e ->
+                if (e != null) {
+                    Log.w("TAG", "Listen failed.", e)
+                    return@addSnapshotListener
+                }
+
+                if(value != null && value.exists()) {
+                    val thesis = value.toObject<Thesis>()!!
+                    _thesis.value = thesis
+                }
+            }
+        }
+    }
+
     fun setExams(exams: String){
         updateExams(exams)
     }
@@ -106,10 +129,38 @@ class ThesisViewModel : ViewModel(){
             Firebase.firestore.collection("requests").document(id)
                 .update(mapOf(
                     "accepted" to true
-                ))
+                    )
+                )
+
         } else {
             Firebase.firestore.collection("requests").document(id)
                 .delete()
+
+            val request = _requests.value.find { request ->  request.id == id}!!
+            sendThesis(request.id_student,request.id)
+
+        }
+    }
+
+    private fun sendThesis(account: String, idThesis:String){
+        viewModelScope.launch {
+            Firebase.firestore.runTransaction {
+                Firebase.firestore.collection("account").document(account).collection("thesis").document(idThesis).get()
+                    .addOnSuccessListener {
+                        if(it != null){
+                            val thesis = it.toObject(Thesis::class.java)!!
+
+                            Firebase.firestore.collection("account").document(_userData.value.id).collection("thesis")
+                                .add(thesis)
+
+                            Firebase.firestore.collection("account").document(account).collection("thesis").document(idThesis)
+                                .delete()
+                        }
+                    }
+
+                null
+            }.addOnSuccessListener { Log.d("TAG", "Transaction success!") }
+                .addOnFailureListener { e -> Log.w("TAG", "Transaction failure.", e) }
         }
     }
 
@@ -354,20 +405,11 @@ class ThesisViewModel : ViewModel(){
                 }
         }
     }
-    private fun setThesis(professor: String, idThesis:String,thesis: Thesis){
-        viewModelScope.launch {
-            Firebase.firestore.collection("account").document(professor).collection("thesis").document(idThesis)
-                .delete()
-
-            Firebase.firestore.collection("account").document(_userData.value.id).collection("thesis")
-                .add(thesis)
-        }
-    }
 
     fun addNewRequest(idStudent: String,idProfessor: String,id_thesis: String, name: String, session: Int, thesisTitle: String,thesis: Thesis){
         val newRequest = getNewRequest(idStudent,idProfessor,name,session,thesisTitle)
         insertRequest(newRequest)
-        setThesis(idProfessor,id_thesis,thesis)
+        sendThesis(idProfessor,id_thesis)
     }
 
     private fun getNewRequest(idStudent: String, idProfessor: String, name: String, session: Int, thesisTitle: String): Request{

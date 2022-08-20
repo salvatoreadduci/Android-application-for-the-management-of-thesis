@@ -25,9 +25,13 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
+import com.whyskey.tesiunical.ApplicationSwitcher
 import com.whyskey.tesiunical.R
 import com.whyskey.tesiunical.data.Session
 import com.whyskey.tesiunical.model.ThesisViewModel
+import com.whyskey.tesiunical.model.UserState
 import com.whyskey.tesiunical.ui.components.ChangeLimitDialog
 import com.whyskey.tesiunical.ui.components.ChangeOptionDialog
 import com.whyskey.tesiunical.ui.components.LimitThesisRow
@@ -232,6 +236,10 @@ fun Settings(
                 }
             }
 
+        }
+        Spacer(modifier = Modifier.width(16.dp))
+        Button(onClick = { Firebase.auth.signOut() }) {
+            Text(text = "Logout")
         }
 
     }

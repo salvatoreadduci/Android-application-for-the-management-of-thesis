@@ -76,7 +76,7 @@ private fun ProfilesCollectionList(
                         else -> stringResource(id = R.string.december_session)
                     }
                     Divider()
-                    AccountCollection(title = title,profileCollection = viewModel.requests.value.filter { request -> request.session == it-1 },viewModel = viewModel, onClick)
+                    AccountCollection(title = title,profileCollection = viewModel.requests.value.filter { request -> request.session == it-1 && request.accepted},viewModel = viewModel, onClick)
                 }
             }
         }

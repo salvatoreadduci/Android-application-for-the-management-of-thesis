@@ -39,7 +39,6 @@ class MainActivity : ComponentActivity() {
     private val userState by viewModels<UserStateViewModel>()
     override fun onCreate(savedInstanceState: Bundle?) {
         //Firebase.firestore.clearPersistence()
-        Firebase.auth.signOut()
         super.onCreate(savedInstanceState)
         setContent {
             val owner = LocalViewModelStoreOwner.current
