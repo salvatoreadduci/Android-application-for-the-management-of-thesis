@@ -5,6 +5,5 @@ data class Thesis(
     val type: Int = 0,
     val description: String = "",
     var id: String = "",
-    var id_professor: String = "",
-    var available: Boolean = true
+    var id_professor: String = ""
 )

@@ -36,6 +36,7 @@ fun ThesisFullScreen(
                         viewModel = viewModel,
                         profile = viewModel.userData.value,
                         name = thesis.title,
+                        description = thesis.description,
                         expanded = expandedThesis == thesis.title,
                         onClick = {
                             expandedThesis = if (expandedThesis == thesis.title) null else thesis.title

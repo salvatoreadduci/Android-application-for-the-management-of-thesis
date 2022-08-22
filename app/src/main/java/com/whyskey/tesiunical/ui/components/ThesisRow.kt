@@ -24,6 +24,7 @@ fun ThesisRow(
     viewModel: ThesisViewModel,
     profile: Account,
     name: String,
+    description: String,
     expanded: Boolean,
     onClick: () -> Unit,
     onDelete: () -> Unit,
@@ -67,7 +68,7 @@ fun ThesisRow(
             if (expanded) {
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = stringResource(R.string.lorem_ipsum),
+                    text = description,
                     textAlign = TextAlign.Justify
                 )
                 

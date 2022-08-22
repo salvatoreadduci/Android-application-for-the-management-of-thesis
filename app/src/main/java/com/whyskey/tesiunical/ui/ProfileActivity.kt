@@ -64,8 +64,6 @@ fun Profile(
             Spacer(Modifier.height(16.dp))
             ResearchThesisCard(onClickSeeAll = onClickSeeAll,viewModel.researchThesis.value,viewModel,profile)
         } else {
-
-            viewModel.returnThesis()
             var expandedThesis by remember { mutableStateOf<String?>(null) }
             AssignedThesis(
                 profile,
@@ -157,6 +155,7 @@ private fun CompilationThesisCard(
             viewModel = viewModel,
             profile = profile,
             name = thesis.title,
+            description = thesis.description,
             expanded = expandedThesis == thesis.title,
             onClick = { expandedThesis = if (expandedThesis == thesis.title) null else thesis.title },
             onDelete = { viewModel.removeThesis(thesis.id) },
@@ -187,6 +186,7 @@ private fun ApplicationThesisCard(
             viewModel = viewModel,
             profile = profile,
             name = thesis.title,
+            description = thesis.description,
             expanded = expandedThesis == thesis.title,
             onClick = {
                 expandedThesis = if (expandedThesis == thesis.title) null else thesis.title
@@ -220,6 +220,7 @@ private fun ResearchThesisCard(
             viewModel = viewModel,
             profile = profile,
             name = thesis.title,
+            description = thesis.description,
             expanded = expandedThesis == thesis.title,
             onClick = {
                 expandedThesis = if (expandedThesis == thesis.title) null else thesis.title
@@ -227,7 +228,6 @@ private fun ResearchThesisCard(
             onDelete = { viewModel.removeThesis(thesis.id) },
             onRequest = {
                 viewModel.addNewRequest(viewModel.userData.value.id, profile.id,thesis.id,viewModel.userData.value.name, 0, thesis.title,thesis)
-                //viewModel.getThesis(profile.id, thesis.type)
             }
         )
     }
@@ -267,20 +267,37 @@ private fun AssignedThesis(
                 Text(text = stringResource(id = R.string.assigned_thesis))
                 Spacer(modifier = Modifier.width(16.dp))
                 if(profile.hasThesis){
+                    viewModel.returnThesis()
+
                     Text(text = viewModel.thesis.value.title)
-                    if (expanded) {
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Text(
-                            text = viewModel.thesis.value.description,
-                            textAlign = TextAlign.Justify
-                        )
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Text(text = "${stringResource(id = R.string.type)} ${viewModel.thesis.value.type}")
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Text(text = "${stringResource(id = R.string.professor)} ${viewModel.thesis.value.id_professor}")
-                    }
+
+                } else {
+                    Text(text = stringResource(id = R.string.not_assigned))
                 }
-                Text(text = stringResource(id = R.string.not_assigned))
+
+            }
+            if (expanded && profile.hasThesis) {
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = viewModel.thesis.value.description,
+                    textAlign = TextAlign.Justify
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                val type = when(viewModel.thesis.value.type){
+                    0 -> stringResource(id = R.string.compilation_thesis)
+                    1 -> stringResource(id = R.string.application_thesis)
+                    2 -> stringResource(id = R.string.corporate_thesis)
+                    3 -> stringResource(id = R.string.erasmus_thesis)
+                    else -> stringResource(id = R.string.research_thesis)
+                }
+
+                Text(text = "${stringResource(id = R.string.type)} $type")
+                Spacer(modifier = Modifier.height(8.dp))
+                val prof = viewModel.accounts.value.find { prof -> prof.id == viewModel.thesis.value.id_professor }
+                Text(text = "${stringResource(id = R.string.professor)} ${
+                    //viewModel.thesis.value.id_professor
+                    prof?.name
+                }")
             }
         }
     }

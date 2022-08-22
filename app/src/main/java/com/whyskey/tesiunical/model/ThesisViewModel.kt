@@ -9,6 +9,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.firestore.ktx.toObject
+import com.google.firebase.firestore.ktx.toObjects
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
 import com.whyskey.tesiunical.data.*
@@ -97,15 +98,15 @@ class ThesisViewModel : ViewModel(){
 
     private fun getThesis(){
         viewModelScope.launch {
-            Firebase.firestore.collection("account").document(_userData.value.id).collection("thesis").document().addSnapshotListener { value, e ->
+            Firebase.firestore.collection("account").document(_userData.value.id).collection("thesis").addSnapshotListener { value, e ->
                 if (e != null) {
                     Log.w("TAG", "Listen failed.", e)
                     return@addSnapshotListener
                 }
-
-                if(value != null && value.exists()) {
-                    val thesis = value.toObject<Thesis>()!!
-                    _thesis.value = thesis
+                if( value != null ) {
+                    val thesis = value.toObjects<Thesis>()
+                    val temp = thesis[0]
+                    _thesis.value = temp
                 }
             }
         }
@@ -130,6 +131,12 @@ class ThesisViewModel : ViewModel(){
                 .update(mapOf(
                     "accepted" to true
                     )
+                )
+
+            Firebase.firestore.collection("account").document(idStudent)
+                .update(mapOf(
+                    "hasThesis" to true
+                )
                 )
         } else {
             Log.d("TAG","$id - $idStudent - $idThesis")
