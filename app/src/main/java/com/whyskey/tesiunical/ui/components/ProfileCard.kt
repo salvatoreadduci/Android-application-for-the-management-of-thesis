@@ -92,7 +92,6 @@ fun ProfileItem(
     onClick: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Log.d("TAG",profile.toString())
     //viewModel.getImage(profile.id)
     Card(
         backgroundColor = MaterialTheme.colors.primary,
@@ -106,7 +105,9 @@ fun ProfileItem(
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
-                .clickable(onClick = { onClick(profile.id) })
+                .clickable(onClick = {
+                    onClick(profile.id_professor)
+                })
                 .padding(8.dp)
         ) {
             ProfileImage(
@@ -141,13 +142,14 @@ fun ProfileItem(
                         Icon(
                             Icons.Filled.Done,
                             contentDescription = "Close",
-                            modifier = Modifier.clickable { viewModel.changeRequest(profile.id,true) }
+                            modifier = Modifier.clickable { viewModel.changeRequest(profile.id,profile.id_student,profile.id_thesis,true) }
                         )
                         Spacer(modifier = Modifier.width(16.dp))
                         Icon(
                             Icons.Filled.Close,
                             contentDescription = "Close",
-                            modifier = Modifier.clickable { viewModel.changeRequest(profile.id,false) }
+                            modifier = Modifier.clickable {
+                                viewModel.changeRequest(profile.id,profile.id_student,profile.id_thesis,false) }
                         )
                     }
                 }

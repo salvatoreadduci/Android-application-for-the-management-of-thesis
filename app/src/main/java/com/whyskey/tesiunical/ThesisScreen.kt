@@ -7,31 +7,60 @@ import androidx.navigation.NavType
 import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
 
-enum class ThesisScreen(
+interface Screen {
     val icon: ImageVector
-    ) {
-        Home(
-            icon = Icons.Filled.Home
-        ),
-        Analytics(
-            icon = Icons.Filled.Insights
-        ),
-        Profile(
-            icon = Icons.Filled.Person
-        ),
-        Settings(
-          icon = Icons.Filled.Settings
-        );
-
-        companion object {
-            fun fromRoute(route: String?): ThesisScreen =
-                when (route?.substringBefore("/")) {
-                    Home.name -> Home
-                    Analytics.name -> Analytics
-                    Profile.name -> Profile
-                    Settings.name -> Settings
-                    null -> Home
-                    else -> throw IllegalArgumentException("Route $route is not recognized.")
-                }
-        }
+    val route: String
 }
+
+object Home : Screen {
+    override val icon = Icons.Filled.Home
+    override val route = "home"
+}
+
+object Analytics : Screen {
+    override val icon = Icons.Filled.Insights
+    override val route = "analytics"
+}
+
+object Profile : Screen {
+    override val icon = Icons.Filled.Person
+    override val route = "profile"
+}
+
+object Settings : Screen {
+    override val icon = Icons.Filled.Settings
+    override val route = "settings"
+}
+
+object FullScreenThesis : Screen {
+    override val icon = Icons.Filled.Person
+    override val route = "full_screen"
+    const val fullScreenIdArg = "fullScreen_id"
+    val routeWithArgs = "$route/{$fullScreenIdArg}"
+    val arguments = listOf(
+        navArgument(fullScreenIdArg) {
+            type = NavType.StringType
+        }
+    )
+    val deepLinks = listOf(
+        navDeepLink { uriPattern = "thesis://$route/{$fullScreenIdArg}" }
+    )
+}
+
+object OtherProfile : Screen {
+    override val icon = Icons.Filled.Person
+    override val route = "profile"
+    const val otherProfileIdArg = "profile_id"
+    val routeWithArgs = "$route/{$otherProfileIdArg}"
+    val arguments = listOf(
+        navArgument(otherProfileIdArg) {
+            type = NavType.StringType
+        }
+    )
+    val deepLinks = listOf(
+        navDeepLink { uriPattern = "thesis://$route/{$otherProfileIdArg}" }
+    )
+}
+
+val tabScreens = listOf(Home,Analytics,Profile,Settings)
+val tabScreensStudent = listOf(Home,Profile,Settings)

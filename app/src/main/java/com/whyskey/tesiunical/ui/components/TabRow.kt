@@ -24,14 +24,14 @@ import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.whyskey.tesiunical.ThesisScreen
+import com.whyskey.tesiunical.Screen
 import java.util.*
 
 @Composable
 fun TabRow(
-    allScreens: List<ThesisScreen>,
-    onTabSelected: (ThesisScreen) -> Unit,
-    currentScreen: ThesisScreen
+    allScreens: List<Screen>,
+    onTabSelected: (Screen) -> Unit,
+    currentScreen: Screen
 ) {
     Surface(
         Modifier
@@ -41,7 +41,7 @@ fun TabRow(
         Row(Modifier.selectableGroup()) {
             allScreens.forEach { screen ->
                 ThesisTab(
-                    text = screen.name,
+                    text = screen.route,
                     icon = screen.icon,
                     onSelected = { onTabSelected(screen) },
                     selected = currentScreen == screen

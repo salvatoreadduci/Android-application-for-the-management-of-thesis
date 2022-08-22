@@ -1,5 +1,6 @@
 package com.whyskey.tesiunical.ui
 
+import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.*
@@ -54,7 +55,7 @@ private fun ProfilesCollectionList(
             GridCells.Fixed(2)
         ){
             itemsIndexed(accounts) { _, item ->
-                ProfileItem(profile = item,viewModel = viewModel, onClick = { onClick(item.id)})
+                ProfileItem(profile = item,viewModel = viewModel, onClick = { onClick(item.id_professor)})
             }
         }
     } else {

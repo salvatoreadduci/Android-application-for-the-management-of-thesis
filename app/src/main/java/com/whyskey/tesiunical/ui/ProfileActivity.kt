@@ -162,7 +162,6 @@ private fun CompilationThesisCard(
             onDelete = { viewModel.removeThesis(thesis.id) },
             onRequest = {
                 viewModel.addNewRequest(viewModel.userData.value.id, profile.id,thesis.id,viewModel.userData.value.name, 0, thesis.title,thesis)
-                //viewModel.getThesis(profile.id, thesis.type)
             }
         )
     }

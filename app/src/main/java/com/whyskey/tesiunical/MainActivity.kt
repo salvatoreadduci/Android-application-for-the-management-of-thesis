@@ -75,13 +75,10 @@ fun ApplicationSwitcher(viewModel: ThesisViewModel) {
 fun ThesisApp(viewModel: ThesisViewModel) {
     TesiUnicalTheme {
 
-        //Navigation
-        val allScreens = ThesisScreen.values().toList()
         val navController = rememberNavController()
-        val backstackEntry = navController.currentBackStackEntryAsState()
-        val currentScreen = ThesisScreen.fromRoute(
-            backstackEntry.value?.destination?.route
-        )
+        val currentBackStack by navController.currentBackStackEntryAsState()
+        val currentDestination = currentBackStack?.destination
+        val currentScreen = tabScreens.find { it.route == currentDestination?.route } ?: Home
 
         AddThesisDialog(
             show = viewModel.showDialog.collectAsState().value,
@@ -93,8 +90,9 @@ fun ThesisApp(viewModel: ThesisViewModel) {
         Scaffold(
             topBar = {
                 com.whyskey.tesiunical.ui.components.TabRow(
-                    allScreens =  allScreens,
-                    onTabSelected = { screen -> navController.navigate(screen.name) },
+                    allScreens =  tabScreens,
+                    onTabSelected = { screen ->
+                        navController.navigateSingleTopTo(screen.route) },
                     currentScreen = currentScreen
                 )
             },
@@ -118,18 +116,16 @@ fun ThesisAppStudent(viewModel: ThesisViewModel) {
     TesiUnicalTheme {
 
         //Navigation
-        val allScreens = listOf(ThesisScreen.Home,ThesisScreen.Profile, ThesisScreen.Settings)
         val navController = rememberNavController()
-        val backstackEntry = navController.currentBackStackEntryAsState()
-        val currentScreen = ThesisScreen.fromRoute(
-            backstackEntry.value?.destination?.route
-        )
-
+        val currentBackStack by navController.currentBackStackEntryAsState()
+        val currentDestination = currentBackStack?.destination
+        val currentScreen = tabScreensStudent.find { it.route == currentDestination?.route } ?: Home
         Scaffold(
             topBar = {
                 com.whyskey.tesiunical.ui.components.TabRow(
-                    allScreens =  allScreens,
-                    onTabSelected = { screen -> navController.navigate(screen.name) },
+                    allScreens =  tabScreensStudent,
+                    onTabSelected = { screen ->
+                        navController.navigateSingleTopTo(screen.route) },
                     currentScreen = currentScreen
                 )
             }
@@ -144,120 +140,7 @@ fun ThesisAppStudent(viewModel: ThesisViewModel) {
 }
 
 @Composable
-fun ThesisNavHost(
-    navController: NavHostController,
-    modifier: Modifier = Modifier,
-    viewModel: ThesisViewModel
-) {
-    NavHost(
-        navController = navController,
-        startDestination = ThesisScreen.Home.name,
-        modifier = modifier
-
-    ) {
-
-        val accountTypeArg = "account_id"
-        val routeWithArgs = "${ThesisScreen.Profile.name}/{$accountTypeArg}"
-        val arguments = listOf(
-            navArgument(accountTypeArg) { type = NavType.StringType }
-        )
-        val deepLinks = listOf(
-            navDeepLink { uriPattern = "thesis://${ThesisScreen.Profile.name}/{$accountTypeArg}" }
-        )
-
-        composable(
-            route = routeWithArgs,
-            arguments = arguments,
-            deepLinks = deepLinks
-        ) { navBackStackEntry ->
-            val accountType =
-                navBackStackEntry.arguments?.getString(accountTypeArg)
-            Profile(
-                onClickSeeAll = { name -> navigateToFullScreenThesis(navController, name) },
-                viewModel = viewModel,
-                id = accountType!!
-            )
-        }
-
-        composable(ThesisScreen.Home.name){
-            Home(
-                onClick = { id -> navController.navigateToProfile(id) },
-                viewModel = viewModel
-            )
-        }
-
-        if(viewModel.userData.value.isProfessor){
-            composable(ThesisScreen.Analytics.name) {
-                Analytics(
-                    viewModel = viewModel
-                )
-            }
-        }
-
-        composable(ThesisScreen.Profile.name) {
-            Profile(
-                onClickSeeAll = { name -> navigateToFullScreenThesis(navController, name) },
-                viewModel = viewModel,
-                id = viewModel.userData.value.id
-            )
-        }
-
-        composable(ThesisScreen.Settings.name){
-            Settings(viewModel = viewModel)
-        }
-
-        val profileName = ThesisScreen.Profile.name
-        composable(
-            "$profileName/{name}",
-            arguments = listOf(
-                navArgument("name"){
-                    type = NavType.StringType
-                }
-            ),
-            deepLinks = listOf(navDeepLink {
-                uriPattern = "thesis://$profileName/{name}"
-            })
-        ){
-                entry ->
-            when(entry.arguments?.getString("name")){
-                stringResource(id = R.string.compilation_thesis) ->
-                    ThesisFullScreen(
-                        list = viewModel.compilationThesis.value,
-                        viewModel = viewModel,
-                        title = stringResource(id = R.string.compilation_thesis)
-                    )
-                stringResource(id = R.string.application_thesis) ->
-                    ThesisFullScreen(
-                        list = viewModel.applicationThesis.value,
-                        viewModel = viewModel,
-                        title = stringResource(id = R.string.application_thesis)
-                    )
-                stringResource(id = R.string.research_thesis) ->
-                    ThesisFullScreen(
-                        list = viewModel.researchThesis.value,
-                        viewModel = viewModel,
-                        title = stringResource(id = R.string.research_thesis)
-                    )
-            }
-        }
-    }
-}
-
-private fun navigateToFullScreenThesis(
-    navController: NavHostController,
-    listName: String
-) {
-    navController.navigate("${ThesisScreen.Profile.name}/$listName")
-}
-
-private fun NavHostController.navigateToProfile(
-    id: String
-) {
-    this.navigateSingleTopTo("${ThesisScreen.Profile.name}/$id")
-}
-
-@Composable
-private fun  AddFloatingActionButton(onClick: () -> Unit){
+private fun AddFloatingActionButton(onClick: () -> Unit){
     FloatingActionButton(onClick = onClick,
     ) {
         Row(
@@ -270,20 +153,3 @@ private fun  AddFloatingActionButton(onClick: () -> Unit){
         }
     }
 }
-
-fun NavHostController.navigateSingleTopTo(route: String) =
-    this.navigate(route) {
-        // Pop up to the start destination of the graph to
-        // avoid building up a large stack of destinations
-        // on the back stack as users select items
-        popUpTo(
-            this@navigateSingleTopTo.graph.findStartDestination().id
-        ) {
-            saveState = true
-        }
-        // Avoid multiple copies of the same destination when
-        // reselecting the same item
-        launchSingleTop = true
-        // Restore state when reselecting a previously selected item
-        restoreState = true
-    }

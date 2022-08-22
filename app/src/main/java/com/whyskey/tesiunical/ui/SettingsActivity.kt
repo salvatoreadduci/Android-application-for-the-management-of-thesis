@@ -1,7 +1,6 @@
 package com.whyskey.tesiunical.ui
 
 
-import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
@@ -27,16 +26,12 @@ import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
-import com.whyskey.tesiunical.ApplicationSwitcher
 import com.whyskey.tesiunical.R
 import com.whyskey.tesiunical.data.Session
 import com.whyskey.tesiunical.model.ThesisViewModel
-import com.whyskey.tesiunical.model.UserState
 import com.whyskey.tesiunical.ui.components.ChangeLimitDialog
 import com.whyskey.tesiunical.ui.components.ChangeOptionDialog
-import com.whyskey.tesiunical.ui.components.LimitThesisRow
 import com.whyskey.tesiunical.ui.components.SettingsRow
-
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -97,7 +92,7 @@ fun Settings(
         mutableStateOf(viewModel.userImage.value)
     }
     val launcher = rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent()){
-        viewModel.storage.child("images/" + viewModel.user!!.uid).putFile(it)
+        viewModel.storage.child("images/" + viewModel.user!!.uid).putFile(it!!)
         uri = it
     }
 
@@ -124,22 +119,21 @@ fun Settings(
 
         SettingsBody(
             title = stringResource(id = R.string.account_settings),
-            items = settingsList,
-            rows = {
-                if(
-                    (it.title != stringResource(id = R.string.web_site) || viewModel.userData.value.isProfessor)
-                ){
-                    SettingsRow(
-                        image = it.image,
-                        title = it.title,
-                        value = it.value,
-                        onClick = {
-                            viewModel.onOptionDialogClicked(it.dialog)
-                        }
-                    )
-                }
+            items = settingsList
+        ) {
+            if (
+                (it.title != stringResource(id = R.string.web_site) || viewModel.userData.value.isProfessor)
+            ) {
+                SettingsRow(
+                    image = it.image,
+                    title = it.title,
+                    value = it.value,
+                    onClick = {
+                        viewModel.onOptionDialogClicked(it.dialog)
+                    }
+                )
             }
-        )
+        }
         Spacer(Modifier.height(8.dp))
 
         if(viewModel.userData.value.isProfessor){
