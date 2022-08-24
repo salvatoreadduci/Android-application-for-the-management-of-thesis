@@ -1,28 +1,24 @@
 package com.whyskey.tesiunical.ui
 
-import android.util.Log
+
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.*
-import androidx.compose.material.Card
-import androidx.compose.material.Divider
+import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.whyskey.tesiunical.R
-import com.whyskey.tesiunical.data.Account
 import com.whyskey.tesiunical.data.Request
 import com.whyskey.tesiunical.model.ThesisViewModel
 import com.whyskey.tesiunical.ui.components.AccountCollection
 import com.whyskey.tesiunical.ui.components.ProfileItem
-
 @Composable
 fun Home(
     viewModel: ThesisViewModel,
     onClick: (String) -> Unit = {}
 ) {
-
     if(viewModel.userData.value.isProfessor){
         viewModel.getAccountsByType(false)
     } else {
@@ -32,6 +28,7 @@ fun Home(
 
     HomeBody(temp, viewModel,onClick)
 }
+
 @Composable
 private fun HomeBody(
     accounts: List<Request>,
@@ -39,7 +36,10 @@ private fun HomeBody(
     onClick: (String) -> Unit
 ){
     Card(modifier = Modifier.fillMaxSize()) {
+        Column {
             ProfilesCollectionList(accounts = accounts, viewModel,onClick)
+            Spacer(modifier = Modifier.height(80.dp))
+        }
     }
 }
 
@@ -55,7 +55,9 @@ private fun ProfilesCollectionList(
             GridCells.Fixed(2)
         ){
             itemsIndexed(accounts) { _, item ->
-                ProfileItem(profile = item,viewModel = viewModel, onClick = { onClick(item.id_professor)})
+                ProfileItem(
+                    profile = item,
+                    viewModel = viewModel, onClick = { onClick(item.id_professor)}, true, {})
             }
         }
     } else {

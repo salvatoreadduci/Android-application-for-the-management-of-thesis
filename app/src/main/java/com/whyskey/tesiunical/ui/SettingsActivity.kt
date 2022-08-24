@@ -1,8 +1,10 @@
 package com.whyskey.tesiunical.ui
 
 
+import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -184,21 +186,32 @@ fun Settings(
                 viewModel = viewModel
             )
 
+            val checkedState = rememberSaveable { mutableStateOf(viewModel.userData.value.hasLimit) }
+
             LimitThesisBody(
                 title = stringResource(id = R.string.thesis_limit),
+                checked = checkedState.value,
+                onCheckedChange = {
+                    checkedState.value = it
+                    viewModel.updateHasLimit(checkedState.value)
+                                  },
                 items = thesisList
             ) {
-                SettingsRow(
-                    image = it.image,
-                    title = it.title,
-                    value = it.title,
-                    onClick = {
-                        title = it.title
-                        idList = it.dialog.toString()
-                        list = it.value as Session
-                        viewModel.onOptionDialogClicked(3)
-                    }
-                )
+
+                if(checkedState.value){
+                    SettingsRow(
+                        image = it.image,
+                        title = it.title,
+                        value = it.title,
+                        onClick = {
+                            title = it.title
+                            idList = it.dialog.toString()
+                            list = it.value as Session
+                            viewModel.onOptionDialogClicked(3)
+                        }
+                    )
+                }
+
             }
         } else {
             Card{
@@ -236,6 +249,8 @@ fun Settings(
             Text(text = "Logout")
         }
 
+        Spacer(modifier = Modifier.height(80.dp))
+
     }
 }
 
@@ -266,15 +281,12 @@ class SettingsData(
     var dialog: Int
 )
 
-class LimitThesis(
-    val title: String,
-    val value: Any
-)
-
 @Composable
 fun <T> LimitThesisBody(
     modifier: Modifier = Modifier,
     title: String,
+    checked: Boolean,
+    onCheckedChange: (Boolean) -> Unit,
     items: List<T>,
     rows: @Composable (T) -> Unit
 ){
@@ -286,7 +298,7 @@ fun <T> LimitThesisBody(
                     modifier = modifier.padding(4.dp)
                 )
                 Spacer(modifier = Modifier.weight(1f))
-                Switch(checked = false, onCheckedChange =  {} )
+                Switch(checked = checked, onCheckedChange =  onCheckedChange )
             }
 
             items.forEach { item ->
@@ -325,7 +337,7 @@ private fun ChangeThesisDialog(
                         openDialog.value = false
                     }
                 ) {
-                    Text("Confirm")
+                    Text(stringResource(id = R.string.save))
                 }
             },
             dismissButton = {
@@ -334,7 +346,7 @@ private fun ChangeThesisDialog(
                         openDialog.value = false
                     }
                 ) {
-                    Text("Dismiss")
+                    Text(stringResource(id = R.string.cancel))
                 }
             }
         )

@@ -16,6 +16,7 @@ import androidx.compose.material.icons.rounded.Email
 import androidx.compose.material.icons.rounded.Info
 import androidx.compose.material.icons.rounded.Language
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -32,6 +33,7 @@ import com.whyskey.tesiunical.data.Thesis
 import com.whyskey.tesiunical.model.ThesisViewModel
 import com.whyskey.tesiunical.ui.components.ThesisCard
 import com.whyskey.tesiunical.ui.components.ThesisRow
+import kotlin.math.exp
 
 @Composable
 fun Profile(
@@ -43,6 +45,7 @@ fun Profile(
         viewModel.userData.value
     } else {
         viewModel.accounts.value.find { account -> id == account.id }!!
+        //cerca account su db
     }
 
     Column(
@@ -63,6 +66,7 @@ fun Profile(
             ApplicationThesisCard(onClickSeeAll = onClickSeeAll,viewModel.applicationThesis.value,viewModel,profile)
             Spacer(Modifier.height(16.dp))
             ResearchThesisCard(onClickSeeAll = onClickSeeAll,viewModel.researchThesis.value,viewModel,profile)
+            Spacer(modifier = Modifier.height(80.dp))
         } else {
             var expandedThesis by remember { mutableStateOf<String?>(null) }
             AssignedThesis(
@@ -145,6 +149,17 @@ private fun CompilationThesisCard(
     var expandedThesis by remember { mutableStateOf<String?>(null) }
     val title = stringResource(id = R.string.compilation_thesis)
 
+    var show by rememberSaveable { mutableStateOf(false) }
+    var thesisId by rememberSaveable { mutableStateOf("") }
+
+    ConfirmDeleteDialog(
+        show = show,
+        onDismiss = { show = false },
+        onRemove = { viewModel.removeThesis(thesisId)
+        show = false
+        }
+    )
+
     ThesisCard(
         title = title,
         onClickSeeAll =  { onClickSeeAll(title) } ,
@@ -158,9 +173,12 @@ private fun CompilationThesisCard(
             description = thesis.description,
             expanded = expandedThesis == thesis.title,
             onClick = { expandedThesis = if (expandedThesis == thesis.title) null else thesis.title },
-            onDelete = { viewModel.removeThesis(thesis.id) },
+            onDelete = {
+                show = true
+                thesisId = thesis.id
+                       },
             onRequest = {
-                viewModel.addNewRequest(viewModel.userData.value.id, profile.id,thesis.id,viewModel.userData.value.name, 0, thesis.title,thesis)
+                viewModel.addNewRequest(viewModel.userData.value.id, profile.id,thesis.id,viewModel.userData.value.name, 0, thesis.title,viewModel.userData.value.email,thesis)
             }
         )
     }
@@ -176,6 +194,17 @@ private fun ApplicationThesisCard(
     var expandedThesis by remember { mutableStateOf<String?>(null) }
     val title = stringResource(id = R.string.application_thesis)
 
+    var show by rememberSaveable { mutableStateOf(false) }
+    var thesisId by rememberSaveable { mutableStateOf("") }
+
+    ConfirmDeleteDialog(
+        show = show,
+        onDismiss = { show = false },
+        onRemove = { viewModel.removeThesis(thesisId)
+            show = false
+        }
+    )
+
     ThesisCard(
         title = title,
         onClickSeeAll = { onClickSeeAll(title) },
@@ -191,10 +220,12 @@ private fun ApplicationThesisCard(
             onClick = {
                 expandedThesis = if (expandedThesis == thesis.title) null else thesis.title
             },
-            onDelete = { viewModel.removeThesis(thesis.id) },
+            onDelete = {
+                show = true
+                thesisId = thesis.id
+            },
             onRequest = {
-                viewModel.addNewRequest(viewModel.userData.value.id, profile.id,thesis.id,viewModel.userData.value.name, 0, thesis.title,thesis)
-                //viewModel.getThesis(profile.id, thesis.type)
+                viewModel.addNewRequest(viewModel.userData.value.id, profile.id,thesis.id,viewModel.userData.value.name, 0, thesis.title,viewModel.userData.value.email,thesis)
             }
         )
     }
@@ -208,7 +239,18 @@ private fun ResearchThesisCard(
     profile: Account
 ){
     var expandedThesis by remember { mutableStateOf<String?>(null) }
-    val title = stringResource(id = R.string.application_thesis)
+    val title = stringResource(id = R.string.research_thesis)
+
+    var show by rememberSaveable { mutableStateOf(false) }
+    var thesisId by rememberSaveable { mutableStateOf("") }
+
+    ConfirmDeleteDialog(
+        show = show,
+        onDismiss = { show = false },
+        onRemove = { viewModel.removeThesis(thesisId)
+            show = false
+        }
+    )
 
     ThesisCard(
         title = title,
@@ -225,9 +267,12 @@ private fun ResearchThesisCard(
             onClick = {
                 expandedThesis = if (expandedThesis == thesis.title) null else thesis.title
             },
-            onDelete = { viewModel.removeThesis(thesis.id) },
+            onDelete = {
+                show = true
+                thesisId = thesis.id
+            },
             onRequest = {
-                viewModel.addNewRequest(viewModel.userData.value.id, profile.id,thesis.id,viewModel.userData.value.name, 0, thesis.title,thesis)
+                viewModel.addNewRequest(viewModel.userData.value.id, profile.id,thesis.id,viewModel.userData.value.name, 0, thesis.title,viewModel.userData.value.email,thesis)
             }
         )
     }
@@ -294,10 +339,7 @@ private fun AssignedThesis(
                 Text(text = "${stringResource(id = R.string.type)} $type")
                 Spacer(modifier = Modifier.height(8.dp))
                 val prof = viewModel.accounts.value.find { prof -> prof.id == viewModel.thesis.value.id_professor }
-                Text(text = "${stringResource(id = R.string.professor)} ${
-                    //viewModel.thesis.value.id_professor
-                    prof?.name
-                }")
+                Text(text = "${stringResource(id = R.string.professor)} ${prof?.name}")
             }
         }
     }
@@ -306,16 +348,39 @@ private fun AssignedThesis(
 @Composable
 private fun NotPassedExams(
     profile: Account
-){
+) {
     Card(modifier = Modifier.fillMaxWidth()) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp)
-        ){
+        ) {
             Text(text = "${stringResource(id = R.string.change_exams)}:")
             Spacer(modifier = Modifier.height(4.dp))
             Text(text = profile.exams)
         }
+    }
+}
+
+@Composable
+private fun ConfirmDeleteDialog(
+    show: Boolean,
+    onDismiss: () -> Unit,
+    onRemove: () -> Unit,
+){
+    if(show){
+        AlertDialog(
+            onDismissRequest = onDismiss,
+            confirmButton = {
+                TextButton(onClick = onRemove  )
+                { Text(text = stringResource(id = R.string.delete)) }
+            },
+            dismissButton = {
+                TextButton(onClick = onDismiss)
+                { Text(text = stringResource(id = R.string.cancel)) }
+            },
+            title = { Text(text = stringResource(id = R.string.confirm_delete)) }
+        )
+            
     }
 }

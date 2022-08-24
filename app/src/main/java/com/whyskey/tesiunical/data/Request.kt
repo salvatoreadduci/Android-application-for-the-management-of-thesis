@@ -9,5 +9,6 @@ data class Request(
     val accepted: Boolean = false,
     val thesis: String = "",
     var id: String = "",
-    var image: String = ""
+    var image: String = "",
+    val email: String = ""
 )

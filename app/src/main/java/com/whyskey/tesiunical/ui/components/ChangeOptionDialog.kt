@@ -88,20 +88,42 @@ fun ChangeLimitDialog(
             title = { Text(text = title)},
             text = {
 
-
-
                 Column(modifier = Modifier.padding(8.dp)){
                     LimitThesisRow(
-                        title = "Applicative",
+                        title = stringResource(id = R.string.application_thesis),
                         value = inputApplicative,
                         idList = idList,
                         viewModel = viewModel,
                         onChangeValue = {inputApplicative = it}
                     )
-                    LimitThesisRow(title = "Compilation", value = inputCompilation, idList = idList,viewModel = viewModel,onChangeValue = {inputCompilation = it})
-                    LimitThesisRow(title = "Corporate", value = inputCorporate, idList = idList,viewModel = viewModel,onChangeValue = {inputCorporate = it})
-                    LimitThesisRow(title = "Erasmus", value = inputErasmus, idList = idList,viewModel = viewModel,onChangeValue = {inputErasmus = it})
-                    LimitThesisRow(title = "Di Ricerca", value = inputResearch, idList = idList,viewModel = viewModel, onChangeValue = {inputResearch = it})
+                    LimitThesisRow(
+                        title = stringResource(id = R.string.compilation_thesis),
+                        value = inputCompilation,
+                        idList = idList,
+                        viewModel = viewModel,
+                        onChangeValue = {inputCompilation = it}
+                    )
+                    LimitThesisRow(
+                        title = stringResource(id = R.string.corporate_thesis),
+                        value = inputCorporate,
+                        idList = idList,
+                        viewModel = viewModel,
+                        onChangeValue = {inputCorporate = it}
+                    )
+                    LimitThesisRow(
+                        title = stringResource(id = R.string.erasmus_thesis),
+                        value = inputErasmus,
+                        idList = idList,
+                        viewModel = viewModel,
+                        onChangeValue = {inputErasmus = it}
+                    )
+                    LimitThesisRow(
+                        title = stringResource(id = R.string.research_thesis),
+                        value = inputResearch,
+                        idList = idList,
+                        viewModel = viewModel,
+                        onChangeValue = {inputResearch = it}
+                    )
                 }
             }
         )

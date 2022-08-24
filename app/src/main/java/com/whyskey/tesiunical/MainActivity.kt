@@ -1,10 +1,12 @@
 package com.whyskey.tesiunical
 
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -34,9 +36,12 @@ import com.whyskey.tesiunical.model.UserStateViewModel
 import com.whyskey.tesiunical.ui.*
 import com.whyskey.tesiunical.ui.components.AddThesisDialog
 import com.whyskey.tesiunical.ui.theme.TesiUnicalTheme
+import java.time.LocalDate
+import java.time.Month
 
 class MainActivity : ComponentActivity() {
     private val userState by viewModels<UserStateViewModel>()
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         //Firebase.firestore.clearPersistence()
         super.onCreate(savedInstanceState)
@@ -86,7 +91,7 @@ fun ThesisApp(viewModel: ThesisViewModel) {
             onConfirm = viewModel::addNewThesis,
             viewModel = viewModel
         )
-        
+
         Scaffold(
             topBar = {
                 com.whyskey.tesiunical.ui.components.TabRow(

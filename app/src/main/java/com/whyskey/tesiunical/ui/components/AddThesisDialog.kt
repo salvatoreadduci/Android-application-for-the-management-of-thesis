@@ -63,7 +63,7 @@ fun AddThesisDialog(
 
                     Spacer(modifier = Modifier.padding(16.dp))
 
-                    Text(text = "Type")
+                    Text(stringResource(id = R.string.type))
 
                     Column(Modifier.selectableGroup()) {
                         radioOptions.forEach { text ->
@@ -94,7 +94,7 @@ fun AddThesisDialog(
 
                     Spacer(modifier = Modifier.padding(8.dp))
 
-                    Text(text = "Description")
+                    Text(text = stringResource(id = R.string.description))
                     TextField(
                         modifier = Modifier.height(180.dp),
                         value = descriptionInput,

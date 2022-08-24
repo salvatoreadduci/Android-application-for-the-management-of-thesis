@@ -1,34 +1,32 @@
 <resources>
     <string name="app_name">Tesi Unical</string>
-    <string name="see_all">SEE ALL</string>
+    <string name="see_all">Mostra tutto</string>
     <string name="compilation_thesis">Tesi Compilativa</string>
     <string name="application_thesis">Tesi Applicativa</string>
     <string name="research_thesis">Tesi di ricerca</string>
     <string name="corporate_thesis">Tesi in azienda</string>
     <string name="erasmus_thesis">Tesi Erasmus</string>
-    <string name="following">Following</string>
-    <string name="requests">Requests</string>
-    <string name="lorem_ipsum">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</string>
+    <string name="requests">Richieste</string>
     <string name="title_activity_profile">ProfileActivity</string>
     <string name="title_activity_profile_activityy">ProfileActivityy</string>
     <string name="title_activity_thesis_full_screen">ThesisFullScreen</string>
     <string name="title_activity_home">HomeActivity</string>
     <string name="title_activity_option">OptionActivity</string>
     <string name="title_activity_analytics">AnalyticsActivity</string>
-    <string name="total">Total</string>
-    <string name="name">Name</string>
+    <string name="total">Totale</string>
+    <string name="name">Nome</string>
     <string name="email">Email</string>
-    <string name="web_site">Web Site</string>
-    <string name="thesis_limit">Thesis limit</string>
-    <string name="account_settings">Account Settings</string>
-    <string name="thesis_settings">Thesis Settings</string>
-    <string name="save">Save</string>
-    <string name="cancel">Cancel</string>
-    <string name="title">Title</string>
-    <string name="thesis_dialog">Add a new Thesis</string>
-    <string name="change_name">Change your name</string>
-    <string name="change_email">Change your email</string>
-    <string name="change_web">Change your web site</string>
+    <string name="web_site">Sito Web</string>
+    <string name="thesis_limit">Limite Tesi</string>
+    <string name="account_settings">Impostazioni Account</string>
+    <string name="thesis_settings">Impostazioni Tesi</string>
+    <string name="save">Salva</string>
+    <string name="cancel">Annulla</string>
+    <string name="title">Titolo</string>
+    <string name="thesis_dialog">Aggiungi una nuova tesi</string>
+    <string name="change_name">Cambia il tuo nome</string>
+    <string name="change_email">Cambia la tua email</string>
+    <string name="change_web">Cambia il tuo sito web</string>
     <string name="change_thesis">Cambia il limite delle tesi che vuoi seguire</string>
     <string name="title_activity_register">RegisterActivity</string>
     <string name="assigned_thesis">Tesi assegnata:</string>
@@ -43,6 +41,10 @@
     <string name="december_session">Sessione di Dicembre</string>
     <string name="students_to_follow">Richieste ricevute</string>
     <string name="not_assigned">Tesi non assegnata</string>
-
+    <string name="delete">Elimina</string>
+    <string name="confirm_delete">Vuoi davvero eliminare la tesi?</string>
+    <string name="send_message">Vuoi inviare un messaggio allo studente?</string>
+    <string name="description">Descrizione</string>
+    <string name="send">Invia</string>
 
 </resources>

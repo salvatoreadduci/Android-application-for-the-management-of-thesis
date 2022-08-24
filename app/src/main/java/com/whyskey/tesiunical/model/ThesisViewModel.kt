@@ -1,12 +1,16 @@
 package com.whyskey.tesiunical.model
 
+import android.annotation.SuppressLint
+import android.content.Context
 import android.net.Uri
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.runtime.*
 import androidx.core.net.toUri
 import androidx.lifecycle.*
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.firestore.ktx.toObject
 import com.google.firebase.firestore.ktx.toObjects
@@ -18,6 +22,10 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.io.File
+import java.text.DateFormat
+import java.text.SimpleDateFormat
+import java.util.*
+import kotlin.collections.ArrayList
 
 class ThesisViewModel : ViewModel(){
 
@@ -125,43 +133,80 @@ class ThesisViewModel : ViewModel(){
         }
     }
 
-    fun changeRequest(id: String, idStudent: String, idThesis: String,accepted: Boolean){
-        if(accepted){
-            Firebase.firestore.collection("requests").document(id)
-                .update(mapOf(
-                    "accepted" to true
-                    )
-                )
+    fun changeRequest(id: String, idStudent: String, idThesis: String,session: Int,accepted: Boolean, context: Context?){
+        viewModelScope.launch{
+            Firebase.firestore.collection("account").document(idStudent).collection("thesis").document(idThesis)
+                .get().addOnSuccessListener {
+                    if(it != null) {
+                        val thesis = it.toObject(Thesis::class.java)
 
-            Firebase.firestore.collection("account").document(idStudent)
-                .update(mapOf(
-                    "hasThesis" to true
-                )
-                )
-        } else {
-            Log.d("TAG","$id - $idStudent - $idThesis")
-            Firebase.firestore.collection("requests").document(id)
-                .delete()
-            sendThesis(idStudent,idThesis)
+                        if(accepted){
+
+                            val temp = when(session){
+                                0 -> "march"
+                                1 -> "july"
+                                2 -> "september"
+                                else -> "december"
+                            }
+
+                            val temp2 = when(thesis!!.type){
+                                0 -> "applicative"
+                                1 -> "compilation"
+                                2 -> "corporate"
+                                3 -> "erasmus"
+                                else -> "research"
+                            }
+
+                            Firebase.firestore.collection("account").document(_userData.value.id).collection("sessions").document(temp)
+                                .get().addOnSuccessListener { document ->
+
+                                    val session = document.toObject<Session>()!!
+                                    val temp3 = when(temp2){
+                                        "applicative" -> session.applicative.values
+                                        "compilation" -> session.compilation.values
+                                        "corporate" -> session.corporate.values
+                                        "erasmus" -> session.erasmus.values
+                                        else ->  session.research.values
+                                    }
+
+                                    if(_userData.value.hasLimit && temp3.toList()[0] >= temp3.toList()[1]){
+                                        val text = "Limite raggiunto o superato!"
+                                        val duration = Toast.LENGTH_SHORT
+                                        val toast = Toast.makeText(context,text, duration)
+                                        toast.show()
+                                        Log.d("LIMIT","Limite Superato")
+                                    } else {
+                                        Firebase.firestore.collection("account").document(_userData.value.id).collection("sessions").document(temp)
+                                            .update(
+                                                "${temp2}.current",FieldValue.increment(1)
+                                            )
+
+                                        Firebase.firestore.collection("requests").document(id)
+                                            .update(mapOf("accepted" to true))
+
+                                        Firebase.firestore.collection("account").document(idStudent)
+                                            .update(mapOf("hasThesis" to true))
+                                    }
+                                }
+
+                        } else {
+                            Firebase.firestore.collection("requests").document(id)
+                                .delete()
+                            sendThesis(idStudent,idThesis,thesis!!)
+
+                        }
+                    }
+                }
         }
     }
 
-    private fun sendThesis(account: String, idThesis:String){
+    private fun sendThesis(account: String, idThesis:String, thesis: Thesis){
         viewModelScope.launch {
             Firebase.firestore.runTransaction {
-                Firebase.firestore.collection("account").document(account).collection("thesis").document(idThesis).get()
-                    .addOnSuccessListener {
-                        if(it != null){
-                            val thesis = it.toObject(Thesis::class.java)
-                            if (thesis != null) {
-                                Firebase.firestore.collection("account").document(_userData.value.id).collection("thesis").document(idThesis)
-                                    .set(thesis)
-
-                                Firebase.firestore.collection("account").document(account).collection("thesis").document(idThesis)
-                                    .delete()
-                            }
-                        }
-                    }
+                Firebase.firestore.collection("account").document(_userData.value.id).collection("thesis").document(idThesis)
+                    .set(thesis)
+                Firebase.firestore.collection("account").document(account).collection("thesis").document(idThesis)
+                    .delete()
                 null
             }.addOnSuccessListener { Log.d("TAG", "Transaction success!") }
                 .addOnFailureListener { e -> Log.w("TAG", "Transaction failure.", e) }
@@ -261,7 +306,7 @@ class ThesisViewModel : ViewModel(){
 
     private fun deleteThesis(thesis: String){
         viewModelScope.launch {
-            Firebase.firestore.collection("thesis").document(thesis)
+            Firebase.firestore.collection("account").document(_userData.value.id).collection("thesis").document(thesis)
                 .delete()
                 .addOnSuccessListener { Log.d("TAG", "DocumentSnapshot successfully deleted!") }
                 .addOnFailureListener { e -> Log.w("TAG", "Error deleting document", e) }
@@ -369,18 +414,62 @@ class ThesisViewModel : ViewModel(){
         }
     }
 
+    private fun resetAnalytics(month: String){
+        when(month){
+            "01" -> reset("december")
+            "04" -> reset("march")
+            "08" -> reset("july")
+            else -> reset("september")
+        }
+    }
+
+    private fun reset(month: String){
+        viewModelScope.launch {
+            Firebase.firestore.collection("account").document(_userData.value.id).collection("sessions").document(month)
+                .update(mapOf(
+                    "applicative.current" to 0,
+                    "compilation.current" to 0,
+                    "corporate.current" to 0,
+                    "erasmus.current" to 0,
+                    "research.current" to 0
+                    )
+                )
+        }
+    }
+
+    @SuppressLint("SimpleDateFormat")
     private fun getUserData(user: String?){
         viewModelScope.launch {
             Firebase.firestore.collection("account").document(user!!)
                 .addSnapshotListener { value, _ ->
                 if(value != null) {
-                    _userData.value = value.toObject()!!
+                    _userData.value = value.toObject<Account>()!!
                     _userData.value.id = user
                     if(value.data!!.getValue("isProfessor") == false){
                         _userData.value.isProfessor = false
                     }
+
+                    val dateFormat: DateFormat = SimpleDateFormat("MM")
+                    val dateFormatDay: DateFormat = SimpleDateFormat("dd")
+                    val date = Date()
+                    val month = dateFormat.format((date))
+                    val day = dateFormatDay.format((date))
+                    if(day == "01" && (month == "01" || month == "04" ||month == "08" || month == "10")){
+                        resetAnalytics(month)
+                    }
                 }
             }
+        }
+    }
+
+    fun updateHasLimit(value: Boolean){
+        sendUpdate(value)
+    }
+
+    private fun sendUpdate(value: Boolean){
+        viewModelScope.launch {
+            Firebase.firestore.collection("account").document(_userData.value.id)
+                .update(mapOf("hasLimit" to value))
         }
     }
 
@@ -410,13 +499,21 @@ class ThesisViewModel : ViewModel(){
         }
     }
 
-    fun addNewRequest(idStudent: String, idProfessor: String, id_thesis: String, name: String, session: Int, thesisTitle: String,thesis: Thesis){
-        val newRequest = getNewRequest(idStudent,idProfessor,id_thesis,name,session,thesisTitle)
+    fun addNewRequest(idStudent: String, idProfessor: String, id_thesis: String, name: String, session: Int, thesisTitle: String,email:String,thesis: Thesis){
+        val newRequest = getNewRequest(idStudent,idProfessor,id_thesis,name,session,email,thesisTitle)
         insertRequest(newRequest)
-        sendThesis(idProfessor,id_thesis)
+        Firebase.firestore.collection("account").document(idProfessor).collection("thesis").document(id_thesis).get()
+            .addOnSuccessListener {
+                if(it != null){
+                    val thesis = it.toObject(Thesis::class.java)
+                    if (thesis != null) {
+                        sendThesis(idProfessor, id_thesis,thesis)
+                    }
+                }
+            }
     }
 
-    private fun getNewRequest(idStudent: String, idProfessor: String, idThesis: String,name: String, session: Int, thesisTitle: String): Request{
+    private fun getNewRequest(idStudent: String, idProfessor: String, idThesis: String,name: String, session: Int, email:String,thesisTitle: String): Request{
         return Request(
             id_student = idStudent,
             id_professor = idProfessor,
@@ -424,6 +521,7 @@ class ThesisViewModel : ViewModel(){
             name = name,
             session = session,
             thesis = thesisTitle,
+            email = email,
             accepted = false
         )
     }
@@ -476,7 +574,6 @@ class ThesisViewModel : ViewModel(){
 
     private val _showLimitDialog = MutableStateFlow(false)
     val showLimitDialog: StateFlow<Boolean> = _showLimitDialog.asStateFlow()
-
 
     fun onOpenDialogClicked() {
         _showDialog.value = true

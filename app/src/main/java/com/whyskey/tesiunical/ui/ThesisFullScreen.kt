@@ -1,8 +1,6 @@
 package com.whyskey.tesiunical.ui
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Card
@@ -46,6 +44,7 @@ fun ThesisFullScreen(
                     )
                 }
             }
+            Spacer(modifier = Modifier.height(80.dp))
         }
     }
 }

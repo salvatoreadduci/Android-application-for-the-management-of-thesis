@@ -1,6 +1,5 @@
 package com.whyskey.tesiunical.ui
 
-import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -10,6 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.whyskey.tesiunical.R
 import com.whyskey.tesiunical.data.Session
 import com.whyskey.tesiunical.model.ThesisViewModel
@@ -46,6 +46,7 @@ fun Analytics(
 
             count++
             AnalyticsBody(
+                viewModel = viewModel,
                 title = title,
                 applicative = it.applicative,
                 compilation = it.compilation,
@@ -54,12 +55,15 @@ fun Analytics(
                 research = it.research
             )
         }
+        Spacer(modifier = Modifier.height(80.dp))
     }
+
 }
 
 @Composable
 fun AnalyticsBody(
     modifier: Modifier = Modifier,
+    viewModel: ThesisViewModel,
     title: String,
     applicative: Map<String,Int>,
     compilation: Map<String,Int>,
@@ -80,7 +84,7 @@ fun AnalyticsBody(
             )
 
             list.forEach{
-                AnalyticsRow(type = it.key, amount = it.value["current"], max = it.value["max"])
+                AnalyticsRow(viewModel = viewModel, type = it.key, amount = it.value["current"], max = it.value["max"])
             }
         }
     }

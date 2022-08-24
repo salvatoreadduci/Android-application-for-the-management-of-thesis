@@ -7,9 +7,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 
 import androidx.compose.ui.unit.dp
+import com.whyskey.tesiunical.model.ThesisViewModel
 
 @Composable
 fun AnalyticsRow(
+    viewModel: ThesisViewModel,
     modifier: Modifier = Modifier,
     type: String,
     amount: Int?,
@@ -28,11 +30,20 @@ fun AnalyticsRow(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
 
-            Text(
-                text = "$amount/$max",
-                style = typography.h6,
-                modifier = Modifier.align(Alignment.CenterVertically)
-            )
+            if(viewModel.userData.value.hasLimit){
+                Text(
+                    text = "$amount/$max",
+                    style = typography.h6,
+                    modifier = Modifier.align(Alignment.CenterVertically)
+                )
+            } else {
+                Text(
+                    text = "$amount",
+                    style = typography.h6,
+                    modifier = Modifier.align(Alignment.CenterVertically)
+                )
+            }
+
         }
         Spacer(Modifier.width(16.dp))
     }

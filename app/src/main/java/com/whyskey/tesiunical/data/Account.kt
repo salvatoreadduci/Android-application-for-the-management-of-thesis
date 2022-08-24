@@ -10,6 +10,7 @@ data class Account(
     val web_site: String = "",
     var isProfessor: Boolean = true,
     var hasThesis: Boolean = false,
+    var hasLimit: Boolean = false,
     var exams: String = "",
     var id: String = "",
     var image: String = ""

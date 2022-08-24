@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.rounded.Info
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -51,11 +52,10 @@ fun ThesisRow(
                 Spacer(modifier = Modifier.width(16.dp))
                 Text(
                     text = name,
-                    style = MaterialTheme.typography.body1
+                    style = MaterialTheme.typography.body1,
+                    modifier = Modifier.widthIn(1.dp,250.dp)
                 )
-
                 Spacer(Modifier.weight(1f))
-                
                 if(viewModel.userData.value.isProfessor){
                     Icon(
                         Icons.Filled.Close,
@@ -72,7 +72,7 @@ fun ThesisRow(
                     textAlign = TextAlign.Justify
                 )
                 
-                if(!viewModel.userData.value.isProfessor){
+                if(!viewModel.userData.value.isProfessor && !viewModel.userData.value.hasThesis){
                     Button(onClick = { onRequest() }) {
                         Text(text = stringResource(id = R.string.request))
                     }
