@@ -1,5 +1,6 @@
 package com.whyskey.tesiunical.ui
 
+import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Button
@@ -14,55 +15,59 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import com.whyskey.tesiunical.model.ThesisViewModel
 import com.whyskey.tesiunical.model.UserState
+import com.whyskey.tesiunical.ui.theme.TesiUnicalTheme
 
 @Composable
 fun Login(
     viewModel: ThesisViewModel
 ) {
-    val vm = UserState.current
+    TesiUnicalTheme {
+        val vm = UserState.current
 
-    Column(modifier = Modifier
-        .fillMaxSize()
-        .padding(8.dp)
-    ) {
-        val emailValue = remember { mutableStateOf("") }
-        val passwordValue = remember { mutableStateOf("") }
-
-        OutlinedTextField(
-            label = { Text(text = "Email") },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-            value = emailValue.value,
-            singleLine = true,
-            modifier = Modifier.fillMaxWidth(),
-            onValueChange = {
-                emailValue.value = it
-            }
-        )
-
-        OutlinedTextField(
-            label = { Text(text = "Password") },
-            visualTransformation = PasswordVisualTransformation(),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-            value =passwordValue.value,
-            singleLine = true,
-            modifier = Modifier.fillMaxWidth(),
-            onValueChange = {
-                passwordValue.value = it
-            }
-        )
-        Spacer(modifier = Modifier.padding(8.dp))
-        Button(
+        Column(
             modifier = Modifier
-                .fillMaxWidth(),
-            onClick = {
-                viewModel.auth.signInWithEmailAndPassword(emailValue.value,passwordValue.value)
-                    .addOnSuccessListener {
-                        vm.signIn()
-                        viewModel.getAllData()
-                    }
+                .fillMaxSize()
+                .padding(8.dp)
+        ) {
+            val emailValue = remember { mutableStateOf("") }
+            val passwordValue = remember { mutableStateOf("") }
+
+            OutlinedTextField(
+                label = { Text(text = "Email") },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                value = emailValue.value,
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth(),
+                onValueChange = {
+                    emailValue.value = it
+                }
+            )
+
+            OutlinedTextField(
+                label = { Text(text = "Password") },
+                visualTransformation = PasswordVisualTransformation(),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                value = passwordValue.value,
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth(),
+                onValueChange = {
+                    passwordValue.value = it
+                }
+            )
+            Spacer(modifier = Modifier.padding(8.dp))
+            Button(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                onClick = {
+                    viewModel.auth.signInWithEmailAndPassword(emailValue.value, passwordValue.value)
+                        .addOnSuccessListener {
+                            vm.signIn()
+                            viewModel.getAllData()
+                        }
+                }
+            ) {
+                Text(text = "Login")
             }
-        ){
-            Text(text = "Login")
         }
     }
 }

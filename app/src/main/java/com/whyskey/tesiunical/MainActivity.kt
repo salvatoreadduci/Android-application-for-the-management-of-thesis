@@ -55,7 +55,7 @@ fun ApplicationSwitcher(viewModel: ThesisViewModel) {
         }
 
     } else {
-        Login(viewModel)
+        RegisterActivity(viewModel)
     }
 }
 

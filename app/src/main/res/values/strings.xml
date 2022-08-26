@@ -46,5 +46,7 @@
     <string name="send_message">Vuoi inviare un messaggio allo studente?</string>
     <string name="description">Descrizione</string>
     <string name="send">Invia</string>
+    <string name="are_you_a_professor">Sono un professore</string>
+
 
 </resources>

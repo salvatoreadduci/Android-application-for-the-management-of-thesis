@@ -19,17 +19,17 @@ object Home : Screen {
 
 object Analytics : Screen {
     override val icon = Icons.Filled.Insights
-    override val route = "analytics"
+    override val route = "statistiche"
 }
 
 object Profile : Screen {
     override val icon = Icons.Filled.Person
-    override val route = "profile"
+    override val route = "profilo"
 }
 
 object Settings : Screen {
     override val icon = Icons.Filled.Settings
-    override val route = "settings"
+    override val route = "impostazioni"
 }
 
 object FullScreenThesis : Screen {
@@ -49,7 +49,7 @@ object FullScreenThesis : Screen {
 
 object OtherProfile : Screen {
     override val icon = Icons.Filled.Person
-    override val route = "profile"
+    override val route = "profilo"
     const val otherProfileIdArg = "profile_id"
     val routeWithArgs = "$route/{$otherProfileIdArg}"
     val arguments = listOf(
@@ -60,6 +60,11 @@ object OtherProfile : Screen {
     val deepLinks = listOf(
         navDeepLink { uriPattern = "thesis://$route/{$otherProfileIdArg}" }
     )
+}
+
+object Login : Screen {
+    override val icon = Icons.Filled.Person
+    override val route = "login"
 }
 
 val tabScreens = listOf(Home,Analytics,Profile,Settings)
