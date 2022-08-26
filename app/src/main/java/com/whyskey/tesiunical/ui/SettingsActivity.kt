@@ -31,6 +31,7 @@ import com.google.firebase.ktx.Firebase
 import com.whyskey.tesiunical.R
 import com.whyskey.tesiunical.data.Session
 import com.whyskey.tesiunical.model.ThesisViewModel
+import com.whyskey.tesiunical.model.UserState
 import com.whyskey.tesiunical.ui.components.ChangeLimitDialog
 import com.whyskey.tesiunical.ui.components.ChangeOptionDialog
 import com.whyskey.tesiunical.ui.components.SettingsRow
@@ -244,8 +245,14 @@ fun Settings(
             }
 
         }
+
+        val vm = UserState.current
+
         Spacer(modifier = Modifier.width(16.dp))
-        Button(onClick = { Firebase.auth.signOut() }) {
+        Button(onClick = {
+            Firebase.auth.signOut()
+            vm.signOut()
+        }) {
             Text(text = "Logout")
         }
 

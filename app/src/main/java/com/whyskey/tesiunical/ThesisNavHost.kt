@@ -1,6 +1,7 @@
 package com.whyskey.tesiunical
 
 
+import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -71,6 +72,7 @@ fun ThesisNavHost(
             deepLinks = OtherProfile.deepLinks
         ) { navBackStackEntry ->
                 val profileId = navBackStackEntry.arguments?.getString(OtherProfile.otherProfileIdArg)
+            Log.d("TAG",profileId!!)
             Profile(
                 onClickSeeAll = { thesis -> navController.navigateToFullScreenThesis(thesis) },
                 viewModel,

@@ -13,6 +13,10 @@ class UserStateViewModel : ViewModel() {
     fun signIn() {
         isLoggedIn = true
     }
+    fun signOut() {
+        isLoggedIn = false
+    }
+
 }
 
 @SuppressLint("CompositionLocalNaming")

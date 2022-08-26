@@ -63,18 +63,6 @@ fun AccountCollection(
                     .weight(1f)
                     .wrapContentWidth(Alignment.Start)
             )
-            IconButton(
-                onClick = { /* todo */ },
-                modifier = Modifier.align(Alignment.CenterVertically)
-            ) {
-                Icon(
-                    imageVector = mirroringIcon(
-                        ltrIcon = Icons.Outlined.ArrowForward,
-                        rtlIcon = Icons.Outlined.ArrowBack
-                    ),
-                    contentDescription = null
-                )
-            }
         }
 
         LazyRow(
@@ -214,10 +202,6 @@ fun ProfileImage(
         )
     }
 }
-
-@Composable
-fun mirroringIcon(ltrIcon: ImageVector, rtlIcon: ImageVector): ImageVector =
-    if (LocalLayoutDirection.current == LayoutDirection.Ltr) ltrIcon else rtlIcon
 
 @Composable
 private fun ConfirmDeclineDialog(

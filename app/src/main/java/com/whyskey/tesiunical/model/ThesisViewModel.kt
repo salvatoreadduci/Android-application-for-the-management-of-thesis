@@ -86,6 +86,10 @@ class ThesisViewModel : ViewModel(){
     val userImage: State<Uri?>
         get() = _userImage
 
+    private val _visitedAccount = mutableStateOf(Account())
+    val visitedAccount: State<Account>
+        get() =_visitedAccount
+
     private val _accounts = mutableStateOf<List<Account>>(emptyList())
     val accounts: State<List<Account>>
         get() = _accounts
@@ -222,6 +226,34 @@ class ThesisViewModel : ViewModel(){
         getImage(_userData.value)
     }
 
+    fun account(id: String){
+        getAccount(id)
+    }
+
+    private fun getAccount(id: String){
+        viewModelScope.launch {
+
+            Firebase.firestore.collection("account").document(id).addSnapshotListener { value, e ->
+
+
+                if (e != null) {
+                    Log.w("TAG", "Listen failed.", e)
+                    return@addSnapshotListener
+                }
+
+                if(value != null){
+                    val temp = value.toObject<Account>()
+
+                    Log.d("TAG",temp.toString())
+                    if(temp != null){
+                        temp.isProfessor = false
+                        _visitedAccount.value = temp
+                    }
+                }
+            }
+        }
+    }
+
     fun getAccountsByType(type: Boolean){
         getAccounts(type)
     }
@@ -231,11 +263,12 @@ class ThesisViewModel : ViewModel(){
             if(type){
                 Firebase.firestore.collection("account").whereEqualTo("isProfessor",type)
                     .addSnapshotListener { value, e ->
+                        if (e != null) {
+                            Log.w("TAG", "Listen failed.", e)
+                            return@addSnapshotListener
+                        }
+
                         if(value != null){
-                            if (e != null) {
-                                Log.w("TAG", "Listen failed.", e)
-                                return@addSnapshotListener
-                            }
                             val accounts = ArrayList<Account>()
                             val documents = value.documents
                             documents.forEach {
