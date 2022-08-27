@@ -47,19 +47,12 @@ fun Profile(
     } else {
         val temp = viewModel.accounts.value.find { account -> id == account.id}
             if(temp != null){
-                viewModel.getThesis(temp.id,0)
-                viewModel.getThesis(temp.id,1)
-                viewModel.getThesis(temp.id,2)
-                viewModel.getThesis(temp.id,3)
-                viewModel.getThesis(temp.id,4)
                 temp
         } else {
             viewModel.account(id)
             viewModel.visitedAccount.value
         }
     }
-
-
 
     Column(
         modifier = Modifier
@@ -69,6 +62,11 @@ fun Profile(
         ProfileCard(viewModel,profile)
         Spacer(Modifier.height(16.dp))
         if(profile.isProfessor){
+            viewModel.getThesis(profile.id,0)
+            viewModel.getThesis(profile.id,1)
+            viewModel.getThesis(profile.id,2)
+            viewModel.getThesis(profile.id,3)
+            viewModel.getThesis(profile.id,4)
             CompilationThesisCard(onClickSeeAll = onClickSeeAll,viewModel.compilationThesis.value,viewModel,profile)
             Spacer(Modifier.height(16.dp))
             ApplicationThesisCard(onClickSeeAll = onClickSeeAll,viewModel.applicationThesis.value,viewModel,profile)

@@ -15,6 +15,9 @@ import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 import com.whyskey.tesiunical.model.ThesisViewModel
 import com.whyskey.tesiunical.model.UserState
 import com.whyskey.tesiunical.model.UserStateViewModel
@@ -22,10 +25,10 @@ import com.whyskey.tesiunical.ui.*
 import com.whyskey.tesiunical.ui.components.AddThesisDialog
 import com.whyskey.tesiunical.ui.theme.TesiUnicalTheme
 
-
 class MainActivity : ComponentActivity() {
     private val userState by viewModels<UserStateViewModel>()
     override fun onCreate(savedInstanceState: Bundle?) {
+        Firebase.auth.signOut()
         //Firebase.firestore.clearPersistence()
         super.onCreate(savedInstanceState)
         setContent {
@@ -66,7 +69,7 @@ fun ThesisApp(viewModel: ThesisViewModel) {
         val navController = rememberNavController()
         val currentBackStack by navController.currentBackStackEntryAsState()
         val currentDestination = currentBackStack?.destination
-        val currentScreen = tabScreens.find { it.route == currentDestination?.route } ?: Home
+        val currentScreen = tabScreens.find { it.route == currentDestination?.route } ?: Login
 
         AddThesisDialog(
             show = viewModel.showDialog.collectAsState().value,

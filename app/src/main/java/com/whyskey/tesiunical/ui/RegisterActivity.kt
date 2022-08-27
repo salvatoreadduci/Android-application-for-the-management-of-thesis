@@ -21,6 +21,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.whyskey.tesiunical.R
 import com.whyskey.tesiunical.model.ThesisViewModel
+import com.whyskey.tesiunical.model.UserState
 import com.whyskey.tesiunical.ui.theme.TesiUnicalTheme
 
 @Composable
@@ -28,7 +29,7 @@ fun RegisterActivity(
     viewModel: ThesisViewModel
 ) {
     TesiUnicalTheme {
-
+        val vm = UserState.current
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -45,7 +46,7 @@ fun RegisterActivity(
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth(),
                 onValueChange = {
-                    emailValue.value = it
+                    nameValue.value = it
                 }
             )
 
@@ -92,12 +93,13 @@ fun RegisterActivity(
                     viewModel.auth.createUserWithEmailAndPassword(
                         emailValue.value.text.trim(),
                         passwordValue.value.text.trim()
-                        //vm.singIn()
-                        //viewModel.registerAccount()
-                    )
+                    ).addOnSuccessListener {
+                        viewModel.addNewAccount(nameValue.value.text, emailValue.value.text,checkedState.value)
+                        vm.signIn()
+                    }
                 }
             ) {
-                Text(text = "Register")
+                Text(text = stringResource(id = R.string.register))
             }
         }
     }

@@ -10,9 +10,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
+import com.whyskey.tesiunical.R
 import com.whyskey.tesiunical.model.ThesisViewModel
 import com.whyskey.tesiunical.model.UserState
 import com.whyskey.tesiunical.ui.theme.TesiUnicalTheme
@@ -66,7 +68,7 @@ fun Login(
                         }
                 }
             ) {
-                Text(text = "Login")
+                Text(text = stringResource(id = R.string.login))
             }
         }
     }

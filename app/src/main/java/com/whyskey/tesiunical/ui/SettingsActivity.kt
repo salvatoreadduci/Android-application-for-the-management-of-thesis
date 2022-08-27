@@ -245,9 +245,7 @@ fun Settings(
             }
 
         }
-
         val vm = UserState.current
-
         Spacer(modifier = Modifier.width(16.dp))
         Button(onClick = {
             Firebase.auth.signOut()
@@ -255,7 +253,6 @@ fun Settings(
         }) {
             Text(text = "Logout")
         }
-
         Spacer(modifier = Modifier.height(80.dp))
 
     }

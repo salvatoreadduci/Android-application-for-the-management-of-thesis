@@ -108,6 +108,54 @@ class ThesisViewModel : ViewModel(){
         getThesis()
     }
 
+    fun addNewAccount(name: String, email: String, isProfessor: Boolean){
+        val account = getNewAccountEntry(name,email)
+        registerAccount(account,isProfessor)
+        getAllData()
+    }
+
+    private fun getNewAccountEntry(name: String, email: String): Account{
+        return Account(name, email)
+    }
+
+    private fun registerAccount(account: Account, isProfessor: Boolean){
+        viewModelScope.launch {
+            val id = Firebase.auth.currentUser?.uid
+            if(id != null){
+                Firebase.firestore.collection("account").document(id)
+                    .set(account)
+
+                Firebase.firestore.collection("account").document(id)
+                    .update(mapOf("isProfessor" to isProfessor))
+
+                if(account.isProfessor){
+                    val limit = hashMapOf(
+                        "current" to 0,
+                        "max" to 99
+                    )
+
+                    val limits = hashMapOf(
+                        "applicative" to limit,
+                        "compilation" to limit,
+                        "corporate" to limit,
+                        "erasmus" to limit,
+                        "research" to limit,
+
+                    )
+
+                    Firebase.firestore.collection("account").document(id).collection("sessions").document("december")
+                        .set(limits)
+                    Firebase.firestore.collection("account").document(id).collection("sessions").document("july")
+                        .set(limits)
+                    Firebase.firestore.collection("account").document(id).collection("sessions").document("march")
+                        .set(limits)
+                    Firebase.firestore.collection("account").document(id).collection("sessions").document("september")
+                        .set(limits)
+                }
+            }
+        }
+    }
+
     private fun getThesis(){
         viewModelScope.launch {
             Firebase.firestore.collection("account").document(_userData.value.id).collection("thesis").addSnapshotListener { value, e ->
@@ -197,7 +245,6 @@ class ThesisViewModel : ViewModel(){
                             Firebase.firestore.collection("requests").document(id)
                                 .delete()
                             sendThesis(idStudent,idThesis,thesis!!)
-
                         }
                     }
                 }
@@ -234,8 +281,6 @@ class ThesisViewModel : ViewModel(){
         viewModelScope.launch {
 
             Firebase.firestore.collection("account").document(id).addSnapshotListener { value, e ->
-
-
                 if (e != null) {
                     Log.w("TAG", "Listen failed.", e)
                     return@addSnapshotListener
@@ -328,7 +373,6 @@ class ThesisViewModel : ViewModel(){
                 } else {
                     profile.image = uri.toString()
                 }
-
             }
         }
     }
@@ -419,14 +463,16 @@ class ThesisViewModel : ViewModel(){
         viewModelScope.launch {
             Firebase.firestore.collection("account").document(id).collection("thesis").whereEqualTo("type",type)
                 .addSnapshotListener { value, e ->
+                    if (e != null) {
+                        Log.w("TAG", "Listen failed.", e)
+                        return@addSnapshotListener
+                    }
+
                     if(value != null) {
-                        if (e != null) {
-                            Log.w("TAG", "Listen failed.", e)
-                            return@addSnapshotListener
-                        }
 
                         val thesis = ArrayList<Thesis>()
                         val documents = value.documents
+
                         documents.forEach {
                             val temp = it.toObject(Thesis::class.java)
                             if(temp != null){
@@ -517,6 +563,7 @@ class ThesisViewModel : ViewModel(){
             2 -> "september"
             else -> "december"
         }
+
         viewModelScope.launch {
             Firebase.firestore.collection("account").document(_userData.value.id).collection("sessions").document(temp)
                 .addSnapshotListener { value, _ ->

@@ -47,6 +47,9 @@
     <string name="description">Descrizione</string>
     <string name="send">Invia</string>
     <string name="are_you_a_professor">Sono un professore</string>
+    <string name="register">Registrati</string>
+    <string name="login">Login</string>
+
 
 
 </resources>
