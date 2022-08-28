@@ -211,67 +211,9 @@ private fun CompilationThesisCard(
                    else -> 3
                 }
                 viewModel.addNewRequest(
-                viewModel.userData.value.id, profile.id,thesis.id,viewModel.userData.value.name, temp, thesis.title,viewModel.userData.value.email,thesis)
-            }
-        )
-    }
-}
-
-@Composable
-private fun SessionDialog(
-    show: Boolean,
-    selectedOption: String,
-    onOptionSelected: (String) -> Unit,
-    onDismiss: () -> Unit,
-    onRequest: () -> Unit,
-){
-    if(show){
-
-        val radioOptions = listOf(
-            stringResource(id = R.string.march_session),
-            stringResource(id = R.string.july_session),
-            stringResource(id = R.string.september_session),
-            stringResource(id = R.string.december_session)
-        )
-
-        AlertDialog(
-            onDismissRequest = onDismiss,
-            confirmButton = {
-                TextButton(onClick = onRequest )
-                { Text(text = stringResource(id = R.string.send)) }
-            },
-            dismissButton = {
-                TextButton(onClick = onDismiss)
-                { Text(text = stringResource(id = R.string.cancel)) }
-            },
-            title = { Text(text = stringResource(id = R.string.confirm_session)) },
-            text = {
-                Column(Modifier.selectableGroup()) {
-                    radioOptions.forEach { text ->
-                        Row(
-                            Modifier
-                                .fillMaxWidth()
-                                .height(56.dp)
-                                .selectable(
-                                    selected = (text == selectedOption),
-                                    onClick = { onOptionSelected(text) },
-                                    role = Role.RadioButton
-                                )
-                                .padding(horizontal = 16.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            RadioButton(
-                                selected = (text == selectedOption),
-                                onClick = null
-                            )
-                            Text(
-                                text = text,
-                                style = MaterialTheme.typography.body1.merge(),
-                                modifier = Modifier.padding(start = 16.dp)
-                            )
-                        }
-                    }
-                }
+                viewModel.userData.value.id, profile.id,thesis.id,viewModel.userData.value.name, temp, thesis.title,viewModel.userData.value.email,thesis
+                )
+                showSession = false
             }
         )
     }
@@ -289,6 +231,17 @@ private fun ApplicationThesisCard(
 
     var show by rememberSaveable { mutableStateOf(false) }
     var thesisId by rememberSaveable { mutableStateOf("") }
+    var showSession by rememberSaveable { mutableStateOf(false) }
+    var session by rememberSaveable { mutableStateOf("") }
+
+
+    ConfirmDeleteDialog(
+        show = show,
+        onDismiss = { show = false },
+        onRemove = { viewModel.removeThesis(thesisId)
+            show = false
+        }
+    )
 
     ConfirmDeleteDialog(
         show = show,
@@ -318,7 +271,30 @@ private fun ApplicationThesisCard(
                 thesisId = thesis.id
             },
             onRequest = {
-                viewModel.addNewRequest(viewModel.userData.value.id, profile.id,thesis.id,viewModel.userData.value.name, 0, thesis.title,viewModel.userData.value.email,thesis)
+                showSession = true
+            }
+        )
+
+        SessionDialog(
+            show = showSession,
+            selectedOption = session,
+            onOptionSelected = {session = it},
+            onDismiss = {
+                if(session != ""){
+                    showSession = false
+                }
+            },
+            onRequest = {
+                val temp = when(session){
+                    "Sessione di Marzo" -> 0
+                    "Sessione di Luglio" -> 1
+                    "Sessione di Settembre" -> 2
+                    else -> 3
+                }
+                viewModel.addNewRequest(
+                    viewModel.userData.value.id, profile.id,thesis.id,viewModel.userData.value.name, temp, thesis.title,viewModel.userData.value.email,thesis
+                )
+                showSession = true
             }
         )
     }
@@ -336,6 +312,17 @@ private fun ResearchThesisCard(
 
     var show by rememberSaveable { mutableStateOf(false) }
     var thesisId by rememberSaveable { mutableStateOf("") }
+    var showSession by rememberSaveable { mutableStateOf(false) }
+    var session by rememberSaveable { mutableStateOf("") }
+
+
+    ConfirmDeleteDialog(
+        show = show,
+        onDismiss = { show = false },
+        onRemove = { viewModel.removeThesis(thesisId)
+            show = false
+        }
+    )
 
     ConfirmDeleteDialog(
         show = show,
@@ -365,7 +352,29 @@ private fun ResearchThesisCard(
                 thesisId = thesis.id
             },
             onRequest = {
-                viewModel.addNewRequest(viewModel.userData.value.id, profile.id,thesis.id,viewModel.userData.value.name, 0, thesis.title,viewModel.userData.value.email,thesis)
+                showSession = true
+            }
+        )
+
+        SessionDialog(
+            show = showSession,
+            selectedOption = session,
+            onOptionSelected = {session = it},
+            onDismiss = {
+                if(session != ""){
+                    showSession = false
+                }
+            },
+            onRequest = {
+                val temp = when(session){
+                    "Sessione di Marzo" -> 0
+                    "Sessione di Luglio" -> 1
+                    "Sessione di Settembre" -> 2
+                    else -> 3
+                }
+                viewModel.addNewRequest(
+                    viewModel.userData.value.id, profile.id,thesis.id,viewModel.userData.value.name, temp, thesis.title,viewModel.userData.value.email,thesis)
+                showSession = false
             }
         )
     }
@@ -476,5 +485,65 @@ private fun ConfirmDeleteDialog(
             title = { Text(text = stringResource(id = R.string.confirm_delete)) }
         )
             
+    }
+}
+
+@Composable
+private fun SessionDialog(
+    show: Boolean,
+    selectedOption: String,
+    onOptionSelected: (String) -> Unit,
+    onDismiss: () -> Unit,
+    onRequest: () -> Unit,
+){
+    if(show){
+
+        val radioOptions = listOf(
+            stringResource(id = R.string.march_session),
+            stringResource(id = R.string.july_session),
+            stringResource(id = R.string.september_session),
+            stringResource(id = R.string.december_session)
+        )
+
+        AlertDialog(
+            onDismissRequest = onDismiss,
+            confirmButton = {
+                TextButton(onClick = onRequest )
+                { Text(text = stringResource(id = R.string.send)) }
+            },
+            dismissButton = {
+                TextButton(onClick = onDismiss)
+                { Text(text = stringResource(id = R.string.cancel)) }
+            },
+            title = { Text(text = stringResource(id = R.string.confirm_session)) },
+            text = {
+                Column(Modifier.selectableGroup()) {
+                    radioOptions.forEach { text ->
+                        Row(
+                            Modifier
+                                .fillMaxWidth()
+                                .height(56.dp)
+                                .selectable(
+                                    selected = (text == selectedOption),
+                                    onClick = { onOptionSelected(text) },
+                                    role = Role.RadioButton
+                                )
+                                .padding(horizontal = 16.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            RadioButton(
+                                selected = (text == selectedOption),
+                                onClick = null
+                            )
+                            Text(
+                                text = text,
+                                style = MaterialTheme.typography.body1.merge(),
+                                modifier = Modifier.padding(start = 16.dp)
+                            )
+                        }
+                    }
+                }
+            }
+        )
     }
 }
