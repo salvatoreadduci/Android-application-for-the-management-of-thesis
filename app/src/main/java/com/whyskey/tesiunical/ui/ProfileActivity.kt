@@ -8,6 +8,8 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
@@ -23,6 +25,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
@@ -157,6 +160,9 @@ private fun CompilationThesisCard(
 
     var show by rememberSaveable { mutableStateOf(false) }
     var thesisId by rememberSaveable { mutableStateOf("") }
+    var showSession by rememberSaveable { mutableStateOf(false) }
+    var session by rememberSaveable { mutableStateOf("") }
+
 
     ConfirmDeleteDialog(
         show = show,
@@ -184,7 +190,88 @@ private fun CompilationThesisCard(
                 thesisId = thesis.id
                        },
             onRequest = {
-                viewModel.addNewRequest(viewModel.userData.value.id, profile.id,thesis.id,viewModel.userData.value.name, 0, thesis.title,viewModel.userData.value.email,thesis)
+                showSession = true
+            }
+        )
+
+        SessionDialog(
+            show = showSession,
+            selectedOption = session,
+            onOptionSelected = {session = it},
+            onDismiss = {
+                if(session != ""){
+                    showSession = false
+                }
+                        },
+            onRequest = {
+                val temp = when(session){
+                    "Sessione di Marzo" -> 0
+                    "Sessione di Luglio" -> 1
+                    "Sessione di Settembre" -> 2
+                   else -> 3
+                }
+                viewModel.addNewRequest(
+                viewModel.userData.value.id, profile.id,thesis.id,viewModel.userData.value.name, temp, thesis.title,viewModel.userData.value.email,thesis)
+            }
+        )
+    }
+}
+
+@Composable
+private fun SessionDialog(
+    show: Boolean,
+    selectedOption: String,
+    onOptionSelected: (String) -> Unit,
+    onDismiss: () -> Unit,
+    onRequest: () -> Unit,
+){
+    if(show){
+
+        val radioOptions = listOf(
+            stringResource(id = R.string.march_session),
+            stringResource(id = R.string.july_session),
+            stringResource(id = R.string.september_session),
+            stringResource(id = R.string.december_session)
+        )
+
+        AlertDialog(
+            onDismissRequest = onDismiss,
+            confirmButton = {
+                TextButton(onClick = onRequest )
+                { Text(text = stringResource(id = R.string.send)) }
+            },
+            dismissButton = {
+                TextButton(onClick = onDismiss)
+                { Text(text = stringResource(id = R.string.cancel)) }
+            },
+            title = { Text(text = stringResource(id = R.string.confirm_session)) },
+            text = {
+                Column(Modifier.selectableGroup()) {
+                    radioOptions.forEach { text ->
+                        Row(
+                            Modifier
+                                .fillMaxWidth()
+                                .height(56.dp)
+                                .selectable(
+                                    selected = (text == selectedOption),
+                                    onClick = { onOptionSelected(text) },
+                                    role = Role.RadioButton
+                                )
+                                .padding(horizontal = 16.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            RadioButton(
+                                selected = (text == selectedOption),
+                                onClick = null
+                            )
+                            Text(
+                                text = text,
+                                style = MaterialTheme.typography.body1.merge(),
+                                modifier = Modifier.padding(start = 16.dp)
+                            )
+                        }
+                    }
+                }
             }
         )
     }
@@ -283,6 +370,7 @@ private fun ResearchThesisCard(
         )
     }
 }
+
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable

@@ -31,21 +31,24 @@ import java.util.*
 fun TabRow(
     allScreens: List<Screen>,
     onTabSelected: (Screen) -> Unit,
-    currentScreen: Screen
+    currentScreen: Screen,
+    show: Boolean
 ) {
-    Surface(
-        Modifier
-            .height(TabHeight)
-            .fillMaxWidth()
-    ) {
-        Row(Modifier.selectableGroup()) {
-            allScreens.forEach { screen ->
-                ThesisTab(
-                    text = screen.route,
-                    icon = screen.icon,
-                    onSelected = { onTabSelected(screen) },
-                    selected = currentScreen == screen
-                )
+    if(show){
+        Surface(
+            Modifier
+                .height(TabHeight)
+                .fillMaxWidth()
+        ) {
+            Row(Modifier.selectableGroup()) {
+                allScreens.forEach { screen ->
+                    ThesisTab(
+                        text = screen.route,
+                        icon = screen.icon,
+                        onSelected = { onTabSelected(screen) },
+                        selected = currentScreen == screen
+                    )
+                }
             }
         }
     }

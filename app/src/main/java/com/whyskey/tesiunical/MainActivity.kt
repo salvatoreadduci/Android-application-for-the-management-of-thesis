@@ -29,7 +29,6 @@ import com.whyskey.tesiunical.ui.theme.TesiUnicalTheme
 class MainActivity : ComponentActivity() {
     private val userState by viewModels<UserStateViewModel>()
     override fun onCreate(savedInstanceState: Bundle?) {
-        Firebase.auth.signOut()
         //Firebase.firestore.clearPersistence()
         super.onCreate(savedInstanceState)
         setContent {
@@ -87,11 +86,13 @@ fun ThesisApp(
                     allScreens =  tabScreens,
                     onTabSelected = { screen ->
                         navController.navigateSingleTopTo(screen.route) },
-                    currentScreen = currentScreen
+                    currentScreen = currentScreen,
+                    viewModel.showTabRow.collectAsState().value
                 )
             },
             floatingActionButton = {
                 AddFloatingActionButton(
+                    viewModel.showFloatingButton.collectAsState().value,
                     onClick = { viewModel.onOpenDialogClicked() }
                 )
             }
@@ -119,7 +120,8 @@ fun ThesisAppStudent(
                     allScreens =  tabScreensStudent,
                     onTabSelected = { screen ->
                         navController.navigateSingleTopTo(screen.route) },
-                    currentScreen = currentScreen
+                    currentScreen = currentScreen,
+                    viewModel.showTabRow.collectAsState().value
                 )
             }
         ) { innerPadding ->
@@ -133,16 +135,22 @@ fun ThesisAppStudent(
 }
 
 @Composable
-private fun AddFloatingActionButton(onClick: () -> Unit){
-    FloatingActionButton(onClick = onClick,
-    ) {
-        Row(
-            modifier = Modifier.padding(horizontal = 16.dp)
+private fun AddFloatingActionButton(
+    show: Boolean,
+    onClick: () -> Unit
+){
+    if(show){
+        FloatingActionButton(onClick = onClick,
         ) {
-            Icon(
-                imageVector = Icons.Default.Edit,
-                contentDescription = null
-            )
+            Row(
+                modifier = Modifier.padding(horizontal = 16.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Edit,
+                    contentDescription = null
+                )
+            }
         }
     }
+
 }

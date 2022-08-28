@@ -579,6 +579,10 @@ class ThesisViewModel : ViewModel(){
         }
     }
 
+    fun startRequest(idStudent: String, idProfessor: String, id_thesis: String, name: String, session: Int, thesisTitle: String,email:String,thesis: Thesis){
+
+    }
+
     fun addNewRequest(idStudent: String, idProfessor: String, id_thesis: String, name: String, session: Int, thesisTitle: String,email:String,thesis: Thesis){
         val newRequest = getNewRequest(idStudent,idProfessor,id_thesis,name,session,email,thesisTitle)
         insertRequest(newRequest)
@@ -642,6 +646,12 @@ class ThesisViewModel : ViewModel(){
     private val _showDialog = MutableStateFlow(false)
     val showDialog: StateFlow<Boolean> = _showDialog.asStateFlow()
 
+    private val _showFloatingButton = MutableStateFlow(false)
+    val showFloatingButton: StateFlow<Boolean> = _showFloatingButton.asStateFlow()
+
+    private val _showTabRow = MutableStateFlow(false)
+    val showTabRow: StateFlow<Boolean> = _showTabRow.asStateFlow()
+
     //Option Dialog
     private val _showOptionNameDialog = MutableStateFlow(false)
     val showOptionNameDialog: StateFlow<Boolean> = _showOptionNameDialog.asStateFlow()
@@ -665,6 +675,11 @@ class ThesisViewModel : ViewModel(){
 
     fun onDialogDismiss() {
         _showDialog.value = false
+    }
+
+    fun showFloatingAndTab(show: Boolean){
+        _showFloatingButton.value = show
+        _showTabRow.value = show
     }
 
     fun onOptionDialogClicked(dialog: Int) {

@@ -25,7 +25,6 @@ fun AddThesisDialog(
 ){
     var nameInput by rememberSaveable { mutableStateOf("") }
     var descriptionInput by rememberSaveable { mutableStateOf("") }
-    var type: Int = 0
     val radioOptions = listOf(
         stringResource(id = R.string.compilation_thesis),
         stringResource(id = R.string.application_thesis),

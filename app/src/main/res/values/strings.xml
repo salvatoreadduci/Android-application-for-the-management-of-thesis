@@ -43,6 +43,7 @@
     <string name="not_assigned">Tesi non assegnata</string>
     <string name="delete">Elimina</string>
     <string name="confirm_delete">Vuoi davvero eliminare la tesi?</string>
+    <string name="confirm_session">Per quale sessione vuoi richidere la tesi?</string>
     <string name="send_message">Vuoi inviare un messaggio allo studente?</string>
     <string name="description">Descrizione</string>
     <string name="send">Invia</string>
@@ -50,7 +51,7 @@
     <string name="register">Registrati</string>
     <string name="login">Login</string>
     <string name="are_you_registered">Non sei iscritto? Registrati</string>
-    <string name="are_you_registered_already">Non sei iscritto? Registrati</string>
+    <string name="are_you_registered_already">Sei già iscritto? Accedi</string>
 
 
 

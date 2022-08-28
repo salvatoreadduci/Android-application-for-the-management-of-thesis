@@ -33,6 +33,7 @@ fun ThesisNavHost(
 
     ) {
         composable(route = Home.route){
+            viewModel.showFloatingAndTab(true)
             Home(
                 viewModel = viewModel,
                 onClick = { account -> navController.navigateToSingleAccount(account) }
@@ -56,6 +57,7 @@ fun ThesisNavHost(
         }
 
         composable(route = Login.route){
+            viewModel.showFloatingAndTab(false)
             Login(
                 viewModel,
                 onRegister = { navController.navigateSingleTopTo(Register.route) }
@@ -63,6 +65,7 @@ fun ThesisNavHost(
         }
 
         composable(route = Register.route){
+            viewModel.showFloatingAndTab(false)
             RegisterActivity(viewModel = viewModel,
             onLogin = { navController.navigateSingleTopTo(Login.route) }
             )
@@ -93,7 +96,6 @@ fun ThesisNavHost(
             deepLinks = OtherProfile.deepLinks
         ) { navBackStackEntry ->
                 val profileId = navBackStackEntry.arguments?.getString(OtherProfile.otherProfileIdArg)
-            Log.d("TAG",profileId!!)
             Profile(
                 onClickSeeAll = { thesis -> navController.navigateToFullScreenThesis(thesis) },
                 viewModel,
