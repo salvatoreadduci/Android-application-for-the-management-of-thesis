@@ -1,8 +1,10 @@
 package com.whyskey.tesiunical.ui
 
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
@@ -13,6 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Alignment.Companion.CenterStart
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -23,10 +26,12 @@ import com.whyskey.tesiunical.R
 import com.whyskey.tesiunical.model.ThesisViewModel
 import com.whyskey.tesiunical.model.UserState
 import com.whyskey.tesiunical.ui.theme.TesiUnicalTheme
+import java.lang.IllegalArgumentException
 
 @Composable
 fun RegisterActivity(
-    viewModel: ThesisViewModel
+    viewModel: ThesisViewModel,
+    onLogin: () -> Unit,
 ) {
     TesiUnicalTheme {
         val vm = UserState.current
@@ -84,23 +89,33 @@ fun RegisterActivity(
                     onCheckedChange = { checkedState.value = it }
                 )
             }
-           
+            val context = LocalContext.current
             Spacer(modifier = Modifier.padding(8.dp))
             Button(
                 modifier = Modifier
                     .fillMaxWidth(),
                 onClick = {
-                    viewModel.auth.createUserWithEmailAndPassword(
-                        emailValue.value.text.trim(),
-                        passwordValue.value.text.trim()
-                    ).addOnSuccessListener {
-                        viewModel.addNewAccount(nameValue.value.text, emailValue.value.text,checkedState.value)
-                        vm.signIn()
+                    try{
+                        viewModel.auth.createUserWithEmailAndPassword(
+                            emailValue.value.text.trim(),
+                            passwordValue.value.text.trim()
+                        ).addOnSuccessListener {
+                            viewModel.addNewAccount(nameValue.value.text, emailValue.value.text,checkedState.value)
+                            vm.signIn()
+                        }
+                    } catch (e: IllegalArgumentException){
+                        Toast.makeText(context, "Registrazione fallita, dati non inseriti correttamente",
+                            Toast.LENGTH_SHORT).show()
                     }
                 }
             ) {
                 Text(text = stringResource(id = R.string.register))
             }
+            Spacer(modifier = Modifier.padding(16.dp))
+            Text(
+                text = stringResource(id = R.string.are_you_registered_already),
+                modifier = Modifier.clickable { onLogin() }
+            )
         }
     }
 }

@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.google.firebase.auth.ktx.auth
@@ -49,27 +50,29 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun ApplicationSwitcher(viewModel: ThesisViewModel) {
-    val vm = UserState.current
-    if (vm.isLoggedIn) {
-        if(viewModel.userData.value.isProfessor){
-            ThesisApp(viewModel)
-        } else {
-            ThesisAppStudent(viewModel = viewModel)
-        }
+    val navController = rememberNavController()
+    val currentBackStack by navController.currentBackStackEntryAsState()
+    val currentDestination = currentBackStack?.destination
+    val currentScreen : Screen
 
-    } else {
-        RegisterActivity(viewModel)
-    }
+    val vm = UserState.current
+
+        if(viewModel.userData.value.isProfessor){
+            currentScreen = tabScreens.find { it.route == currentDestination?.route } ?: Login
+            ThesisApp(viewModel,navController,currentScreen)
+        } else {
+            currentScreen = tabScreensStudent.find { it.route == currentDestination?.route } ?: Home
+            ThesisAppStudent(viewModel = viewModel,navController,currentScreen)
+        }
 }
 
 @Composable
-fun ThesisApp(viewModel: ThesisViewModel) {
+fun ThesisApp(
+    viewModel: ThesisViewModel,
+    navController: NavHostController,
+    currentScreen: Screen
+) {
     TesiUnicalTheme {
-
-        val navController = rememberNavController()
-        val currentBackStack by navController.currentBackStackEntryAsState()
-        val currentDestination = currentBackStack?.destination
-        val currentScreen = tabScreens.find { it.route == currentDestination?.route } ?: Login
 
         AddThesisDialog(
             show = viewModel.showDialog.collectAsState().value,
@@ -103,14 +106,13 @@ fun ThesisApp(viewModel: ThesisViewModel) {
 }
 
 @Composable
-fun ThesisAppStudent(viewModel: ThesisViewModel) {
+fun ThesisAppStudent(
+    viewModel: ThesisViewModel,
+    navController: NavHostController,
+    currentScreen: Screen
+) {
     TesiUnicalTheme {
 
-        //Navigation
-        val navController = rememberNavController()
-        val currentBackStack by navController.currentBackStackEntryAsState()
-        val currentDestination = currentBackStack?.destination
-        val currentScreen = tabScreensStudent.find { it.route == currentDestination?.route } ?: Home
         Scaffold(
             topBar = {
                 com.whyskey.tesiunical.ui.components.TabRow(

@@ -49,6 +49,8 @@
     <string name="are_you_a_professor">Sono un professore</string>
     <string name="register">Registrati</string>
     <string name="login">Login</string>
+    <string name="are_you_registered">Non sei iscritto? Registrati</string>
+    <string name="are_you_registered_already">Non sei iscritto? Registrati</string>
 
 
 

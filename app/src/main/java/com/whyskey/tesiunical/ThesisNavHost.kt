@@ -10,17 +10,25 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.whyskey.tesiunical.model.ThesisViewModel
+import com.whyskey.tesiunical.model.UserState
 import com.whyskey.tesiunical.ui.*
 
 @Composable
 fun ThesisNavHost(
     navController: NavHostController,
     modifier: Modifier = Modifier,
-    viewModel: ThesisViewModel
+    viewModel: ThesisViewModel,
 ) {
+    val vm = UserState.current
+    val start = if(vm.isLoggedIn){
+        Home.route
+    } else {
+        Login.route
+    }
+
     NavHost(
         navController = navController,
-        startDestination = Home.route,
+        startDestination = start,
         modifier = modifier
 
     ) {
@@ -45,6 +53,19 @@ fun ThesisNavHost(
 
         composable(route = Settings.route){
             Settings(viewModel)
+        }
+
+        composable(route = Login.route){
+            Login(
+                viewModel,
+                onRegister = { navController.navigateSingleTopTo(Register.route) }
+            )
+        }
+
+        composable(route = Register.route){
+            RegisterActivity(viewModel = viewModel,
+            onLogin = { navController.navigateSingleTopTo(Login.route) }
+            )
         }
 
         composable(

@@ -67,5 +67,10 @@ object Login : Screen {
     override val route = "login"
 }
 
+object Register : Screen {
+    override val icon = Icons.Filled.Person
+    override val route = "register"
+}
+
 val tabScreens = listOf(Home,Analytics,Profile,Settings)
 val tabScreensStudent = listOf(Home,Profile,Settings)
