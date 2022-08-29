@@ -47,11 +47,14 @@
     <string name="send_message">Vuoi inviare un messaggio allo studente?</string>
     <string name="description">Descrizione</string>
     <string name="send">Invia</string>
+    <string name="session">Sessione</string>
     <string name="are_you_a_professor">Sono un professore</string>
     <string name="register">Registrati</string>
     <string name="login">Login</string>
+    <string name="supervisor">Relatore</string>
     <string name="are_you_registered">Non sei iscritto? Registrati</string>
     <string name="are_you_registered_already">Sei già iscritto? Accedi</string>
+    <string name="custom_thesis_dialog">Crea una tesi personalizzata</string>
 
 
 

@@ -16,20 +16,19 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.whyskey.tesiunical.model.ThesisViewModel
 import com.whyskey.tesiunical.model.UserState
 import com.whyskey.tesiunical.model.UserStateViewModel
-import com.whyskey.tesiunical.ui.*
 import com.whyskey.tesiunical.ui.components.AddThesisDialog
+import com.whyskey.tesiunical.ui.components.CustomThesisDialog
 import com.whyskey.tesiunical.ui.theme.TesiUnicalTheme
 
 class MainActivity : ComponentActivity() {
     private val userState by viewModels<UserStateViewModel>()
     override fun onCreate(savedInstanceState: Bundle?) {
-        //Firebase.firestore.clearPersistence()
+        Firebase.firestore.clearPersistence()
         super.onCreate(savedInstanceState)
         setContent {
             val owner = LocalViewModelStoreOwner.current
@@ -113,6 +112,13 @@ fun ThesisAppStudent(
     currentScreen: Screen
 ) {
     TesiUnicalTheme {
+        CustomThesisDialog(
+            show = viewModel.showDialog.collectAsState().value,
+            profile = viewModel.visitedAccount.value,
+            onConfirm = viewModel::addNewRequest,
+            onDismiss = { viewModel.onDialogDismiss() },
+            viewModel = viewModel
+        )
 
         Scaffold(
             topBar = {
@@ -123,6 +129,12 @@ fun ThesisAppStudent(
                     currentScreen = currentScreen,
                     viewModel.showTabRow.collectAsState().value
                 )
+            },
+            floatingActionButton = {
+                AddFloatingActionButton(
+                    viewModel.showFloatingButton.collectAsState().value,
+                    onClick = { viewModel.onOpenDialogClicked() }
+                )
             }
         ) { innerPadding ->
             ThesisNavHost(
@@ -132,6 +144,8 @@ fun ThesisAppStudent(
             )
         }
     }
+
+
 }
 
 @Composable

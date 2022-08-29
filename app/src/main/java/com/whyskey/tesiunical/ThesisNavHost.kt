@@ -33,7 +33,13 @@ fun ThesisNavHost(
 
     ) {
         composable(route = Home.route){
-            viewModel.showFloatingAndTab(true)
+            viewModel.showTab(true)
+            if(viewModel.userData.value.isProfessor){
+                viewModel.showFloating(true)
+            } else {
+                viewModel.showFloating(false)
+            }
+
             Home(
                 viewModel = viewModel,
                 onClick = { account -> navController.navigateToSingleAccount(account) }
@@ -45,6 +51,9 @@ fun ThesisNavHost(
         }
 
         composable(route = Profile.route){
+            if(!viewModel.userData.value.isProfessor) {
+                viewModel.showFloating(false)
+            }
             Profile(
                 onClickSeeAll = { thesis -> navController.navigateToFullScreenThesis(thesis) },
                 viewModel,
@@ -53,11 +62,16 @@ fun ThesisNavHost(
         }
 
         composable(route = Settings.route){
-            Settings(viewModel)
+            if(!viewModel.userData.value.isProfessor) {
+                viewModel.showFloating(false)
+            }
+
+                Settings(viewModel)
         }
 
         composable(route = Login.route){
-            viewModel.showFloatingAndTab(false)
+            viewModel.showFloating(false)
+            viewModel.showTab(false)
             Login(
                 viewModel,
                 onRegister = { navController.navigateSingleTopTo(Register.route) }
@@ -65,7 +79,6 @@ fun ThesisNavHost(
         }
 
         composable(route = Register.route){
-            viewModel.showFloatingAndTab(false)
             RegisterActivity(viewModel = viewModel,
             onLogin = { navController.navigateSingleTopTo(Login.route) }
             )
@@ -96,6 +109,9 @@ fun ThesisNavHost(
             deepLinks = OtherProfile.deepLinks
         ) { navBackStackEntry ->
                 val profileId = navBackStackEntry.arguments?.getString(OtherProfile.otherProfileIdArg)
+            if(!viewModel.userData.value.isProfessor){
+                viewModel.showFloating(true)
+            }
             Profile(
                 onClickSeeAll = { thesis -> navController.navigateToFullScreenThesis(thesis) },
                 viewModel,

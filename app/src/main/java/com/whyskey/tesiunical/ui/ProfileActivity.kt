@@ -50,12 +50,15 @@ fun Profile(
     } else {
         val temp = viewModel.accounts.value.find { account -> id == account.id}
             if(temp != null){
+                viewModel.accountProfessor(temp)
                 temp
         } else {
             viewModel.account(id)
             viewModel.visitedAccount.value
         }
     }
+
+    Log.d("PROFILE",viewModel.visitedAccount.value.toString())
 
     Column(
         modifier = Modifier
@@ -64,7 +67,7 @@ fun Profile(
     ) {
         ProfileCard(viewModel,profile)
         Spacer(Modifier.height(16.dp))
-        if(profile.isProfessor){
+        if(profile.isProfessor && profile.name != ""){
             viewModel.getThesis(profile.id,0)
             viewModel.getThesis(profile.id,1)
             viewModel.getThesis(profile.id,2)
@@ -77,13 +80,21 @@ fun Profile(
             ResearchThesisCard(onClickSeeAll = onClickSeeAll,viewModel.researchThesis.value,viewModel,profile)
             Spacer(modifier = Modifier.height(80.dp))
         } else {
+            viewModel.returnThesis(id)
             var expandedThesis by remember { mutableStateOf<String?>(null) }
+            val thesis = if(viewModel.thesis.value.isNotEmpty()){
+                viewModel.thesis.value[0]
+            } else {
+                Thesis()
+            }
+
             AssignedThesis(
                 profile,
+                thesis,
                 viewModel,
-                expandedThesis == viewModel.thesis.value.id,
+                expandedThesis == thesis.id,
                 onClick = {
-                    expandedThesis = if (expandedThesis == viewModel.thesis.value.id) null else viewModel.thesis.value.id
+                    expandedThesis = if (expandedThesis == thesis.id) null else thesis.id
                 }
             )
             Spacer(Modifier.height(16.dp))
@@ -126,7 +137,6 @@ private fun ProfileCard(
             )
             Text(profile.name)
             Row(Modifier.padding(8.dp)) {
-
                 if(profile.isProfessor) {
                     Icon(
                         Icons.Rounded.Language,
@@ -211,7 +221,7 @@ private fun CompilationThesisCard(
                    else -> 3
                 }
                 viewModel.addNewRequest(
-                viewModel.userData.value.id, profile.id,thesis.id,viewModel.userData.value.name, temp, thesis.title,viewModel.userData.value.email,thesis
+                viewModel.userData.value.id, profile.id,thesis.id,viewModel.userData.value.name, temp, thesis.title,viewModel.userData.value.email
                 )
                 showSession = false
             }
@@ -292,7 +302,7 @@ private fun ApplicationThesisCard(
                     else -> 3
                 }
                 viewModel.addNewRequest(
-                    viewModel.userData.value.id, profile.id,thesis.id,viewModel.userData.value.name, temp, thesis.title,viewModel.userData.value.email,thesis
+                    viewModel.userData.value.id, profile.id,thesis.id,viewModel.userData.value.name, temp, thesis.title,viewModel.userData.value.email
                 )
                 showSession = true
             }
@@ -373,7 +383,7 @@ private fun ResearchThesisCard(
                     else -> 3
                 }
                 viewModel.addNewRequest(
-                    viewModel.userData.value.id, profile.id,thesis.id,viewModel.userData.value.name, temp, thesis.title,viewModel.userData.value.email,thesis)
+                    viewModel.userData.value.id, profile.id,thesis.id,viewModel.userData.value.name, temp, thesis.title,viewModel.userData.value.email)
                 showSession = false
             }
         )
@@ -385,6 +395,7 @@ private fun ResearchThesisCard(
 @Composable
 private fun AssignedThesis(
     profile: Account,
+    thesis: Thesis,
     viewModel: ThesisViewModel,
     expanded: Boolean,
     onClick: () -> Unit,
@@ -415,23 +426,20 @@ private fun AssignedThesis(
                 Text(text = stringResource(id = R.string.assigned_thesis))
                 Spacer(modifier = Modifier.width(16.dp))
                 if(profile.hasThesis){
-                    viewModel.returnThesis()
-
-                    Text(text = viewModel.thesis.value.title)
+                    Text(text = thesis.title)
 
                 } else {
                     Text(text = stringResource(id = R.string.not_assigned))
                 }
-
             }
             if (expanded && profile.hasThesis) {
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = viewModel.thesis.value.description,
+                    text = thesis.description,
                     textAlign = TextAlign.Justify
                 )
                 Spacer(modifier = Modifier.height(8.dp))
-                val type = when(viewModel.thesis.value.type){
+                val type = when(thesis.type){
                     0 -> stringResource(id = R.string.compilation_thesis)
                     1 -> stringResource(id = R.string.application_thesis)
                     2 -> stringResource(id = R.string.corporate_thesis)
@@ -441,7 +449,7 @@ private fun AssignedThesis(
 
                 Text(text = "${stringResource(id = R.string.type)} $type")
                 Spacer(modifier = Modifier.height(8.dp))
-                val prof = viewModel.accounts.value.find { prof -> prof.id == viewModel.thesis.value.id_professor }
+                val prof = viewModel.accounts.value.find { prof -> prof.id == thesis.id_professor }
                 Text(text = "${stringResource(id = R.string.professor)} ${prof?.name}")
             }
         }
