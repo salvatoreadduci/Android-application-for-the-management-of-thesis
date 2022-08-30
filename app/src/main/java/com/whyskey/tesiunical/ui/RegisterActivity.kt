@@ -1,9 +1,6 @@
 package com.whyskey.tesiunical.ui
 
-import android.os.Bundle
 import android.widget.Toast
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
@@ -11,22 +8,18 @@ import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Alignment.Companion.CenterHorizontally
-import androidx.compose.ui.Alignment.Companion.CenterStart
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.whyskey.tesiunical.R
 import com.whyskey.tesiunical.model.ThesisViewModel
 import com.whyskey.tesiunical.model.UserState
 import com.whyskey.tesiunical.ui.theme.TesiUnicalTheme
-import java.lang.IllegalArgumentException
+import kotlin.IllegalArgumentException
 
 @Composable
 fun RegisterActivity(
@@ -43,6 +36,7 @@ fun RegisterActivity(
             val nameValue = remember { mutableStateOf(TextFieldValue()) }
             val emailValue = remember { mutableStateOf(TextFieldValue()) }
             val passwordValue = remember { mutableStateOf(TextFieldValue()) }
+            val confirmPasswordValue = remember { mutableStateOf(TextFieldValue()) }
 
             OutlinedTextField(
                 label = { Text(text = stringResource(id = R.string.name)) },
@@ -78,6 +72,18 @@ fun RegisterActivity(
                 }
             )
 
+            OutlinedTextField(
+                label = { Text(text = "Conferma Password") },
+                visualTransformation = PasswordVisualTransformation(),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                value = confirmPasswordValue.value,
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth(),
+                onValueChange = {
+                    confirmPasswordValue.value = it
+                }
+            )
+
             val checkedState = remember { mutableStateOf(true) }
             Row(){
                 Text(
@@ -96,13 +102,19 @@ fun RegisterActivity(
                     .fillMaxWidth(),
                 onClick = {
                     try{
-                        viewModel.auth.createUserWithEmailAndPassword(
-                            emailValue.value.text.trim(),
-                            passwordValue.value.text.trim()
-                        ).addOnSuccessListener {
-                            viewModel.addNewAccount(nameValue.value.text, emailValue.value.text,checkedState.value)
-                            vm.signIn()
+                        if(passwordValue == confirmPasswordValue){
+                            viewModel.auth.createUserWithEmailAndPassword(
+                                emailValue.value.text.trim(),
+                                passwordValue.value.text.trim()
+                            ).addOnSuccessListener {
+                                viewModel.addNewAccount(nameValue.value.text, emailValue.value.text,checkedState.value)
+                                vm.signIn()
+                            }
+                        } else{
+                            Toast.makeText(context, "Password non inserita correttamente",
+                                Toast.LENGTH_SHORT).show()
                         }
+
                     } catch (e: IllegalArgumentException){
                         Toast.makeText(context, "Registrazione fallita, dati non inseriti correttamente",
                             Toast.LENGTH_SHORT).show()

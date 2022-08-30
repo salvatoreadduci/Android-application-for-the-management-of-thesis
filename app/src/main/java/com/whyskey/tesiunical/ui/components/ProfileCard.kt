@@ -27,6 +27,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
@@ -113,6 +114,8 @@ fun ProfileItem(
             end = 4.dp,
             bottom = 8.dp
         )
+            .width(200.dp)
+            .height(280.dp)
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -142,13 +145,25 @@ fun ProfileItem(
             if(viewModel.userData.value.isProfessor){
                 Text(
                     text = profile.thesis,
+                    maxLines = 3,
+                    overflow = TextOverflow.Ellipsis,
+                    textAlign = TextAlign.Center,
                     style = MaterialTheme.typography.subtitle2,
                     color = MaterialTheme.colors.onSecondary,
-                    modifier = Modifier.padding(top = 8.dp)
+                    modifier = Modifier
+                        .padding(top = 8.dp)
+                        .widthIn(1.dp,180.dp)
                 )
                 if(!profile.accepted){
+                    val session = when(profile.session){
+                        0 -> stringResource(id = R.string.march_session)
+                        1 -> stringResource(id = R.string.july_session)
+                        2 -> stringResource(id = R.string.september_session)
+                        else -> stringResource(id = R.string.december_session)
+                    }
+
                     Text(
-                        text = profile.session.toString(),
+                        text = session,
                         style = MaterialTheme.typography.subtitle2,
                         color = MaterialTheme.colors.onSecondary,
                         modifier = Modifier.padding(top = 8.dp)

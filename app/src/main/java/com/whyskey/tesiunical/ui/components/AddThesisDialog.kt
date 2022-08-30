@@ -119,6 +119,7 @@ fun CustomThesisDialog(
     onDismiss:() -> Unit,
     viewModel: ThesisViewModel
     ){
+    viewModel.returnThesis(viewModel.userData.value.id)
     var nameInput by rememberSaveable { mutableStateOf("") }
     var supervisorInput by rememberSaveable { mutableStateOf("") }
     val radioOptions = listOf(
@@ -134,25 +135,34 @@ fun CustomThesisDialog(
     )
     var (selectedOption, onOptionSelected) = remember { mutableStateOf(radioOptions[0]) }
     var (selectedSession, onSessionSelected) = remember { mutableStateOf(sessionOptions[0]) }
-
+    Log.d("TAG",viewModel.thesis.value.size.toString())
     if (show) {
         AlertDialog(
             modifier = Modifier.fillMaxWidth(),
             onDismissRequest = onDismiss,
             confirmButton = {
                 TextButton(onClick = {
-                    val temp = when(selectedSession){
-                        "Sessione di Marzo" -> 0
-                        "Sessione di Luglio" -> 1
-                        "Sessione di Settembre" -> 2
-                        else -> 3
+                    Log.d("TAG",viewModel.thesis.value.size.toString())
+                    if(!viewModel.userData.value.isProfessor && (!viewModel.userData.value.hasThesis
+                                && viewModel.thesis.value.size < 3 && viewModel.thesis.value.find { thesis -> thesis.id_professor != profile.id } == null)) {
+                        val temp = when (selectedSession) {
+                            "Sessione di Marzo" -> 0
+                            "Sessione di Luglio" -> 1
+                            "Sessione di Settembre" -> 2
+                            else -> 3
+                        }
+                        viewModel.addNewCustomRequest(
+                            nameInput,
+                            supervisorInput,
+                            selectedOption,
+                            temp
+                        )
+                        //onConfirm( viewModel.userData.value.id, profile.id,"",viewModel.userData.value.name, temp, nameInput,viewModel.userData.value.email)
+                        selectedOption = radioOptions[0]
+                        selectedSession = sessionOptions[0]
+                        nameInput = ""
+                        supervisorInput = ""
                     }
-                    viewModel.addNewCustomRequest(nameInput,supervisorInput,selectedOption,temp)
-                    //onConfirm( viewModel.userData.value.id, profile.id,"",viewModel.userData.value.name, temp, nameInput,viewModel.userData.value.email)
-                    selectedOption = radioOptions[0]
-                    selectedSession = sessionOptions[0]
-                    nameInput = ""
-                    supervisorInput =""
                 })
                 { Text(text = stringResource(id = R.string.send)) }
             },
@@ -162,7 +172,8 @@ fun CustomThesisDialog(
             },
             title = { Text(text = stringResource(id = R.string.custom_thesis_dialog)) },
             text = {
-                Column(modifier = Modifier.padding(8.dp) ) {
+                Column(
+                    modifier = Modifier.padding(8.dp) ) {
                     Text(text = stringResource(id = R.string.title))
                     TextField(
                         value = nameInput,

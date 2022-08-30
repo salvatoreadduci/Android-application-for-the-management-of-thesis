@@ -20,7 +20,7 @@ fun ThesisNavHost(
     viewModel: ThesisViewModel,
 ) {
     val vm = UserState.current
-    val start = if(vm.isLoggedIn){
+    val start = if(vm.isLoggedIn || viewModel.user != null){
         Home.route
     } else {
         Login.route

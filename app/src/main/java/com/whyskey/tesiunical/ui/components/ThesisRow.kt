@@ -1,5 +1,6 @@
 package com.whyskey.tesiunical.ui.components
 
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.animateContentSize
@@ -31,6 +32,7 @@ fun ThesisRow(
     onDelete: () -> Unit,
     onRequest: () -> Unit
 ) {
+    viewModel.returnThesis(viewModel.userData.value.id)
     ThesisRowSpacer(visible = expanded)
     Surface(
         modifier = Modifier
@@ -71,8 +73,9 @@ fun ThesisRow(
                     text = description,
                     textAlign = TextAlign.Justify
                 )
-                
-                if(!viewModel.userData.value.isProfessor && !viewModel.userData.value.hasThesis){
+
+                if(!viewModel.userData.value.isProfessor && !viewModel.userData.value.hasThesis
+                    && viewModel.thesis.value.size < 3 && viewModel.thesis.value.find { thesis -> thesis.id_professor != profile.id } == null){
                     Button(onClick = { onRequest() }) {
                         Text(text = stringResource(id = R.string.request))
                     }

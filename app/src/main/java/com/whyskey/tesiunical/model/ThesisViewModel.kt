@@ -205,9 +205,9 @@ class ThesisViewModel : ViewModel(){
                             val temp2 = when(thesis!!.type){
                                 0 -> "applicative"
                                 1 -> "compilation"
-                                2 -> "corporate"
-                                3 -> "erasmus"
-                                else -> "research"
+                                2 -> "research"
+                                3 -> "corporate"
+                                else -> "erasmus"
                             }
 
                             Firebase.firestore.collection("account").document(_userData.value.id).collection("sessions").document(temp)
@@ -227,7 +227,6 @@ class ThesisViewModel : ViewModel(){
                                         val duration = Toast.LENGTH_SHORT
                                         val toast = Toast.makeText(context,text, duration)
                                         toast.show()
-                                        Log.d("LIMIT","Limite Superato")
                                     } else {
                                         Firebase.firestore.collection("account").document(_userData.value.id).collection("sessions").document(temp)
                                             .update(
@@ -250,7 +249,6 @@ class ThesisViewModel : ViewModel(){
                                                 }
 
                                             }
-
                                         Firebase.firestore.collection("requests").whereEqualTo("id_student",idStudent).whereEqualTo("accepted",false)
                                             .get().addOnSuccessListener { request ->
                                                 for(r in request){
@@ -264,7 +262,7 @@ class ThesisViewModel : ViewModel(){
                             Firebase.firestore.collection("requests").document(id)
                                 .delete()
                             if(thesis!!.type == 3 || thesis.type == 4){
-                                Firebase.firestore.collection("account").document(_userData.value.id).collection("thesis").document(idThesis)
+                                Firebase.firestore.collection("account").document(idStudent).collection("thesis").document(idThesis)
                                     .delete()
                             } else {
                                 sendThesis(idStudent,idThesis,thesis)
@@ -626,6 +624,8 @@ class ThesisViewModel : ViewModel(){
     }
 
     fun addNewRequest(idStudent: String, idProfessor: String, id_thesis: String, name: String, session: Int, thesisTitle: String,email:String){
+
+
         val newRequest = getNewRequest(idStudent,idProfessor,id_thesis,name,session,email,thesisTitle)
         insertRequest(newRequest)
         if( id_thesis != ""){
@@ -662,11 +662,11 @@ class ThesisViewModel : ViewModel(){
 
     fun addNewThesis(thesisName: String, thesisType: String,thesisDescription: String,idProfessor: String) {
         val temp = when(thesisType){
-            "Tesi Compilativa" -> 1
-            "Tesi Applicativa" -> 0
-            "Tesi di ricerca" -> 4
-            "Tesi in azienda" -> 2
-            else -> 3
+            "Tesi Compilativa" -> 0
+            "Tesi Applicativa" -> 1
+            "Tesi di ricerca" -> 2
+            "Tesi in azienda" -> 3
+            else -> 4
 
         }
         val newThesis = getNewThesisEntry(thesisName, temp, thesisDescription, idProfessor)
