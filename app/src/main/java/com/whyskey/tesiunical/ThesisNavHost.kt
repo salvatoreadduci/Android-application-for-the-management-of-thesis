@@ -9,6 +9,8 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 import com.whyskey.tesiunical.model.ThesisViewModel
 import com.whyskey.tesiunical.model.UserState
 import com.whyskey.tesiunical.ui.*
@@ -65,8 +67,14 @@ fun ThesisNavHost(
             if(!viewModel.userData.value.isProfessor) {
                 viewModel.showFloating(false)
             }
-
-                Settings(viewModel)
+                Settings(
+                    viewModel,
+                    onLogout = {
+                        Firebase.auth.signOut()
+                        vm.signOut()
+                        navController.navigateSingleTopTo(Login.route)
+                    }
+                )
         }
 
         composable(route = Login.route){
@@ -126,6 +134,7 @@ fun NavHostController.navigateSingleTopTo(route: String) =
         popUpTo(
             this@navigateSingleTopTo.graph.findStartDestination().id
         ) {
+            inclusive = route != Login.route
             saveState = true
         }
         launchSingleTop = true

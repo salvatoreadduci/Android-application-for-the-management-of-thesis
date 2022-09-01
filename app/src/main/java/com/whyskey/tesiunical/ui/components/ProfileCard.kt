@@ -2,6 +2,8 @@ package com.whyskey.tesiunical.ui.components
 
 
 import android.content.Intent
+import android.util.Log
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
@@ -104,16 +106,17 @@ fun ProfileItem(
     onShow: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    //viewModel.getImage(profile.id)
+    viewModel.retrieveImageRequest(profile)
 
     Card(
         backgroundColor = MaterialTheme.colors.primary,
         shape = MaterialTheme.shapes.medium,
-        modifier = modifier.padding(
-            start = 4.dp,
-            end = 4.dp,
-            bottom = 8.dp
-        )
+        modifier = modifier
+            .padding(
+                start = 4.dp,
+                end = 4.dp,
+                bottom = 8.dp
+            )
             .width(200.dp)
             .height(280.dp)
     ) {
@@ -121,7 +124,7 @@ fun ProfileItem(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
                 .clickable(onClick = {
-                    if(!viewModel.userData.value.isProfessor){
+                    if (!viewModel.userData.value.isProfessor) {
                         onClick(profile.id_professor)
                     } else {
                         onClick(profile.id_student)
@@ -130,7 +133,7 @@ fun ProfileItem(
                 .padding(8.dp)
         ) {
             ProfileImage(
-                imageUrl = profile.image,
+                imageUrl = viewModel.images.value[profile.id].toString(),
                 elevation = 4.dp,
                 contentDescription = null,
                 modifier = Modifier.size(120.dp)
@@ -152,7 +155,7 @@ fun ProfileItem(
                     color = MaterialTheme.colors.onSecondary,
                     modifier = Modifier
                         .padding(top = 8.dp)
-                        .widthIn(1.dp,180.dp)
+                        .widthIn(1.dp, 180.dp)
                 )
 
                 val type = when(profile.type){
@@ -222,9 +225,19 @@ fun ProfileImage(
         shape = CircleShape,
         modifier = modifier
     ) {
+        Log.d("IMAGE",imageUrl)
         AsyncImage(
             model = ImageRequest.Builder(LocalContext.current)
-                .data(imageUrl)
+                .data(
+                    if(imageUrl == ""){
+                        Image(
+                            painter = painterResource(id = R.drawable.user),
+                            contentDescription = "Foto"
+                        )
+                    } else {
+                        imageUrl
+                    }
+                )
                 .crossfade(true)
                 .build(),
             contentDescription = contentDescription,

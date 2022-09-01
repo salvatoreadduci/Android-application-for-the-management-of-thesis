@@ -34,6 +34,7 @@ import com.whyskey.tesiunical.R
 import com.whyskey.tesiunical.data.Account
 import com.whyskey.tesiunical.data.Thesis
 import com.whyskey.tesiunical.model.ThesisViewModel
+import com.whyskey.tesiunical.ui.components.ProfileImage
 import com.whyskey.tesiunical.ui.components.ThesisCard
 import com.whyskey.tesiunical.ui.components.ThesisRow
 import kotlin.math.exp
@@ -107,7 +108,6 @@ private fun ProfileCard(
     viewModel: ThesisViewModel,
     profile: Account
 ){
-
     viewModel.getImage(profile)
     val webIntent = if(profile.isProfessor){
         Intent(Intent.ACTION_VIEW, Uri.parse("http://${profile.web_site}"))
@@ -125,13 +125,15 @@ private fun ProfileCard(
         modifier = Modifier.fillMaxWidth()) {
         Column(horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.padding(top = 16.dp)) {
-            Image(
-                painter = rememberAsyncImagePainter(model = viewModel.userImage.value),
-                contentDescription = null,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .size(140.dp)
-                    .clip(CircleShape)
+            val img = if(profile.id == viewModel.userData.value.id){
+                viewModel.userImage.value.toString()
+            } else {
+                profile.image
+            }
+            ProfileImage(
+                imageUrl = img,
+                contentDescription = "Foto",
+                modifier = Modifier.size(120.dp)
             )
             Text(profile.name)
             Row(Modifier.padding(8.dp)) {

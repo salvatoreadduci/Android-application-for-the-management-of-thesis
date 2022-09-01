@@ -1,6 +1,7 @@
 package com.whyskey.tesiunical.ui
 
 
+import android.net.Uri
 import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -27,6 +28,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.auth.ktx.userProfileChangeRequest
 import com.google.firebase.ktx.Firebase
 import com.whyskey.tesiunical.R
 import com.whyskey.tesiunical.data.Session
@@ -34,12 +36,14 @@ import com.whyskey.tesiunical.model.ThesisViewModel
 import com.whyskey.tesiunical.model.UserState
 import com.whyskey.tesiunical.ui.components.ChangeLimitDialog
 import com.whyskey.tesiunical.ui.components.ChangeOptionDialog
+import com.whyskey.tesiunical.ui.components.ProfileImage
 import com.whyskey.tesiunical.ui.components.SettingsRow
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun Settings(
-    viewModel: ThesisViewModel
+    viewModel: ThesisViewModel,
+    onLogout: () -> Unit
 ) {
     viewModel.getImage(viewModel.userData.value)
 
@@ -91,12 +95,16 @@ fun Settings(
         )
     )
 
-    var uri by remember {
+    val uri by remember {
         mutableStateOf(viewModel.userImage.value)
     }
     val launcher = rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent()){
         viewModel.storage.child("images/" + viewModel.user!!.uid).putFile(it!!)
-        uri = it
+        //uri = it
+        val profileUpdate = userProfileChangeRequest {
+            photoUri = it
+        }
+        viewModel.user.updateProfile(profileUpdate)
     }
 
     Column(
@@ -106,17 +114,13 @@ fun Settings(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
-        Image(
-            painter = rememberAsyncImagePainter(model = uri),
-            contentDescription = null,
-            contentScale = ContentScale.Crop,
+
+        ProfileImage(
+            imageUrl = uri.toString(),
+            contentDescription = "Foto",
             modifier = Modifier
-                .padding(top = 8.dp)
-                .size(154.dp)
-                .clip(CircleShape)
-                .clickable {
-                    launcher.launch("image/*")
-                }
+                .size(120.dp)
+                .clickable { launcher.launch("image/*") }
         )
         Spacer(Modifier.height(8.dp))
 
@@ -247,10 +251,7 @@ fun Settings(
         }
         val vm = UserState.current
         Spacer(modifier = Modifier.width(16.dp))
-        Button(onClick = {
-            Firebase.auth.signOut()
-            vm.signOut()
-        }) {
+        Button(onClick = onLogout) {
             Text(text = "Logout")
         }
         Spacer(modifier = Modifier.height(80.dp))

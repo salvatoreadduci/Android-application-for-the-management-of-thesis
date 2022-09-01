@@ -78,6 +78,10 @@ class ThesisViewModel : ViewModel(){
     val userImage: State<Uri?>
         get() = _userImage
 
+    private val _images = mutableStateOf<MutableMap<String,Uri?>>(mutableMapOf())
+    val images: State<Map<String,Uri?>>
+        get() = _images
+
     private val _visitedAccount = mutableStateOf(Account())
     val visitedAccount: State<Account>
         get() =_visitedAccount
@@ -306,7 +310,11 @@ class ThesisViewModel : ViewModel(){
 
     fun getAllData(){
         getUserData(Firebase.auth.currentUser?.uid)
-        getImage(_userData.value)
+        //getImage(_userData.value)
+        _user?.let {
+            _userImage.value = _user?.photoUrl
+        }
+
     }
 
     fun account(id: String){
@@ -414,6 +422,27 @@ class ThesisViewModel : ViewModel(){
         }
     }
 
+    fun retrieveImageRequest(profile: Request){
+        val localFile: File = File.createTempFile("localFile", ".jpg")
+        viewModelScope.launch {
+            val id = if(userData.value.isProfessor){
+                profile.id_student
+            } else {
+                profile.id_professor
+            }
+            storage.child("images/${id}").getFile(localFile).addOnSuccessListener {
+
+                val uri: Uri = localFile.absolutePath.toUri()
+                if(profile.id == _userData.value.id){
+                    _userImage.value = uri
+                } else {
+                    profile.image = uri.toString()
+                    _images.value[id] = uri
+                }
+            }
+        }
+    }
+
     fun removeThesis(thesis: String){
         deleteThesis(thesis)
     }
@@ -444,6 +473,7 @@ class ThesisViewModel : ViewModel(){
 
     fun changeEmail(email:String){
         setEmail(email)
+        user?.updateEmail(email)
         _showOptionEmailDialog.value = false
     }
 
