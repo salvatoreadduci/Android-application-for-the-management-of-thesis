@@ -62,6 +62,7 @@ fun ApplicationSwitcher(viewModel: ThesisViewModel) {
 
     val vm = UserState.current
 
+
         if(viewModel.userData.value.isProfessor){
             currentScreen = tabScreens.find { it.route == currentDestination?.route } ?: Login
             ThesisApp(viewModel,navController,currentScreen)

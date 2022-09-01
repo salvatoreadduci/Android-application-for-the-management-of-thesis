@@ -27,6 +27,7 @@ import java.lang.IllegalArgumentException
 fun Login(
     viewModel: ThesisViewModel,
     onRegister: () -> Unit,
+    onLogin: () -> Unit,
 ) {
     TesiUnicalTheme {
         val vm = UserState.current
@@ -70,8 +71,7 @@ fun Login(
                     try{
                         viewModel.auth.signInWithEmailAndPassword(emailValue.value, passwordValue.value)
                             .addOnSuccessListener {
-                                vm.signIn()
-                                viewModel.getAllData()
+                                onLogin()
                             }
                     } catch (e: IllegalArgumentException){
                         Toast.makeText(context, "Login fallito, dati non inseriti correttamente",

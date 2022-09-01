@@ -82,7 +82,12 @@ fun ThesisNavHost(
             viewModel.showTab(false)
             Login(
                 viewModel,
-                onRegister = { navController.navigateSingleTopTo(Register.route) }
+                onRegister = { navController.navigateSingleTopTo(Register.route) },
+                onLogin = {
+                    vm.signIn()
+                    viewModel.getAllData()
+                    navController.navigateSingleTopTo(Home.route)
+                }
             )
         }
 
@@ -134,8 +139,13 @@ fun NavHostController.navigateSingleTopTo(route: String) =
         popUpTo(
             this@navigateSingleTopTo.graph.findStartDestination().id
         ) {
-            inclusive = route != Login.route
-            saveState = true
+            if(route == Login.route || this@navigateSingleTopTo.graph.findStartDestination().route == Login.route){
+                inclusive = true
+                saveState = false
+            } else {
+                inclusive = false
+                saveState = true
+            }
         }
         launchSingleTop = true
         restoreState = true
