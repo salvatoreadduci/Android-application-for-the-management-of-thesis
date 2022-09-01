@@ -57,7 +57,8 @@ private fun ProfilesCollectionList(
             itemsIndexed(accounts) { _, item ->
                 ProfileItem(
                     profile = item,
-                    viewModel = viewModel, onClick = { onClick(item.id_professor)}, true, {})
+                    viewModel = viewModel, onClick = { onClick(item.id_professor)}, true, {},
+                modifier = Modifier.height(200.dp))
             }
         }
     } else {

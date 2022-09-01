@@ -6,6 +6,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Card
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.whyskey.tesiunical.data.Thesis
@@ -20,27 +21,77 @@ fun ThesisFullScreen(
 ) {
     var expandedThesis by remember { mutableStateOf<String?>(null) }
 
-    Card{
+    var show by rememberSaveable { mutableStateOf(false) }
+    var thesisId by rememberSaveable { mutableStateOf("") }
+    var thesisTitle by rememberSaveable { mutableStateOf("") }
+    var thesisType by rememberSaveable { mutableStateOf(0) }
+    var showSession by rememberSaveable { mutableStateOf(false) }
+    var session by rememberSaveable { mutableStateOf("") }
+
+    val id =if(list.isNotEmpty()){
+        list[0].id_professor
+    } else {
+        ""
+    }
+
+    ConfirmDeleteDialog(
+        show = show,
+        onDismiss = { show = false },
+        onRemove = { viewModel.removeThesis(thesisId)
+            show = false
+        }
+    )
+
+    Card(modifier = Modifier.fillMaxWidth()){
         Column {
             Column(Modifier.padding(16.dp)) {
                 Text(text = title)
             }
 
             LazyColumn(
-                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 32.dp),
+                Modifier.padding(start = 8.dp, top = 4.dp, end = 8.dp)
             ){
                 items(list) { thesis ->
                     ThesisRow(
                         viewModel = viewModel,
-                        profile = viewModel.userData.value,
+                        profileId = id,
                         name = thesis.title,
                         description = thesis.description,
                         expanded = expandedThesis == thesis.title,
                         onClick = {
                             expandedThesis = if (expandedThesis == thesis.title) null else thesis.title
                         },
-                        onDelete = { viewModel.removeThesis(thesis.id) },
-                        onRequest = { }
+                        onDelete = { show = true
+                            thesisId = thesis.id },
+                        onRequest = {
+                            thesisId = thesis.id
+                            thesisType = thesis.type
+                            thesisTitle = thesis.title
+                            showSession = true
+                        }
+                    )
+
+                    SessionDialog(
+                        show = showSession,
+                        selectedOption = session,
+                        onOptionSelected = {session = it},
+                        onDismiss = {
+                            if(session != ""){
+                                showSession = false
+                            }
+                        },
+                        onRequest = {
+                            val temp = when(session){
+                                "Sessione di Marzo" -> 0
+                                "Sessione di Luglio" -> 1
+                                "Sessione di Settembre" -> 2
+                                else -> 3
+                            }
+                            viewModel.addNewRequest(
+                                viewModel.userData.value.id, id,thesisId,viewModel.userData.value.name, temp, thesisType, thesisTitle,viewModel.userData.value.email
+                            )
+                            showSession = false
+                        }
                     )
                 }
             }

@@ -1,7 +1,6 @@
 package com.whyskey.tesiunical
 
 import android.os.Bundle
-import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -12,14 +11,14 @@ import androidx.compose.material.icons.filled.Edit
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.ktx.Firebase
 import com.whyskey.tesiunical.model.ThesisViewModel
 import com.whyskey.tesiunical.model.UserState
 import com.whyskey.tesiunical.model.UserStateViewModel
@@ -30,6 +29,7 @@ import com.whyskey.tesiunical.ui.theme.TesiUnicalTheme
 class MainActivity : ComponentActivity() {
     private val userState by viewModels<UserStateViewModel>()
     override fun onCreate(savedInstanceState: Bundle?) {
+        //Firebase.auth.signOut()
         super.onCreate(savedInstanceState)
         setContent {
             val owner = LocalViewModelStoreOwner.current
@@ -44,6 +44,12 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(android.R.id.content)){ view, insets ->
+            val bottom = insets.getInsets(WindowInsetsCompat.Type.ime()).bottom
+            view.updatePadding(bottom = bottom)
+            insets
+        }
+
     }
 }
 

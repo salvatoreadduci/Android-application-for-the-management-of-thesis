@@ -58,8 +58,6 @@ fun Profile(
         }
     }
 
-    Log.d("PROFILE",viewModel.visitedAccount.value.toString())
-
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -170,6 +168,8 @@ private fun CompilationThesisCard(
 
     var show by rememberSaveable { mutableStateOf(false) }
     var thesisId by rememberSaveable { mutableStateOf("") }
+    var thesisTitle by rememberSaveable { mutableStateOf("") }
+    var thesisType by rememberSaveable { mutableStateOf(0) }
     var showSession by rememberSaveable { mutableStateOf(false) }
     var session by rememberSaveable { mutableStateOf("") }
 
@@ -190,7 +190,7 @@ private fun CompilationThesisCard(
             thesis ->
         ThesisRow(
             viewModel = viewModel,
-            profile = profile,
+            profileId = profile.id,
             name = thesis.title,
             description = thesis.description,
             expanded = expandedThesis == thesis.title,
@@ -200,6 +200,9 @@ private fun CompilationThesisCard(
                 thesisId = thesis.id
                        },
             onRequest = {
+                thesisId = thesis.id
+                thesisType = thesis.type
+                thesisTitle = thesis.title
                 showSession = true
             }
         )
@@ -221,7 +224,7 @@ private fun CompilationThesisCard(
                    else -> 3
                 }
                 viewModel.addNewRequest(
-                viewModel.userData.value.id, profile.id,thesis.id,viewModel.userData.value.name, temp, thesis.title,viewModel.userData.value.email
+                    viewModel.userData.value.id, profile.id,thesisId,viewModel.userData.value.name, temp, thesisType, thesisTitle,viewModel.userData.value.email
                 )
                 showSession = false
             }
@@ -241,6 +244,8 @@ private fun ApplicationThesisCard(
 
     var show by rememberSaveable { mutableStateOf(false) }
     var thesisId by rememberSaveable { mutableStateOf("") }
+    var thesisTitle by rememberSaveable { mutableStateOf("") }
+    var thesisType by rememberSaveable { mutableStateOf(0) }
     var showSession by rememberSaveable { mutableStateOf(false) }
     var session by rememberSaveable { mutableStateOf("") }
 
@@ -269,7 +274,7 @@ private fun ApplicationThesisCard(
             thesis ->
         ThesisRow(
             viewModel = viewModel,
-            profile = profile,
+            profileId = profile.id,
             name = thesis.title,
             description = thesis.description,
             expanded = expandedThesis == thesis.title,
@@ -281,6 +286,9 @@ private fun ApplicationThesisCard(
                 thesisId = thesis.id
             },
             onRequest = {
+                thesisId = thesis.id
+                thesisType = thesis.type
+                thesisTitle = thesis.title
                 showSession = true
             }
         )
@@ -302,7 +310,7 @@ private fun ApplicationThesisCard(
                     else -> 3
                 }
                 viewModel.addNewRequest(
-                    viewModel.userData.value.id, profile.id,thesis.id,viewModel.userData.value.name, temp, thesis.title,viewModel.userData.value.email
+                    viewModel.userData.value.id, profile.id,thesisId,viewModel.userData.value.name, temp, thesisType, thesisTitle,viewModel.userData.value.email
                 )
                 showSession = true
             }
@@ -322,9 +330,10 @@ private fun ResearchThesisCard(
 
     var show by rememberSaveable { mutableStateOf(false) }
     var thesisId by rememberSaveable { mutableStateOf("") }
+    var thesisTitle by rememberSaveable { mutableStateOf("") }
+    var thesisType by rememberSaveable { mutableStateOf(0) }
     var showSession by rememberSaveable { mutableStateOf(false) }
     var session by rememberSaveable { mutableStateOf("") }
-
 
     ConfirmDeleteDialog(
         show = show,
@@ -350,7 +359,7 @@ private fun ResearchThesisCard(
             thesis ->
         ThesisRow(
             viewModel = viewModel,
-            profile = profile,
+            profileId = profile.id,
             name = thesis.title,
             description = thesis.description,
             expanded = expandedThesis == thesis.title,
@@ -362,6 +371,9 @@ private fun ResearchThesisCard(
                 thesisId = thesis.id
             },
             onRequest = {
+                thesisId = thesis.id
+                thesisType = thesis.type
+                thesisTitle = thesis.title
                 showSession = true
             }
         )
@@ -383,7 +395,7 @@ private fun ResearchThesisCard(
                     else -> 3
                 }
                 viewModel.addNewRequest(
-                    viewModel.userData.value.id, profile.id,thesis.id,viewModel.userData.value.name, temp, thesis.title,viewModel.userData.value.email)
+                    viewModel.userData.value.id, profile.id,thesisId,viewModel.userData.value.name, temp, thesisType, thesisTitle,viewModel.userData.value.email)
                 showSession = false
             }
         )
@@ -474,7 +486,7 @@ private fun NotPassedExams(
 }
 
 @Composable
-private fun ConfirmDeleteDialog(
+fun ConfirmDeleteDialog(
     show: Boolean,
     onDismiss: () -> Unit,
     onRemove: () -> Unit,
@@ -497,7 +509,7 @@ private fun ConfirmDeleteDialog(
 }
 
 @Composable
-private fun SessionDialog(
+fun SessionDialog(
     show: Boolean,
     selectedOption: String,
     onOptionSelected: (String) -> Unit,

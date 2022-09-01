@@ -116,7 +116,7 @@ class ThesisViewModel : ViewModel(){
                 Firebase.firestore.collection("account").document(id)
                     .update(mapOf("isProfessor" to isProfessor))
 
-                if(account.isProfessor){
+                if(isProfessor){
                     val limit = hashMapOf(
                         "current" to 0,
                         "max" to 99
@@ -163,7 +163,7 @@ class ThesisViewModel : ViewModel(){
                         val temp = it.toObject(Thesis::class.java)
                         if(temp != null){
                             temp.id = it.id
-                            temp.id_professor = _userData.value.id
+                            //temp.id_professor = _userData.value.id
                             thesis.add(temp)
                         }
 
@@ -213,13 +213,13 @@ class ThesisViewModel : ViewModel(){
                             Firebase.firestore.collection("account").document(_userData.value.id).collection("sessions").document(temp)
                                 .get().addOnSuccessListener { document ->
 
-                                    val session = document.toObject<Session>()!!
+                                    val sessionReached = document.toObject<Session>()!!
                                     val temp3 = when(temp2){
-                                        "applicative" -> session.applicative.values
-                                        "compilation" -> session.compilation.values
-                                        "corporate" -> session.corporate.values
-                                        "erasmus" -> session.erasmus.values
-                                        else ->  session.research.values
+                                        "applicative" -> sessionReached.applicative.values
+                                        "compilation" -> sessionReached.compilation.values
+                                        "corporate" -> sessionReached.corporate.values
+                                        "erasmus" -> sessionReached.erasmus.values
+                                        else ->  sessionReached.research.values
                                     }
 
                                     if(_userData.value.hasLimit && temp3.toList()[0] >= temp3.toList()[1]){
@@ -239,20 +239,33 @@ class ThesisViewModel : ViewModel(){
                                         Firebase.firestore.collection("account").document(idStudent)
                                             .update(mapOf("hasThesis" to true))
 
-                                        Firebase.firestore.collection("account").document(idStudent).collection("thesis").get()
-                                            .addOnSuccessListener { thesis ->
-                                                for(t in thesis){
-                                                    if(t.id != idThesis){
-                                                        Firebase.firestore.collection("account").document(idStudent).collection("thesis")
-                                                            .document(t.id).delete()
+                                        Firebase.firestore.collection("account").document(idStudent).collection("thesis").addSnapshotListener { thesis, e ->
+
+                                            if (e != null) {
+                                                Log.w("TAG", "Listen failed.", e)
+                                                return@addSnapshotListener
+                                            }
+
+                                            if(thesis != null){
+                                                    for(t in thesis){
+                                                        if(t.id != idThesis){
+                                                            Firebase.firestore.collection("account").document(idStudent).collection("thesis")
+                                                                .document(t.id).delete()
+                                                        }
                                                     }
                                                 }
-
                                             }
-                                        Firebase.firestore.collection("requests").whereEqualTo("id_student",idStudent).whereEqualTo("accepted",false)
-                                            .get().addOnSuccessListener { request ->
-                                                for(r in request){
-                                                    Firebase.firestore.collection("requests").document(r.id).delete()
+
+                                        Firebase.firestore.collection("requests").whereEqualTo("id_student",idStudent).whereEqualTo("accepted",false).addSnapshotListener { request, e ->
+                                                if (e != null) {
+                                                    Log.w("TAG", "Listen failed.", e)
+                                                    return@addSnapshotListener
+                                                }
+
+                                                if(request != null){
+                                                    for(r in request){
+                                                        Firebase.firestore.collection("requests").document(r.id).delete()
+                                                    }
                                                 }
                                             }
                                     }
@@ -610,23 +623,26 @@ class ThesisViewModel : ViewModel(){
                 return@addSnapshotListener
             }
             if( value != null ) {
+
+                val typeTemp = when(type){
+                    "Tesi in azienda" -> 3
+                    else -> 4
+                }
                 val documents = value.documents
                 documents.forEach {
                     val temp = it.toObject(Thesis::class.java)
                     if(temp != null && temp.title == title && temp.description == supervisor){
                         temp.id = it.id
                         temp.id_professor = _userData.value.id
-                        addNewRequest(userData.value.id, _visitedAccount.value.id,temp.id,userData.value.name, session, title,userData.value.email)
+                        addNewRequest(userData.value.id, _visitedAccount.value.id,temp.id,userData.value.name, session, typeTemp, title,userData.value.email)
                     }
                 }
             }
         }
     }
 
-    fun addNewRequest(idStudent: String, idProfessor: String, id_thesis: String, name: String, session: Int, thesisTitle: String,email:String){
-
-
-        val newRequest = getNewRequest(idStudent,idProfessor,id_thesis,name,session,email,thesisTitle)
+    fun addNewRequest(idStudent: String, idProfessor: String, id_thesis: String, name: String, session: Int,type: Int, thesisTitle: String,email:String){
+        val newRequest = getNewRequest(idStudent,idProfessor,id_thesis,name,session,type,email,thesisTitle)
         insertRequest(newRequest)
         if( id_thesis != ""){
             Firebase.firestore.collection("account").document(idProfessor).collection("thesis").document(id_thesis).get()
@@ -641,13 +657,14 @@ class ThesisViewModel : ViewModel(){
         }
     }
 
-    private fun getNewRequest(idStudent: String, idProfessor: String, idThesis: String,name: String, session: Int, email:String,thesisTitle: String): Request{
+    private fun getNewRequest(idStudent: String, idProfessor: String, idThesis: String,name: String, session: Int, type: Int, email:String,thesisTitle: String): Request{
         return Request(
             id_student = idStudent,
             id_professor = idProfessor,
             id_thesis = idThesis,
             name = name,
             session = session,
+            type = type,
             thesis = thesisTitle,
             email = email,
             accepted = false

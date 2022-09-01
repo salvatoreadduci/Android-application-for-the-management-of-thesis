@@ -6,6 +6,7 @@ data class Request(
     val id_thesis: String = "",
     val name: String = "",
     val session: Int = 0,
+    val type: Int = 0,
     val accepted: Boolean = false,
     val thesis: String = "",
     var id: String = "",

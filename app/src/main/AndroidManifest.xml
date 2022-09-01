@@ -14,41 +14,49 @@
         android:theme="@style/Theme.TesiUnical"
         tools:targetApi="31">
         <activity
+            android:windowSoftInputMode="adjustResize"
             android:name=".RegisterActivity"
             android:exported="false"
             android:label="@string/title_activity_register"
             android:theme="@style/Theme.TesiUnical" />
         <activity
+            android:windowSoftInputMode="adjustResize"
             android:name=".AnalyticsActivity"
             android:exported="false"
             android:label="@string/title_activity_analytics"
             android:theme="@style/Theme.TesiUnical" />
         <activity
+            android:windowSoftInputMode="adjustResize"
             android:name=".OptionActivity"
             android:exported="false"
             android:label="@string/title_activity_option"
             android:theme="@style/Theme.TesiUnical" />
         <activity
+            android:windowSoftInputMode="adjustResize"
             android:name=".HomeActivity"
             android:exported="false"
             android:label="@string/title_activity_home"
             android:theme="@style/Theme.TesiUnical" />
         <activity
+            android:windowSoftInputMode="adjustResize"
             android:name=".ThesisFullScreen"
             android:exported="false"
             android:label="@string/title_activity_thesis_full_screen"
             android:theme="@style/Theme.TesiUnical" />
         <activity
+            android:windowSoftInputMode="adjustResize"
             android:name=".ProfileActivityy"
             android:exported="false"
             android:label="@string/title_activity_profile_activityy"
             android:theme="@style/Theme.TesiUnical" />
         <activity
+            android:windowSoftInputMode="adjustResize"
             android:name=".ProfileActivity"
             android:exported="false"
             android:label="@string/title_activity_profile"
             android:theme="@style/Theme.TesiUnical" />
         <activity
+            android:windowSoftInputMode="adjustResize"
             android:name=".MainActivity"
             android:exported="true"
             android:label="@string/app_name"

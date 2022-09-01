@@ -154,6 +154,23 @@ fun ProfileItem(
                         .padding(top = 8.dp)
                         .widthIn(1.dp,180.dp)
                 )
+
+                val type = when(profile.type){
+                    0 -> stringResource(id = R.string.compilation_thesis)
+                    1 -> stringResource(id = R.string.application_thesis)
+                    2 -> stringResource(id = R.string.research_thesis)
+                    3 -> stringResource(id = R.string.corporate_thesis)
+                    4 -> stringResource(id = R.string.erasmus_thesis)
+                    else -> ""
+                }
+
+                Text(
+                    text = type,
+                    style = MaterialTheme.typography.subtitle1,
+                    color = MaterialTheme.colors.onSecondary,
+                    modifier = Modifier.padding(top = 8.dp)
+                )
+
                 if(!profile.accepted){
                     val session = when(profile.session){
                         0 -> stringResource(id = R.string.march_session)

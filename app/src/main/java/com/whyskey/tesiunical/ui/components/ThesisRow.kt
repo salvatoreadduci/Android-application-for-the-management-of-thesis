@@ -24,7 +24,7 @@ import com.whyskey.tesiunical.model.ThesisViewModel
 @Composable
 fun ThesisRow(
     viewModel: ThesisViewModel,
-    profile: Account,
+    profileId: String,
     name: String,
     description: String,
     expanded: Boolean,
@@ -74,8 +74,8 @@ fun ThesisRow(
                     textAlign = TextAlign.Justify
                 )
 
-                if(!viewModel.userData.value.isProfessor && !viewModel.userData.value.hasThesis
-                    && viewModel.thesis.value.size < 3 && viewModel.thesis.value.find { thesis -> thesis.id_professor != profile.id } == null){
+                if(!viewModel.userData.value.isProfessor && (!viewModel.userData.value.hasThesis
+                    && viewModel.thesis.value.size < 3 && viewModel.thesis.value.find { thesis -> thesis.id_professor != profileId } == null)){
                     Button(onClick = { onRequest() }) {
                         Text(text = stringResource(id = R.string.request))
                     }

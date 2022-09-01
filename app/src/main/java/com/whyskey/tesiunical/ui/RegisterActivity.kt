@@ -102,7 +102,7 @@ fun RegisterActivity(
                     .fillMaxWidth(),
                 onClick = {
                     try{
-                        if(passwordValue == confirmPasswordValue){
+                        if(passwordValue.value.text == confirmPasswordValue.value.text){
                             viewModel.auth.createUserWithEmailAndPassword(
                                 emailValue.value.text.trim(),
                                 passwordValue.value.text.trim()

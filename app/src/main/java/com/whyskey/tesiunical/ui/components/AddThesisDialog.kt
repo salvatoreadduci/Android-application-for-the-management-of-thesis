@@ -1,25 +1,41 @@
 package com.whyskey.tesiunical.ui.components
 
 import android.util.Log
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.relocation.BringIntoViewRequester
+import androidx.compose.foundation.relocation.bringIntoViewRequester
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.onFocusEvent
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.SemanticsProperties.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.whyskey.tesiunical.R
 import com.whyskey.tesiunical.data.Account
 import com.whyskey.tesiunical.model.ThesisViewModel
+import kotlinx.coroutines.launch
 import kotlin.reflect.KFunction3
 import kotlin.reflect.KFunction4
 import kotlin.reflect.KFunction7
+import kotlin.reflect.KFunction8
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun AddThesisDialog(
     show: Boolean,
@@ -27,6 +43,8 @@ fun AddThesisDialog(
     onConfirm: KFunction4<String, String, String, String, Unit>,
     viewModel: ThesisViewModel
 ){
+    val coroutineScope = rememberCoroutineScope()
+    val bringIntoViewRequester = BringIntoViewRequester()
     var nameInput by rememberSaveable { mutableStateOf("") }
     var descriptionInput by rememberSaveable { mutableStateOf("") }
     val radioOptions = listOf(
@@ -42,12 +60,15 @@ fun AddThesisDialog(
             modifier = Modifier.fillMaxWidth(),
             onDismissRequest = onDismiss,
             confirmButton = {
-                TextButton(onClick = {
+                TextButton(
+                    onClick = {
                     onConfirm(nameInput,selectedOption,descriptionInput,viewModel.userData.value.id)
                     selectedOption = radioOptions[0]
                     nameInput = ""
                     descriptionInput =""
-                })
+                },
+                    modifier = Modifier.bringIntoViewRequester(bringIntoViewRequester)
+                )
                 { Text(text = stringResource(id = R.string.save)) }
             },
             dismissButton = {
@@ -56,7 +77,10 @@ fun AddThesisDialog(
             },
             title = { Text(text = stringResource(id = R.string.thesis_dialog)) },
             text = {
-                Column(modifier = Modifier.padding(8.dp) ) {
+                Column(
+                    modifier = Modifier
+                        .padding(8.dp)
+                        .verticalScroll(rememberScrollState())) {
                     Text(text = stringResource(id = R.string.title))
                     TextField(
                         value = nameInput,
@@ -99,11 +123,18 @@ fun AddThesisDialog(
 
                     Text(text = stringResource(id = R.string.description))
                     TextField(
-                        modifier = Modifier.height(180.dp),
+                        modifier = Modifier
+                            .height(180.dp)
+                            .onFocusEvent { event ->
+                                if(event.isFocused){
+                                    coroutineScope.launch {
+                                        bringIntoViewRequester.bringIntoView()
+                                    }
+                                }
+                            },
                         value = descriptionInput,
                         onValueChange = {descriptionInput = it},
                     )
-
                 }
             }
 
@@ -115,7 +146,7 @@ fun AddThesisDialog(
 fun CustomThesisDialog(
     show: Boolean,
     profile: Account,
-    onConfirm: KFunction7<String, String, String, String, Int, String, String, Unit>,
+    onConfirm: KFunction8<String, String, String, String, Int, Int, String, String, Unit>,
     onDismiss:() -> Unit,
     viewModel: ThesisViewModel
     ){
@@ -135,7 +166,6 @@ fun CustomThesisDialog(
     )
     var (selectedOption, onOptionSelected) = remember { mutableStateOf(radioOptions[0]) }
     var (selectedSession, onSessionSelected) = remember { mutableStateOf(sessionOptions[0]) }
-    Log.d("TAG",viewModel.thesis.value.size.toString())
     if (show) {
         AlertDialog(
             modifier = Modifier.fillMaxWidth(),
