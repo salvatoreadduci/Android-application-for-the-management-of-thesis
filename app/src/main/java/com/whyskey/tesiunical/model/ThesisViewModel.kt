@@ -6,6 +6,7 @@ import android.net.Uri
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.runtime.*
+import androidx.compose.ui.platform.LocalContext
 import androidx.core.net.toUri
 import androidx.lifecycle.*
 import com.google.firebase.auth.FirebaseAuth
@@ -433,12 +434,10 @@ class ThesisViewModel : ViewModel(){
             storage.child("images/${id}").getFile(localFile).addOnSuccessListener {
 
                 val uri: Uri = localFile.absolutePath.toUri()
-                if(profile.id == _userData.value.id){
-                    _userImage.value = uri
-                } else {
-                    profile.image = uri.toString()
-                    _images.value[id] = uri
-                }
+                profile.image = uri.toString()
+                //_images.value[profile.id] = uri
+                //onAssign(uri)
+
             }
         }
     }
@@ -644,8 +643,8 @@ class ThesisViewModel : ViewModel(){
         }
     }
 
-    fun addNewCustomRequest(title: String, supervisor: String, type: String, session: Int){
-        addNewThesis(title,type,supervisor,_visitedAccount.value.id)
+    fun addNewCustomRequest(title: String, supervisor: String, type: String, session: Int,professorId: String,context: Context?){
+        addNewThesis(title,type,supervisor,professorId)
 
         Firebase.firestore.collection("account").document(_userData.value.id).collection("thesis").addSnapshotListener { value, e ->
             if (e != null) {
@@ -664,27 +663,55 @@ class ThesisViewModel : ViewModel(){
                     if(temp != null && temp.title == title && temp.description == supervisor){
                         temp.id = it.id
                         temp.id_professor = _userData.value.id
-                        addNewRequest(userData.value.id, _visitedAccount.value.id,temp.id,userData.value.name, session, typeTemp, title,userData.value.email)
+                        addNewRequest(userData.value.id, _visitedAccount.value.id,temp.id,userData.value.name, session, typeTemp, title,userData.value.email, context)
                     }
                 }
             }
         }
     }
 
-    fun addNewRequest(idStudent: String, idProfessor: String, id_thesis: String, name: String, session: Int,type: Int, thesisTitle: String,email:String){
+    fun addNewRequest(idStudent: String, idProfessor: String, id_thesis: String, name: String, session: Int,type: Int, thesisTitle: String,email:String,context: Context?){
         val newRequest = getNewRequest(idStudent,idProfessor,id_thesis,name,session,type,email,thesisTitle)
-        insertRequest(newRequest)
-        if( id_thesis != ""){
-            Firebase.firestore.collection("account").document(idProfessor).collection("thesis").document(id_thesis).get()
-                .addOnSuccessListener {
-                    if(it != null){
-                        val thesis = it.toObject(Thesis::class.java)
-                        if (thesis != null) {
-                            sendThesis(idProfessor, id_thesis,thesis)
-                        }
-                    }
-                }
+        val temp = when(session){
+            0 -> "march"
+            1 -> "july"
+            2 -> "september"
+            else -> "december"
         }
+
+        Firebase.firestore.collection("account").document(idProfessor).collection("sessions").document(temp).get().addOnSuccessListener {
+           val checkSession = it.toObject<Session>()!!
+            val temp2 = when(type){
+                0 -> checkSession.applicative
+                1 -> checkSession.compilation
+                2 -> checkSession.research
+                3 -> checkSession.corporate
+                else -> checkSession.erasmus
+            }
+
+            if(temp2.values.toList()[0] >= temp2.values.toList()[0]){
+                val text = "Il professore non può accettare tesi per la sessione e tipologia selezionata"
+                val duration = Toast.LENGTH_SHORT
+                val toast = Toast.makeText(context,text, duration)
+                toast.show()
+            } else {
+                insertRequest(newRequest)
+                if( id_thesis != ""){
+                    Firebase.firestore.collection("account").document(idProfessor).collection("thesis").document(id_thesis).get()
+                        .addOnSuccessListener { th ->
+                            if(th != null){
+                                val thesis = th.toObject(Thesis::class.java)
+                                if (thesis != null) {
+                                    sendThesis(idProfessor, id_thesis,thesis)
+                                }
+                            }
+                        }
+                }
+            }
+
+        }
+
+
     }
 
     private fun getNewRequest(idStudent: String, idProfessor: String, idThesis: String,name: String, session: Int, type: Int, email:String,thesisTitle: String): Request{

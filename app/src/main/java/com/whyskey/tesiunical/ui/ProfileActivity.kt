@@ -174,6 +174,8 @@ private fun CompilationThesisCard(
     var thesisType by rememberSaveable { mutableStateOf(0) }
     var showSession by rememberSaveable { mutableStateOf(false) }
     var session by rememberSaveable { mutableStateOf("") }
+    val context = LocalContext.current
+
 
 
     ConfirmDeleteDialog(
@@ -226,7 +228,7 @@ private fun CompilationThesisCard(
                    else -> 3
                 }
                 viewModel.addNewRequest(
-                    viewModel.userData.value.id, profile.id,thesisId,viewModel.userData.value.name, temp, thesisType, thesisTitle,viewModel.userData.value.email
+                    viewModel.userData.value.id, profile.id,thesisId,viewModel.userData.value.name, temp, thesisType, thesisTitle,viewModel.userData.value.email,context
                 )
                 showSession = false
             }
@@ -250,6 +252,7 @@ private fun ApplicationThesisCard(
     var thesisType by rememberSaveable { mutableStateOf(0) }
     var showSession by rememberSaveable { mutableStateOf(false) }
     var session by rememberSaveable { mutableStateOf("") }
+    val context = LocalContext.current
 
 
     ConfirmDeleteDialog(
@@ -312,7 +315,7 @@ private fun ApplicationThesisCard(
                     else -> 3
                 }
                 viewModel.addNewRequest(
-                    viewModel.userData.value.id, profile.id,thesisId,viewModel.userData.value.name, temp, thesisType, thesisTitle,viewModel.userData.value.email
+                    viewModel.userData.value.id, profile.id,thesisId,viewModel.userData.value.name, temp, thesisType, thesisTitle,viewModel.userData.value.email,context
                 )
                 showSession = true
             }
@@ -336,6 +339,7 @@ private fun ResearchThesisCard(
     var thesisType by rememberSaveable { mutableStateOf(0) }
     var showSession by rememberSaveable { mutableStateOf(false) }
     var session by rememberSaveable { mutableStateOf("") }
+    val context = LocalContext.current
 
     ConfirmDeleteDialog(
         show = show,
@@ -397,13 +401,13 @@ private fun ResearchThesisCard(
                     else -> 3
                 }
                 viewModel.addNewRequest(
-                    viewModel.userData.value.id, profile.id,thesisId,viewModel.userData.value.name, temp, thesisType, thesisTitle,viewModel.userData.value.email)
+                    viewModel.userData.value.id, profile.id,thesisId,viewModel.userData.value.name, temp, thesisType, thesisTitle,viewModel.userData.value.email,context
+                )
                 showSession = false
             }
         )
     }
 }
-
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -463,8 +467,12 @@ private fun AssignedThesis(
 
                 Text(text = "${stringResource(id = R.string.type)} $type")
                 Spacer(modifier = Modifier.height(8.dp))
-                val prof = viewModel.accounts.value.find { prof -> prof.id == thesis.id_professor }
-                Text(text = "${stringResource(id = R.string.professor)} ${prof?.name}")
+                val prof = if(viewModel.userData.value.isProfessor){
+                    viewModel.userData.value.name
+                } else {
+                    viewModel.accounts.value.find { prof -> prof.id == thesis.id_professor }!!.name
+                }
+                Text(text = "${stringResource(id = R.string.professor)} $prof")
             }
         }
     }

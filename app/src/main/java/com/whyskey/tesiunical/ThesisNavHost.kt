@@ -22,7 +22,7 @@ fun ThesisNavHost(
     viewModel: ThesisViewModel,
 ) {
     val vm = UserState.current
-    val start = if(vm.isLoggedIn || viewModel.user != null){
+    val start = if( vm.isLoggedIn){
         Home.route
     } else {
         Login.route
@@ -140,10 +140,10 @@ fun NavHostController.navigateSingleTopTo(route: String) =
             this@navigateSingleTopTo.graph.findStartDestination().id
         ) {
             if(route == Login.route || this@navigateSingleTopTo.graph.findStartDestination().route == Login.route){
-                inclusive = true
+                inclusive = false
                 saveState = false
             } else {
-                inclusive = false
+                inclusive = true
                 saveState = true
             }
         }

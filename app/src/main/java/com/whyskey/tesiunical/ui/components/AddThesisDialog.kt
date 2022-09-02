@@ -1,5 +1,6 @@
 package com.whyskey.tesiunical.ui.components
 
+import android.content.Context
 import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.*
@@ -18,6 +19,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusEvent
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
@@ -30,10 +32,7 @@ import com.whyskey.tesiunical.R
 import com.whyskey.tesiunical.data.Account
 import com.whyskey.tesiunical.model.ThesisViewModel
 import kotlinx.coroutines.launch
-import kotlin.reflect.KFunction3
-import kotlin.reflect.KFunction4
-import kotlin.reflect.KFunction7
-import kotlin.reflect.KFunction8
+import kotlin.reflect.*
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -146,7 +145,7 @@ fun AddThesisDialog(
 fun CustomThesisDialog(
     show: Boolean,
     profile: Account,
-    onConfirm: KFunction8<String, String, String, String, Int, Int, String, String, Unit>,
+    onConfirm: KFunction9<String, String, String, String, Int, Int, String, String, Context?, Unit>,
     onDismiss:() -> Unit,
     viewModel: ThesisViewModel
     ){
@@ -166,6 +165,7 @@ fun CustomThesisDialog(
     )
     var (selectedOption, onOptionSelected) = remember { mutableStateOf(radioOptions[0]) }
     var (selectedSession, onSessionSelected) = remember { mutableStateOf(sessionOptions[0]) }
+    val context = LocalContext.current
     if (show) {
         AlertDialog(
             modifier = Modifier.fillMaxWidth(),
@@ -185,7 +185,9 @@ fun CustomThesisDialog(
                             nameInput,
                             supervisorInput,
                             selectedOption,
-                            temp
+                            temp,
+                            profile.id,
+                            context
                         )
                         //onConfirm( viewModel.userData.value.id, profile.id,"",viewModel.userData.value.name, temp, nameInput,viewModel.userData.value.email)
                         selectedOption = radioOptions[0]

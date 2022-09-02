@@ -8,6 +8,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.whyskey.tesiunical.data.Thesis
 import com.whyskey.tesiunical.model.ThesisViewModel
@@ -70,6 +71,7 @@ fun ThesisFullScreen(
                             showSession = true
                         }
                     )
+                    val context = LocalContext.current
 
                     SessionDialog(
                         show = showSession,
@@ -88,7 +90,7 @@ fun ThesisFullScreen(
                                 else -> 3
                             }
                             viewModel.addNewRequest(
-                                viewModel.userData.value.id, id,thesisId,viewModel.userData.value.name, temp, thesisType, thesisTitle,viewModel.userData.value.email
+                                viewModel.userData.value.id, id,thesisId,viewModel.userData.value.name, temp, thesisType, thesisTitle,viewModel.userData.value.email,context
                             )
                             showSession = false
                         }
