@@ -80,14 +80,15 @@ fun AddThesisDialog(
                     modifier = Modifier
                         .padding(8.dp)
                         .verticalScroll(rememberScrollState())) {
-                    Text(text = stringResource(id = R.string.title))
-                    TextField(
+
+                    OutlinedTextField(
+                        label = { Text(text = stringResource(id = R.string.title)) },
                         value = nameInput,
                         onValueChange = {nameInput = it},
                         maxLines = 1
                     )
 
-                    Spacer(modifier = Modifier.padding(16.dp))
+                    Spacer(modifier = Modifier.padding(8.dp))
 
                     Text(stringResource(id = R.string.type))
 
@@ -96,7 +97,7 @@ fun AddThesisDialog(
                             Row(
                                 Modifier
                                     .fillMaxWidth()
-                                    .height(56.dp)
+                                    .height(50.dp)
                                     .selectable(
                                         selected = (text == selectedOption),
                                         onClick = { onOptionSelected(text) },
@@ -120,8 +121,9 @@ fun AddThesisDialog(
 
                     Spacer(modifier = Modifier.padding(8.dp))
 
-                    Text(text = stringResource(id = R.string.description))
-                    TextField(
+
+                    OutlinedTextField(
+                        label = { Text(text = stringResource(id = R.string.description)) },
                         modifier = Modifier
                             .height(180.dp)
                             .onFocusEvent { event ->
@@ -172,7 +174,6 @@ fun CustomThesisDialog(
             onDismissRequest = onDismiss,
             confirmButton = {
                 TextButton(onClick = {
-                    Log.d("TAG",viewModel.thesis.value.size.toString())
                     if(!viewModel.userData.value.isProfessor && (!viewModel.userData.value.hasThesis
                                 && viewModel.thesis.value.size < 3 && viewModel.thesis.value.find { thesis -> thesis.id_professor != profile.id } == null)) {
                         val temp = when (selectedSession) {
@@ -206,23 +207,24 @@ fun CustomThesisDialog(
             text = {
                 Column(
                     modifier = Modifier.padding(8.dp) ) {
-                    Text(text = stringResource(id = R.string.title))
-                    TextField(
+
+                    OutlinedTextField(
+                        label = { Text(text = stringResource(id = R.string.title)) },
                         value = nameInput,
                         onValueChange = {nameInput = it},
                         maxLines = 1
                     )
 
-                    Spacer(modifier = Modifier.padding(16.dp))
+                    Spacer(modifier = Modifier.padding(8.dp))
 
-                    Text(text = stringResource(id = R.string.supervisor))
-                    TextField(
+                    OutlinedTextField(
+                        label = { Text(text = stringResource(id = R.string.supervisor)) },
                         value = supervisorInput,
                         onValueChange = {supervisorInput = it},
                         maxLines = 1
                     )
 
-                    Spacer(modifier = Modifier.padding(16.dp))
+                    Spacer(modifier = Modifier.padding(8.dp))
 
                     Text(stringResource(id = R.string.type))
 
@@ -231,7 +233,7 @@ fun CustomThesisDialog(
                             Row(
                                 Modifier
                                     .fillMaxWidth()
-                                    .height(56.dp)
+                                    .height(50.dp)
                                     .selectable(
                                         selected = (text == selectedOption),
                                         onClick = { onOptionSelected(text) },
@@ -253,7 +255,7 @@ fun CustomThesisDialog(
                         }
                     }
 
-                    Spacer(modifier = Modifier.padding(16.dp))
+                    Spacer(modifier = Modifier.padding(8.dp))
 
                     Text(stringResource(id = R.string.session))
 
@@ -262,7 +264,7 @@ fun CustomThesisDialog(
                             Row(
                                 Modifier
                                     .fillMaxWidth()
-                                    .height(56.dp)
+                                    .height(50.dp)
                                     .selectable(
                                         selected = (text == selectedSession),
                                         onClick = { onSessionSelected(text) },

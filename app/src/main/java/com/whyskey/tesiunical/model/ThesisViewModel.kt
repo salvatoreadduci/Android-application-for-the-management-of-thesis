@@ -79,10 +79,6 @@ class ThesisViewModel : ViewModel(){
     val userImage: State<Uri?>
         get() = _userImage
 
-    private val _images = mutableStateOf<MutableMap<String,Uri?>>(mutableMapOf())
-    val images: State<Map<String,Uri?>>
-        get() = _images
-
     private val _visitedAccount = mutableStateOf(Account())
     val visitedAccount: State<Account>
         get() =_visitedAccount
@@ -424,17 +420,18 @@ class ThesisViewModel : ViewModel(){
     }
 
     fun retrieveImageRequest(profile: Request){
-        val localFile: File = File.createTempFile("localFile", ".jpg")
+        //val localFile: File = File.createTempFile("localFile", ".jpg")
         viewModelScope.launch {
             val id = if(userData.value.isProfessor){
                 profile.id_student
             } else {
                 profile.id_professor
             }
-            storage.child("images/${id}").getFile(localFile).addOnSuccessListener {
+            //storage.child("images/${id}").getFile(localFile).addOnSuccessListener {
+            storage.child("images/${id}").downloadUrl.addOnSuccessListener {
 
-                val uri: Uri = localFile.absolutePath.toUri()
-                profile.image = uri.toString()
+                //val uri: Uri = localFile.absolutePath.toUri()
+                profile.image = it.toString()
                 //_images.value[profile.id] = uri
                 //onAssign(uri)
 

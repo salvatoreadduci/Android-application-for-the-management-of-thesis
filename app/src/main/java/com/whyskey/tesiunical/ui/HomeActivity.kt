@@ -54,7 +54,7 @@ private fun ProfilesCollectionList(
         LazyVerticalGrid(
             GridCells.Fixed(2)
         ){
-            itemsIndexed(accounts) { _, item ->
+            items(accounts) {item ->
                 ProfileItem(
                     profile = item,
                     viewModel = viewModel, onClick = { onClick(item.id_professor)}, true, {},
