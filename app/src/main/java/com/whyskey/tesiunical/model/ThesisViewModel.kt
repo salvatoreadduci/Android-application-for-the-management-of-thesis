@@ -6,15 +6,12 @@ import android.net.Uri
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.runtime.*
-import androidx.compose.ui.platform.LocalContext
-import androidx.core.net.toUri
 import androidx.lifecycle.*
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.firestore.ktx.toObject
-import com.google.firebase.firestore.ktx.toObjects
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
 import com.whyskey.tesiunical.data.*
@@ -22,7 +19,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import java.io.File
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*
@@ -50,6 +46,10 @@ class ThesisViewModel : ViewModel(){
     private val _researchThesis = mutableStateOf<List<Thesis>>(emptyList())
     val researchThesis: State<List<Thesis>>
         get() = _researchThesis
+
+    private val _images = mutableStateOf<Map<String,String>>(mutableMapOf())
+    val images: State<Map<String,String>>
+        get() = _images
 
     private val _thesis = mutableStateOf<List<Thesis>>(emptyList())
     val thesis: State<List<Thesis>>
@@ -333,6 +333,7 @@ class ThesisViewModel : ViewModel(){
                 if(value != null){
                     val temp = value.toObject<Account>()
                     if(temp != null){
+                        temp.id = value.id
                         temp.isProfessor = false
                         _visitedAccount.value = temp
                     }
@@ -372,7 +373,7 @@ class ThesisViewModel : ViewModel(){
                                     Request(
                                         id_professor = it.id,
                                         name = it.name,
-                                        image = it.image
+                                        image = it.image,
                                     )
                                 )
                             }
@@ -405,36 +406,21 @@ class ThesisViewModel : ViewModel(){
     }
 
     private fun retrieveImage(profile: Account){
-        val localFile: File = File.createTempFile("localFile", ".jpg")
         viewModelScope.launch {
-            storage.child("images/${profile.id}").getFile(localFile).addOnSuccessListener {
-
-                val uri: Uri = localFile.absolutePath.toUri()
-                if(profile.id == _userData.value.id){
-                    _userImage.value = uri
-                } else {
-                    profile.image = uri.toString()
-                }
+            storage.child("images/${profile.id}").downloadUrl.addOnSuccessListener {
+                _userImage.value = it
             }
         }
     }
-
-    fun retrieveImageRequest(profile: Request){
-        //val localFile: File = File.createTempFile("localFile", ".jpg")
+    fun retrieveImageRequest(profile: Request, onAssign:(Uri) -> Unit){
         viewModelScope.launch {
-            val id = if(userData.value.isProfessor){
+            val temp = if(userData.value.isProfessor){
                 profile.id_student
             } else {
                 profile.id_professor
             }
-            //storage.child("images/${id}").getFile(localFile).addOnSuccessListener {
-            storage.child("images/${id}").downloadUrl.addOnSuccessListener {
-
-                //val uri: Uri = localFile.absolutePath.toUri()
-                profile.image = it.toString()
-                //_images.value[profile.id] = uri
-                //onAssign(uri)
-
+            storage.child("images/${temp}").downloadUrl.addOnSuccessListener {
+                onAssign(it)
             }
         }
     }

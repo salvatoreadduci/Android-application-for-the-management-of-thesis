@@ -125,13 +125,8 @@ private fun ProfileCard(
         modifier = Modifier.fillMaxWidth()) {
         Column(horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.padding(top = 16.dp)) {
-            val img = if(profile.id == viewModel.userData.value.id){
-                viewModel.userImage.value.toString()
-            } else {
-                profile.image
-            }
             ProfileImage(
-                imageUrl = img,
+                imageUrl = viewModel.userImage.value.toString(),
                 contentDescription = "Foto",
                 modifier = Modifier.size(120.dp)
             )

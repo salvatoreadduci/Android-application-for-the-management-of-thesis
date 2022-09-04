@@ -73,18 +73,24 @@ fun AnalyticsBody(
 ){
     Spacer(modifier.height(10.dp))
     Card {
-        Text(text = title)
-        Column(modifier = modifier.padding(12.dp)) {
-            val list = mapOf(
-                stringResource(id = R.string.application_thesis) to applicative,
-                stringResource(id = R.string.compilation_thesis) to compilation,
-                stringResource(id = R.string.corporate_thesis) to corporate,
-                stringResource(id = R.string.erasmus_thesis) to erasmus,
-                stringResource(id = R.string.research_thesis) to research
-            )
+        Column {
 
-            list.forEach{
-                AnalyticsRow(viewModel = viewModel, type = it.key, amount = it.value["current"], max = it.value["max"])
+            Column(Modifier.padding(start = 8.dp, top = 8.dp)) {
+                Text(text = title)
+            }
+
+            Column(modifier = modifier.padding(8.dp)) {
+                val list = mapOf(
+                    stringResource(id = R.string.application_thesis) to applicative,
+                    stringResource(id = R.string.compilation_thesis) to compilation,
+                    stringResource(id = R.string.corporate_thesis) to corporate,
+                    stringResource(id = R.string.erasmus_thesis) to erasmus,
+                    stringResource(id = R.string.research_thesis) to research
+                )
+
+                list.forEach{
+                    AnalyticsRow(viewModel = viewModel, type = it.key, amount = it.value["current"], max = it.value["max"])
+                }
             }
         }
     }

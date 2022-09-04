@@ -80,7 +80,9 @@ fun AddThesisDialog(
                     modifier = Modifier
                         .padding(8.dp)
                         .verticalScroll(rememberScrollState())) {
-
+                    Text(
+                        text = "",
+                        modifier = Modifier.height(4.dp))
                     OutlinedTextField(
                         label = { Text(text = stringResource(id = R.string.title)) },
                         value = nameInput,
@@ -207,7 +209,9 @@ fun CustomThesisDialog(
             text = {
                 Column(
                     modifier = Modifier.padding(8.dp) ) {
-
+                    Text(
+                        text = "",
+                        modifier = Modifier.height(4.dp))
                     OutlinedTextField(
                         label = { Text(text = stringResource(id = R.string.title)) },
                         value = nameInput,

@@ -106,7 +106,8 @@ fun ProfileItem(
     onShow: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    viewModel.retrieveImageRequest(profile)
+    val image = rememberSaveable { mutableStateOf("") }
+    viewModel.retrieveImageRequest(profile, onAssign = { image.value = it.toString() })
 
     Card(
         backgroundColor = MaterialTheme.colors.primary,
@@ -132,10 +133,8 @@ fun ProfileItem(
                 })
                 .padding(8.dp)
         ) {
-            val img = rememberSaveable{ mutableStateOf(profile.image)}
-            Log.d("TAG",profile.image)
             ProfileImage(
-                imageUrl = img.value,
+                imageUrl = image.value,
                 elevation = 4.dp,
                 contentDescription = null,
                 modifier = Modifier.size(120.dp)

@@ -30,6 +30,7 @@ fun ChangeOptionDialog(
 
     if(show){
         AlertDialog(
+            modifier = Modifier.height(180.dp),
             onDismissRequest =  onDismiss,
             confirmButton = {
                 TextButton(onClick = {
@@ -45,8 +46,11 @@ fun ChangeOptionDialog(
             title = { Text(text = title)},
             text = {
                 Column(modifier = Modifier.padding(8.dp)){
-                    Text(text = "")
-                    TextField(
+                    Text(
+                        text = "",
+                        modifier = Modifier.height(4.dp)
+                    )
+                    OutlinedTextField(
                         value = input,
                         onValueChange = {input = it},
                         maxLines = 1
@@ -87,7 +91,9 @@ fun ChangeLimitDialog(
             },
             title = { Text(text = title)},
             text = {
-
+                Text(
+                    text = "",
+                    modifier = Modifier.height(4.dp))
                 Column(modifier = Modifier.padding(8.dp)){
                     LimitThesisRow(
                         title = stringResource(id = R.string.application_thesis),
@@ -144,7 +150,7 @@ fun LimitThesisRow(
     ){
         Row(
             modifier = Modifier
-                .height(68.dp)
+                .height(58.dp)
                 .padding(start = 4.dp, end = 4.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -152,10 +158,10 @@ fun LimitThesisRow(
 
             Text(text = title)
             Spacer(modifier = Modifier.weight(1f))
-            TextField(
+            OutlinedTextField(
                 modifier = Modifier
                     .width(60.dp)
-                    .height(60.dp),
+                    .height(50.dp),
                 value = value,
                 onValueChange = onChangeValue,
                 singleLine = true,

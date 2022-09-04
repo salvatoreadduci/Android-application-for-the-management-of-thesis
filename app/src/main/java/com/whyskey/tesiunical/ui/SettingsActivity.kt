@@ -21,15 +21,10 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import coil.compose.rememberAsyncImagePainter
-import com.google.firebase.auth.ktx.auth
 import com.google.firebase.auth.ktx.userProfileChangeRequest
-import com.google.firebase.ktx.Firebase
 import com.whyskey.tesiunical.R
 import com.whyskey.tesiunical.data.Session
 import com.whyskey.tesiunical.model.ThesisViewModel
@@ -45,7 +40,6 @@ fun Settings(
     viewModel: ThesisViewModel,
     onLogout: () -> Unit
 ) {
-    viewModel.getImage(viewModel.userData.value)
 
     val openDialog = remember { mutableStateOf(false) }
     ChangeThesisDialog(openDialog = openDialog,viewModel = viewModel)
@@ -94,17 +88,17 @@ fun Settings(
             2
         )
     )
-
-    val uri by remember {
+    var uri by remember {
         mutableStateOf(viewModel.userImage.value)
     }
+    viewModel.getImage(viewModel.userData.value)
+    uri = viewModel.userImage.value
     val launcher = rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent()){
-        viewModel.storage.child("images/" + viewModel.user!!.uid).putFile(it!!)
-        //uri = it
+        viewModel.storage.child("images/" + viewModel.userData.value.id).putFile(it!!)
         val profileUpdate = userProfileChangeRequest {
             photoUri = it
         }
-        viewModel.user.updateProfile(profileUpdate)
+        viewModel.user?.updateProfile(profileUpdate)
     }
 
     Column(
@@ -249,7 +243,6 @@ fun Settings(
             }
 
         }
-        val vm = UserState.current
         Spacer(modifier = Modifier.width(16.dp))
         Button(onClick = onLogout) {
             Text(text = "Logout")
@@ -329,7 +322,11 @@ private fun ChangeThesisDialog(
                 Text(text = stringResource(id = R.string.change_exams))
             },
             text = {
-                TextField(
+                Text(
+                    text = "",
+                    modifier = Modifier.height(4.dp)
+                )
+                OutlinedTextField(
                     modifier = Modifier.height(180.dp),
                     value = examsInput,
                     onValueChange = {examsInput = it},
