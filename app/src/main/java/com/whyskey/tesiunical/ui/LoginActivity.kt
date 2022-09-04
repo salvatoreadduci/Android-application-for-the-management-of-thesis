@@ -73,7 +73,7 @@ fun Login(
                             .addOnSuccessListener {
                                 onLogin()
                             }
-                    } catch (e: IllegalArgumentException){
+                    } catch (e: Exception){
                         Toast.makeText(context, "Login fallito, dati non inseriti correttamente",
                             Toast.LENGTH_SHORT).show()
                     }

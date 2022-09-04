@@ -1,16 +1,11 @@
 package com.whyskey.tesiunical.ui
 
 
-import android.net.Uri
-import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.annotation.RequiresApi
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -28,7 +23,6 @@ import com.google.firebase.auth.ktx.userProfileChangeRequest
 import com.whyskey.tesiunical.R
 import com.whyskey.tesiunical.data.Session
 import com.whyskey.tesiunical.model.ThesisViewModel
-import com.whyskey.tesiunical.model.UserState
 import com.whyskey.tesiunical.ui.components.ChangeLimitDialog
 import com.whyskey.tesiunical.ui.components.ChangeOptionDialog
 import com.whyskey.tesiunical.ui.components.ProfileImage
@@ -53,12 +47,19 @@ fun Settings(
     )
 
    ChangeOptionDialog(
+        show = viewModel.showOptionPasswordDialog.collectAsState().value,
+        title = stringResource(id = R.string.change_password),
+        onDismiss =  { viewModel.onOptionDialogConfirm() },
+        onConfirm = viewModel::changePassword,
+        viewModel = viewModel
+   )
+    ChangeOptionDialog(
         show = viewModel.showOptionEmailDialog.collectAsState().value,
         title = stringResource(id = R.string.change_email),
         onDismiss =  { viewModel.onOptionDialogConfirm() },
         onConfirm = viewModel::changeEmail,
         viewModel = viewModel
-   )
+    )
 
     ChangeOptionDialog(
         show = viewModel.showOptionWebDialog.collectAsState().value,
@@ -76,16 +77,22 @@ fun Settings(
             0
         ),
         SettingsData(
+            Icons.Rounded.Language,
+            stringResource(id = R.string.web_site),
+            viewModel.userData.value.web_site,
+            2
+        ),
+        SettingsData(
             Icons.Rounded.Email,
             stringResource(id = R.string.email),
             viewModel.userData.value.email,
             1
         ),
         SettingsData(
-            Icons.Rounded.Language,
-            stringResource(id = R.string.web_site),
-            viewModel.userData.value.web_site,
-            2
+            Icons.Rounded.Lock,
+            stringResource(id = R.string.password),
+            "",
+            4
         )
     )
     var uri by remember {
@@ -201,7 +208,7 @@ fun Settings(
                     SettingsRow(
                         image = it.image,
                         title = it.title,
-                        value = it.title,
+                        value = "",
                         onClick = {
                             title = it.title
                             idList = it.dialog.toString()
@@ -263,6 +270,7 @@ fun <T> SettingsBody(
         Column {
             Text(
                 text = title,
+                style = MaterialTheme.typography.h6,
                 modifier = modifier.padding(4.dp)
             )
             items.forEach { item ->
@@ -293,6 +301,7 @@ fun <T> LimitThesisBody(
             Row(modifier = modifier.fillMaxWidth()) {
                 Text(
                     text = title,
+                    style = MaterialTheme.typography.h6,
                     modifier = modifier.padding(4.dp)
                 )
                 Spacer(modifier = Modifier.weight(1f))

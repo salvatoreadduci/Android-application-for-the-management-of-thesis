@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Card
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -46,7 +47,9 @@ fun ThesisFullScreen(
     Card(modifier = Modifier.fillMaxWidth()){
         Column {
             Column(Modifier.padding(16.dp)) {
-                Text(text = title)
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.h6)
             }
 
             LazyColumn(

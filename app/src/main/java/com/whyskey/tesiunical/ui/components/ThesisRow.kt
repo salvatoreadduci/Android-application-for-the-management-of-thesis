@@ -55,7 +55,7 @@ fun ThesisRow(
                 Spacer(modifier = Modifier.width(16.dp))
                 Text(
                     text = name,
-                    style = MaterialTheme.typography.body1,
+                    style = MaterialTheme.typography.subtitle1,
                     modifier = Modifier.widthIn(1.dp,250.dp)
                 )
                 Spacer(Modifier.weight(1f))
@@ -72,7 +72,8 @@ fun ThesisRow(
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
                     text = description,
-                    textAlign = TextAlign.Justify
+                    textAlign = TextAlign.Justify,
+                    style = MaterialTheme.typography.body2,
                 )
                 if(!viewModel.userData.value.isProfessor && (!viewModel.userData.value.hasThesis
                     && viewModel.thesis.value.size < 3 && viewModel.thesis.value.find { thesis -> thesis.id_professor != profileId } == null)){

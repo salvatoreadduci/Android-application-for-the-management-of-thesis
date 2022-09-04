@@ -22,9 +22,8 @@ fun AnalyticsRow(
             .height(58.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        val typography = MaterialTheme.typography
         Spacer(Modifier.width(12.dp))
-        Text(text = type, style = typography.body1)
+        Text(text = type, style = MaterialTheme.typography.subtitle1)
         Spacer(Modifier.weight(1f))
         Row(
             horizontalArrangement = Arrangement.SpaceBetween
@@ -33,13 +32,13 @@ fun AnalyticsRow(
             if(viewModel.userData.value.hasLimit){
                 Text(
                     text = "$amount/$max",
-                    style = typography.h6,
+                    style = MaterialTheme.typography.h6,
                     modifier = Modifier.align(Alignment.CenterVertically)
                 )
             } else {
                 Text(
                     text = "$amount",
-                    style = typography.h6,
+                    style = MaterialTheme.typography.h6,
                     modifier = Modifier.align(Alignment.CenterVertically)
                 )
             }

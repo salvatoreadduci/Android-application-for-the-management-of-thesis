@@ -26,6 +26,8 @@
     <string name="thesis_dialog">Aggiungi una nuova tesi</string>
     <string name="change_name">Cambia il tuo nome</string>
     <string name="change_email">Cambia la tua email</string>
+    <string name="change_password">Cambia la tua password</string>
+    <string name="password">Password</string>
     <string name="change_web">Cambia il tuo sito web</string>
     <string name="change_thesis">Cambia il limite delle tesi che vuoi seguire</string>
     <string name="title_activity_register">RegisterActivity</string>

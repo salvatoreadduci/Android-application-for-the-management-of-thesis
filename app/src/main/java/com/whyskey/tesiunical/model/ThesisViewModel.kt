@@ -7,8 +7,11 @@ import android.util.Log
 import android.widget.Toast
 import androidx.compose.runtime.*
 import androidx.lifecycle.*
+import com.google.firebase.auth.EmailAuthCredential
+import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.auth.ktx.userProfileChangeRequest
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.firestore.ktx.toObject
@@ -46,10 +49,6 @@ class ThesisViewModel : ViewModel(){
     private val _researchThesis = mutableStateOf<List<Thesis>>(emptyList())
     val researchThesis: State<List<Thesis>>
         get() = _researchThesis
-
-    private val _images = mutableStateOf<Map<String,String>>(mutableMapOf())
-    val images: State<Map<String,String>>
-        get() = _images
 
     private val _thesis = mutableStateOf<List<Thesis>>(emptyList())
     val thesis: State<List<Thesis>>
@@ -455,8 +454,23 @@ class ThesisViewModel : ViewModel(){
 
     fun changeEmail(email:String){
         setEmail(email)
-        user?.updateEmail(email)
+        user!!.updateEmail(email)
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    Log.d("TAG", "User email address updated.")
+                }
+            }
         _showOptionEmailDialog.value = false
+    }
+
+    fun changePassword(password:String){
+        user!!.updatePassword(password)
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    Log.d("TAG", "User password address updated.")
+                }
+            }
+        _showOptionPasswordDialog.value = false
     }
 
     private fun setEmail(email:String){
@@ -763,6 +777,9 @@ class ThesisViewModel : ViewModel(){
     private val _showOptionEmailDialog = MutableStateFlow(false)
     val showOptionEmailDialog: StateFlow<Boolean> = _showOptionEmailDialog.asStateFlow()
 
+    private val _showOptionPasswordDialog = MutableStateFlow(false)
+    val showOptionPasswordDialog: StateFlow<Boolean> = _showOptionPasswordDialog.asStateFlow()
+
     private val _showOptionWebDialog = MutableStateFlow(false)
     val showOptionWebDialog: StateFlow<Boolean> = _showOptionWebDialog.asStateFlow()
 
@@ -795,6 +812,7 @@ class ThesisViewModel : ViewModel(){
             1 -> _showOptionEmailDialog.value = true
             2 -> _showOptionWebDialog.value = true
             3 -> _showLimitDialog.value = true
+            4 -> _showOptionPasswordDialog.value = true
         }
     }
 
@@ -803,5 +821,6 @@ class ThesisViewModel : ViewModel(){
         _showOptionEmailDialog.value = false
         _showOptionWebDialog.value = false
         _showLimitDialog.value = false
+        _showOptionPasswordDialog.value = false
     }
 }

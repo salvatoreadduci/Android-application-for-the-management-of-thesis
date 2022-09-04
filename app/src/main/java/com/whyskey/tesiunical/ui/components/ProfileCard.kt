@@ -141,7 +141,7 @@ fun ProfileItem(
             )
             Text(
                 text = profile.name,
-                style = MaterialTheme.typography.subtitle1,
+                style = MaterialTheme.typography.h6,
                 color = MaterialTheme.colors.onSecondary,
                 modifier = Modifier.padding(top = 8.dp)
             )
@@ -152,7 +152,7 @@ fun ProfileItem(
                     maxLines = 3,
                     overflow = TextOverflow.Ellipsis,
                     textAlign = TextAlign.Center,
-                    style = MaterialTheme.typography.subtitle2,
+                    style = MaterialTheme.typography.body2,
                     color = MaterialTheme.colors.onSecondary,
                     modifier = Modifier
                         .padding(top = 8.dp)
@@ -170,7 +170,7 @@ fun ProfileItem(
 
                 Text(
                     text = type,
-                    style = MaterialTheme.typography.subtitle1,
+                    style = MaterialTheme.typography.subtitle2,
                     color = MaterialTheme.colors.onSecondary,
                     modifier = Modifier.padding(top = 8.dp)
                 )

@@ -1,5 +1,6 @@
 package com.whyskey.tesiunical.ui.components
 
+import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
@@ -12,7 +13,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
+import com.google.firebase.auth.EmailAuthProvider
 import com.whyskey.tesiunical.R
 import com.whyskey.tesiunical.data.Session
 import com.whyskey.tesiunical.model.ThesisViewModel
@@ -25,17 +28,44 @@ fun ChangeOptionDialog(
     onConfirm: (String) -> Unit,
     viewModel: ThesisViewModel
 ){
+    var currentInput by rememberSaveable { mutableStateOf("") }
+
+    if( title == stringResource(id = R.string.change_email)){
+        currentInput = viewModel.userData.value.email
+    }
 
     var input by rememberSaveable { mutableStateOf("") }
 
+    val size = if(title == stringResource(id = R.string.change_password) || title == stringResource(id = R.string.change_email)){
+        300.dp
+    } else {
+        180.dp
+    }
+
     if(show){
         AlertDialog(
-            modifier = Modifier.height(180.dp),
+            modifier = Modifier.height(size),
             onDismissRequest =  onDismiss,
             confirmButton = {
                 TextButton(onClick = {
-                    onConfirm(input)
-                    input = ""
+                    if(title == "Cambia la tua password" || title == "Cambia la tua email"){
+                        try{
+                            val credential = EmailAuthProvider
+                                .getCredential(currentInput, input)
+
+                            viewModel.user?.reauthenticate(credential)!!
+                                .addOnCompleteListener {
+                                    onConfirm(input)
+                                    input = ""
+                                }
+                        } catch (e: Exception){
+                            Log.d("TAG","ERRORE")
+                        }
+
+                    } else {
+                        onConfirm(input)
+                        input = ""
+                    }
                 } )
                 { Text(text = stringResource(id = R.string.save)) }
             },
@@ -50,11 +80,55 @@ fun ChangeOptionDialog(
                         text = "",
                         modifier = Modifier.height(4.dp)
                     )
-                    OutlinedTextField(
-                        value = input,
-                        onValueChange = {input = it},
-                        maxLines = 1
-                    )
+
+                    if(title == stringResource(id = R.string.change_password) || title == stringResource(id = R.string.change_email)){
+                        if(title == stringResource(id = R.string.change_password)){
+                            OutlinedTextField(
+                                visualTransformation = PasswordVisualTransformation(),
+                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                                label = { Text(text =  "Password Corrente") },
+                                value = currentInput,
+                                onValueChange = {currentInput = it},
+                                maxLines = 1
+                            )
+                        } else {
+                            OutlinedTextField(
+                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                                label = { Text(text = "Email Corrente") },
+                                value = currentInput,
+                                onValueChange = {currentInput = it},
+                                maxLines = 1
+                            )
+                        }
+                        Spacer(modifier = Modifier.padding(8.dp))
+
+                        if(title == stringResource(id = R.string.change_password)){
+
+                            OutlinedTextField(
+                                visualTransformation = PasswordVisualTransformation(),
+                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                                label = { Text("Nuova Password") },
+                                value = input,
+                                onValueChange = {input = it},
+                                maxLines = 1
+                            )
+                        } else {
+                            OutlinedTextField(
+                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                                label = { Text( "Nuova Email") },
+                                value = input,
+                                onValueChange = {input = it},
+                                maxLines = 1
+                            )
+                        }
+
+                    } else {
+                        OutlinedTextField(
+                            value = input,
+                            onValueChange = {input = it},
+                            maxLines = 1
+                        )
+                    }
                 }
             }
         )

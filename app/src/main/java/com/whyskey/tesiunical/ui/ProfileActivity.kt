@@ -130,7 +130,10 @@ private fun ProfileCard(
                 contentDescription = "Foto",
                 modifier = Modifier.size(120.dp)
             )
-            Text(profile.name)
+            Text(
+                profile.name,
+                style = MaterialTheme.typography.h6
+            )
             Row(Modifier.padding(8.dp)) {
                 if(profile.isProfessor) {
                     Icon(
@@ -436,20 +439,28 @@ private fun AssignedThesis(
                     contentDescription = null
                 )
                 Spacer(modifier = Modifier.width(16.dp))
-                Text(text = stringResource(id = R.string.assigned_thesis))
+                Text(text = stringResource(id = R.string.assigned_thesis),
+                    style = MaterialTheme.typography.subtitle1
+                )
                 Spacer(modifier = Modifier.width(16.dp))
                 if(profile.hasThesis){
-                    Text(text = thesis.title)
+                    Text(
+                        text = thesis.title,
+                        style = MaterialTheme.typography.subtitle1
+                    )
 
                 } else {
-                    Text(text = stringResource(id = R.string.not_assigned))
+                    Text(text = stringResource(id = R.string.not_assigned),
+                        style = MaterialTheme.typography.subtitle1
+                    )
                 }
             }
             if (expanded && profile.hasThesis) {
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
                     text = thesis.description,
-                    textAlign = TextAlign.Justify
+                    textAlign = TextAlign.Justify,
+                    style = MaterialTheme.typography.body1
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 val type = when(thesis.type){
@@ -460,14 +471,16 @@ private fun AssignedThesis(
                     else -> stringResource(id = R.string.research_thesis)
                 }
 
-                Text(text = "${stringResource(id = R.string.type)} $type")
+                Text(text = "${stringResource(id = R.string.type)} $type",
+                    style = MaterialTheme.typography.subtitle1)
                 Spacer(modifier = Modifier.height(8.dp))
                 val prof = if(viewModel.userData.value.isProfessor){
                     viewModel.userData.value.name
                 } else {
                     viewModel.accounts.value.find { prof -> prof.id == thesis.id_professor }!!.name
                 }
-                Text(text = "${stringResource(id = R.string.professor)} $prof")
+                Text(text = "${stringResource(id = R.string.professor)} $prof",
+                    style = MaterialTheme.typography.subtitle1)
             }
         }
     }
@@ -483,9 +496,15 @@ private fun NotPassedExams(
                 .fillMaxWidth()
                 .padding(16.dp)
         ) {
-            Text(text = "${stringResource(id = R.string.change_exams)}:")
+            Text(
+                text = "${stringResource(id = R.string.change_exams)}:",
+                style = MaterialTheme.typography.subtitle1
+            )
             Spacer(modifier = Modifier.height(4.dp))
-            Text(text = profile.exams)
+            Text(
+                text = profile.exams,
+                style = MaterialTheme.typography.body1
+            )
         }
     }
 }

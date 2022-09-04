@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Card
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
@@ -26,7 +27,9 @@ fun <T> ThesisCard(
     Card{
         Column {
             Column(Modifier.padding(16.dp)) {
-                Text(text = title)
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.h6)
             }
 
             Column(Modifier.padding(start = 8.dp, top = 4.dp, end = 8.dp)) {
@@ -56,7 +59,10 @@ private fun SeeAllButton(
             .height(44.dp)
             .fillMaxWidth()
     ) {
-        Text(stringResource(R.string.see_all))
+        Text(
+            stringResource(R.string.see_all),
+            style = MaterialTheme.typography.button
+        )
     }
 }
 
