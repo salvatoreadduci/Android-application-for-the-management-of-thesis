@@ -1,6 +1,7 @@
 package com.whyskey.tesiunical.ui.components
 
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
@@ -11,7 +12,9 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
@@ -28,12 +31,7 @@ fun ChangeOptionDialog(
     onConfirm: (String) -> Unit,
     viewModel: ThesisViewModel
 ){
-    var currentInput by rememberSaveable { mutableStateOf("") }
-
-    if( title == stringResource(id = R.string.change_email)){
-        currentInput = viewModel.userData.value.email
-    }
-
+    var password by rememberSaveable { mutableStateOf("") }
     var input by rememberSaveable { mutableStateOf("") }
 
     val size = if(title == stringResource(id = R.string.change_password) || title == stringResource(id = R.string.change_email)){
@@ -41,7 +39,7 @@ fun ChangeOptionDialog(
     } else {
         180.dp
     }
-
+    val context = LocalContext.current
     if(show){
         AlertDialog(
             modifier = Modifier.height(size),
@@ -51,17 +49,25 @@ fun ChangeOptionDialog(
                     if(title == "Cambia la tua password" || title == "Cambia la tua email"){
                         try{
                             val credential = EmailAuthProvider
-                                .getCredential(currentInput, input)
+                                .getCredential(viewModel.userData.value.email, password)
 
                             viewModel.user?.reauthenticate(credential)!!
                                 .addOnCompleteListener {
+
+                                }.addOnSuccessListener {
                                     onConfirm(input)
+                                    password = ""
                                     input = ""
+                                }.addOnFailureListener {
+                                    Toast.makeText(context, "Password non inserita correttamente",
+                                        Toast.LENGTH_SHORT).show()
                                 }
                         } catch (e: Exception){
-                            Log.d("TAG","ERRORE")
-                        }
 
+                            Log.d("TAG","ERRORE")
+                            Toast.makeText(context, "Password non inserita correttamente",
+                                Toast.LENGTH_SHORT).show()
+                        }
                     } else {
                         onConfirm(input)
                         input = ""
@@ -82,31 +88,27 @@ fun ChangeOptionDialog(
                     )
 
                     if(title == stringResource(id = R.string.change_password) || title == stringResource(id = R.string.change_email)){
-                        if(title == stringResource(id = R.string.change_password)){
                             OutlinedTextField(
                                 visualTransformation = PasswordVisualTransformation(),
-                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                                label = { Text(text =  "Password Corrente") },
-                                value = currentInput,
-                                onValueChange = {currentInput = it},
+                                keyboardOptions = KeyboardOptions(
+                                    keyboardType = KeyboardType.Password,
+                                    capitalization = KeyboardCapitalization.Sentences
+                                ),
+                                label = { Text(text =  "Password") },
+                                value = password,
+                                onValueChange = {password = it},
                                 maxLines = 1
                             )
-                        } else {
-                            OutlinedTextField(
-                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-                                label = { Text(text = "Email Corrente") },
-                                value = currentInput,
-                                onValueChange = {currentInput = it},
-                                maxLines = 1
-                            )
-                        }
                         Spacer(modifier = Modifier.padding(8.dp))
 
                         if(title == stringResource(id = R.string.change_password)){
 
                             OutlinedTextField(
                                 visualTransformation = PasswordVisualTransformation(),
-                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                                keyboardOptions = KeyboardOptions(
+                                    keyboardType = KeyboardType.Password,
+                                    capitalization = KeyboardCapitalization.Sentences
+                                ),
                                 label = { Text("Nuova Password") },
                                 value = input,
                                 onValueChange = {input = it},
@@ -114,14 +116,16 @@ fun ChangeOptionDialog(
                             )
                         } else {
                             OutlinedTextField(
-                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                                keyboardOptions = KeyboardOptions(
+                                    keyboardType = KeyboardType.Email,
+                                    capitalization = KeyboardCapitalization.Sentences
+                                ),
                                 label = { Text( "Nuova Email") },
                                 value = input,
                                 onValueChange = {input = it},
                                 maxLines = 1
                             )
                         }
-
                     } else {
                         OutlinedTextField(
                             value = input,

@@ -453,10 +453,10 @@ class ThesisViewModel : ViewModel(){
     }
 
     fun changeEmail(email:String){
-        setEmail(email)
         user!!.updateEmail(email)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
+                    setEmail(email)
                     Log.d("TAG", "User email address updated.")
                 }
             }

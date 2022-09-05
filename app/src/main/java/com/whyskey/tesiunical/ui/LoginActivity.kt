@@ -72,6 +72,9 @@ fun Login(
                         viewModel.auth.signInWithEmailAndPassword(emailValue.value, passwordValue.value)
                             .addOnSuccessListener {
                                 onLogin()
+                            }.addOnFailureListener {
+                                Toast.makeText(context, "Login fallito, dati non inseriti correttamente",
+                                    Toast.LENGTH_SHORT).show()
                             }
                     } catch (e: Exception){
                         Toast.makeText(context, "Login fallito, dati non inseriti correttamente",
