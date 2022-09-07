@@ -6,6 +6,7 @@ import android.net.Uri
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.runtime.*
+import androidx.core.net.toUri
 import androidx.lifecycle.*
 import com.google.firebase.auth.EmailAuthCredential
 import com.google.firebase.auth.EmailAuthProvider
@@ -306,7 +307,6 @@ class ThesisViewModel : ViewModel(){
 
     fun getAllData(){
         getUserData(Firebase.auth.currentUser?.uid)
-        //getImage(_userData.value)
         _user?.let {
             _userImage.value = _user?.photoUrl
         }
@@ -408,7 +408,7 @@ class ThesisViewModel : ViewModel(){
         viewModelScope.launch {
             storage.child("images/${profile.id}").downloadUrl.addOnSuccessListener {
                 _userImage.value = it
-            }
+            }.addOnFailureListener { _userImage.value = "".toUri() }
         }
     }
     fun retrieveImageRequest(profile: Request, onAssign:(Uri) -> Unit){
@@ -686,7 +686,7 @@ class ThesisViewModel : ViewModel(){
                 else -> checkSession.erasmus
             }
 
-            if(temp2.values.toList()[0] >= temp2.values.toList()[0]){
+            if(temp2.values.toList()[0] >= temp2.values.toList()[1]){
                 val text = "Il professore non può accettare tesi per la sessione e tipologia selezionata"
                 val duration = Toast.LENGTH_SHORT
                 val toast = Toast.makeText(context,text, duration)

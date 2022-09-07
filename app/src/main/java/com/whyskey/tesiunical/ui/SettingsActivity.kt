@@ -106,6 +106,7 @@ fun Settings(
             photoUri = it
         }
         viewModel.user?.updateProfile(profileUpdate)
+        viewModel.getImage(viewModel.userData.value)
     }
 
     Column(
