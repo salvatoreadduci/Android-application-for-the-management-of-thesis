@@ -155,7 +155,7 @@ fun ProfileItem(
                     style = MaterialTheme.typography.body2,
                     color = MaterialTheme.colors.onSecondary,
                     modifier = Modifier
-                        .padding(top = 8.dp)
+                        .padding(top = 4.dp)
                         .widthIn(1.dp, 180.dp)
                 )
 
@@ -172,7 +172,7 @@ fun ProfileItem(
                     text = type,
                     style = MaterialTheme.typography.subtitle2,
                     color = MaterialTheme.colors.onSecondary,
-                    modifier = Modifier.padding(top = 8.dp)
+                    modifier = Modifier.padding(top = 4.dp)
                 )
 
                 if(!profile.accepted){
@@ -187,7 +187,7 @@ fun ProfileItem(
                         text = session,
                         style = MaterialTheme.typography.subtitle2,
                         color = MaterialTheme.colors.onSecondary,
-                        modifier = Modifier.padding(top = 8.dp)
+                        modifier = Modifier.padding(top = 4.dp)
                     )
                     Row(){
                         val context = LocalContext.current
