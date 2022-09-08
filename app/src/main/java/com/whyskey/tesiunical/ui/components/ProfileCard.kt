@@ -119,7 +119,7 @@ fun ProfileItem(
                 bottom = 8.dp
             )
             .width(200.dp)
-            .height(280.dp)
+            .height(300.dp)
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -143,7 +143,8 @@ fun ProfileItem(
                 text = profile.name,
                 style = MaterialTheme.typography.h6,
                 color = MaterialTheme.colors.onSecondary,
-                modifier = Modifier.padding(top = 8.dp)
+                modifier = Modifier
+                    .padding(top = 8.dp)
             )
 
             if(viewModel.userData.value.isProfessor){
